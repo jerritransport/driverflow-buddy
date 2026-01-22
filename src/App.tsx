@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Drivers from "./pages/Drivers";
 import Saps from "./pages/Saps";
 import Clinics from "./pages/Clinics";
 import Admin from "./pages/Admin";
@@ -28,6 +29,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/drivers"
+              element={
+                <ProtectedRoute>
+                  <Drivers />
                 </ProtectedRoute>
               }
             />
