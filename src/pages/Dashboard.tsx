@@ -1,0 +1,36 @@
+import { useState } from 'react';
+import { AppLayout } from '@/components/layout/AppLayout';
+import { SummaryCards } from '@/components/dashboard/SummaryCards';
+import { ViewToggle, ViewMode } from '@/components/dashboard/ViewToggle';
+import { TableView } from '@/components/dashboard/TableView';
+import { KanbanView } from '@/components/dashboard/KanbanView';
+
+export default function Dashboard() {
+  const [viewMode, setViewMode] = useState<ViewMode>('table');
+
+  return (
+    <AppLayout>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-muted-foreground">
+              Return-to-Duty driver pipeline overview
+            </p>
+          </div>
+          <ViewToggle value={viewMode} onChange={setViewMode} />
+        </div>
+
+        {/* Summary Cards */}
+        <SummaryCards />
+
+        {/* Driver Pipeline */}
+        <div>
+          <h2 className="mb-4 text-lg font-semibold">Driver Pipeline</h2>
+          {viewMode === 'table' ? <TableView /> : <KanbanView />}
+        </div>
+      </div>
+    </AppLayout>
+  );
+}

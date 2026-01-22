@@ -1,0 +1,129 @@
+import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from '@/components/ui/sidebar';
+import { useAuth } from '@/contexts/AuthContext';
+import { 
+  LayoutDashboard, 
+  Users, 
+  Building2, 
+  Stethoscope, 
+  Settings, 
+  LogOut,
+  Truck,
+  Shield,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+const mainNavItems = [
+  { title: 'Dashboard', icon: LayoutDashboard, path: '/' },
+  { title: 'Drivers', icon: Users, path: '/drivers' },
+  { title: 'SAPs', icon: Stethoscope, path: '/saps' },
+  { title: 'Clinics', icon: Building2, path: '/clinics' },
+];
+
+const adminNavItems = [
+  { title: 'Admin', icon: Shield, path: '/admin' },
+  { title: 'Settings', icon: Settings, path: '/settings' },
+];
+
+export function AppSidebar() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut, isAdmin, user } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login');
+  };
+
+  return (
+    <Sidebar>
+      <SidebarHeader className="border-b border-sidebar-border p-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sidebar-primary">
+            <Truck className="h-5 w-5 text-sidebar-primary-foreground" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-sidebar-foreground">RTD Dashboard</h2>
+            <p className="text-xs text-sidebar-foreground/70">Driver Management</p>
+          </div>
+        </div>
+      </SidebarHeader>
+
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {mainNavItems.map((item) => (
+                <SidebarMenuItem key={item.path}>
+                  <SidebarMenuButton
+                    isActive={location.pathname === item.path}
+                    onClick={() => navigate(item.path)}
+                    tooltip={item.title}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {isAdmin && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Administration</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {adminNavItems.map((item) => (
+                  <SidebarMenuItem key={item.path}>
+                    <SidebarMenuButton
+                      isActive={location.pathname === item.path}
+                      onClick={() => navigate(item.path)}
+                      tooltip={item.title}
+                    >
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+      </SidebarContent>
+
+      <SidebarFooter className="border-t border-sidebar-border p-4">
+        <div className="flex items-center justify-between">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium text-sidebar-foreground">
+              {user?.email}
+            </p>
+            <p className="text-xs capitalize text-sidebar-foreground/70">
+              {isAdmin ? 'Administrator' : 'Staff'}
+            </p>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleSignOut}
+            className="shrink-0 text-sidebar-foreground hover:bg-sidebar-accent"
+          >
+            <LogOut className="h-4 w-4" />
+          </Button>
+        </div>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
