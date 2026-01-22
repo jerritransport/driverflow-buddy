@@ -6,13 +6,20 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
-import { Loader2, Search, MapPin, Star, Users, User } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Loader2, Search, MapPin, Star, Users, User, MoreHorizontal, Eye, Pencil } from 'lucide-react';
 
 interface ClinicListViewProps {
   onSelectClinic: (clinic: ClinicPerformance) => void;
+  onEditClinic?: (clinicId: string) => void;
 }
 
-export function ClinicListView({ onSelectClinic }: ClinicListViewProps) {
+export function ClinicListView({ onSelectClinic, onEditClinic }: ClinicListViewProps) {
   const { data: clinics, isLoading } = useClinicPerformance();
   const [search, setSearch] = useState('');
 
@@ -101,6 +108,7 @@ export function ClinicListView({ onSelectClinic }: ClinicListViewProps) {
                 <TableHead>Completion Rate</TableHead>
                 <TableHead>Rating</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead className="w-[80px]"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -143,11 +151,32 @@ export function ClinicListView({ onSelectClinic }: ClinicListViewProps) {
                       {clinic.is_active ? 'Active' : 'Inactive'}
                     </Badge>
                   </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                        <Button variant="ghost" size="icon">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onSelectClinic(clinic); }}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Details
+                        </DropdownMenuItem>
+                        {onEditClinic && clinic.id && (
+                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEditClinic(clinic.id!); }}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Edit Clinic
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
                 </TableRow>
               ))}
               {filteredClinics?.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
                     No clinics found.
                   </TableCell>
                 </TableRow>

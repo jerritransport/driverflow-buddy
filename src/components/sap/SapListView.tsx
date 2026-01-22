@@ -9,14 +9,21 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, TrendingUp, Users, CheckCircle2, Clock } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Eye, MoreHorizontal, Pencil, TrendingUp, Users, CheckCircle2, Clock } from 'lucide-react';
 
 interface SapListViewProps {
   saps: SapPerformance[];
   onSelectSap: (sapId: string) => void;
+  onEditSap?: (sapId: string) => void;
 }
 
-export function SapListView({ saps, onSelectSap }: SapListViewProps) {
+export function SapListView({ saps, onSelectSap, onEditSap }: SapListViewProps) {
   const getCompletionRate = (sap: SapPerformance) => {
     if (!sap.total_drivers_assigned || sap.total_drivers_assigned === 0) return 0;
     return Math.round((sap.rtd_completed_count / sap.total_drivers_assigned) * 100);
@@ -119,16 +126,25 @@ export function SapListView({ saps, onSelectSap }: SapListViewProps) {
                   </span>
                 </TableCell>
                 <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSelectSap(sap.id);
-                    }}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                      <Button variant="ghost" size="icon">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onSelectSap(sap.id); }}>
+                        <Eye className="mr-2 h-4 w-4" />
+                        View Details
+                      </DropdownMenuItem>
+                      {onEditSap && (
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEditSap(sap.id); }}>
+                          <Pencil className="mr-2 h-4 w-4" />
+                          Edit SAP
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))
