@@ -14,7 +14,8 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { GlobalSearch } from '@/components/layout/GlobalSearch';
-import { Search, Bell, User, LogOut, Settings } from 'lucide-react';
+import { NotificationsDropdown } from '@/components/layout/NotificationsDropdown';
+import { Search, User, LogOut, Settings } from 'lucide-react';
 
 export function AppHeader() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -62,11 +63,8 @@ export function AppHeader() {
         </Button>
 
         <div className="flex items-center gap-2">
-          {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-destructive" />
-          </Button>
+          {/* Notifications Dropdown */}
+          <NotificationsDropdown />
 
           {/* User Menu */}
           <DropdownMenu>
