@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,9 +11,11 @@ import {
   BulkActionsBar,
 } from '@/components/drivers';
 import { DriverDetailPanel } from '@/components/driver-detail/DriverDetailPanel';
-import { useDriversPaginated, DriverFilters as FilterType } from '@/hooks/useDriversManagement';
+import { useDriversPaginated, useAllFilteredDrivers, DriverFilters as FilterType } from '@/hooks/useDriversManagement';
 import { Driver } from '@/hooks/useDrivers';
-import { Plus, Users, AlertTriangle, Wine, CheckCircle } from 'lucide-react';
+import { exportDriversToCSV } from '@/lib/exportUtils';
+import { Plus, Users, AlertTriangle, Wine, CheckCircle, Download, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Drivers() {
   // State management
@@ -31,9 +33,34 @@ export default function Drivers() {
   const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingDriver, setDeletingDriver] = useState<Driver | null>(null);
+  
+  // Export state
+  const [isExporting, setIsExporting] = useState(false);
 
   // Fetch drivers with pagination
   const { data, isLoading, error } = useDriversPaginated(filters, { page, pageSize });
+  
+  // Fetch all filtered drivers for export (only when exporting)
+  const { data: allDrivers, isFetching: isFetchingAll, refetch: refetchAll } = useAllFilteredDrivers(filters, isExporting);
+
+  // Handle export completion
+  useEffect(() => {
+    if (isExporting && allDrivers && !isFetchingAll) {
+      if (allDrivers.length === 0) {
+        toast.error('No drivers to export');
+      } else {
+        exportDriversToCSV(allDrivers, 'drivers_export');
+        toast.success(`Exported ${allDrivers.length} driver${allDrivers.length === 1 ? '' : 's'} to CSV`);
+      }
+      setIsExporting(false);
+    }
+  }, [isExporting, allDrivers, isFetchingAll]);
+
+  // Handle export all
+  const handleExportAll = useCallback(() => {
+    setIsExporting(true);
+    refetchAll();
+  }, [refetchAll]);
 
   // Reset to page 1 when filters change
   const handleFiltersChange = useCallback((newFilters: FilterType) => {
@@ -94,10 +121,25 @@ export default function Drivers() {
               Manage driver records, track their progress, and handle RTD workflow
             </p>
           </div>
-          <Button onClick={handleAddNew} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Add Driver
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              onClick={handleExportAll} 
+              disabled={isExporting || isFetchingAll}
+              className="gap-2"
+            >
+              {isExporting || isFetchingAll ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              Export All
+            </Button>
+            <Button onClick={handleAddNew} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add Driver
+            </Button>
+          </div>
         </div>
 
         {/* Quick Stats */}
