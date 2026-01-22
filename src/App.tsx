@@ -8,6 +8,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Saps from "./pages/Saps";
+import Clinics from "./pages/Clinics";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -43,6 +44,14 @@ const App = () => (
               element={
                 <ProtectedRoute requireAdmin>
                   <Admin />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/clinics"
+              element={
+                <ProtectedRoute>
+                  <Clinics />
                 </ProtectedRoute>
               }
             />
