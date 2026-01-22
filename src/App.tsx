@@ -11,6 +11,8 @@ import Drivers from "./pages/Drivers";
 import Saps from "./pages/Saps";
 import Clinics from "./pages/Clinics";
 import Admin from "./pages/Admin";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -61,6 +63,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Clinics />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <Settings />
                 </ProtectedRoute>
               }
             />
