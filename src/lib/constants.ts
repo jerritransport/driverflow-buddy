@@ -9,6 +9,27 @@ export const DRIVER_STEPS = [
   { step: 7, label: 'Complete', statuses: ['RTD_COMPLETE'] },
 ] as const;
 
+// Workflow steps for UI (same as DRIVER_STEPS but simpler format)
+export const WORKFLOW_STEPS = DRIVER_STEPS.map(s => ({ step: s.step, label: s.label }));
+
+// All possible driver statuses for dropdowns
+export const DRIVER_STATUSES = [
+  { value: 'INTAKE_PENDING', label: 'Consent Pending' },
+  { value: 'PAYMENT_HOLD', label: 'Payment Hold' },
+  { value: 'PAYMENT_COMPLETE', label: 'Payment Complete' },
+  { value: 'SAP_REQUEST_PENDING', label: 'SAP Request Pending' },
+  { value: 'SAP_PAPERWORK_PENDING', label: 'SAP Paperwork Pending' },
+  { value: 'ALCOHOL_FEE_PENDING', label: 'Alcohol Fee Pending' },
+  { value: 'CLEARINGHOUSE_PENDING', label: 'Clearinghouse Pending' },
+  { value: 'CLEARINGHOUSE_AUTOMATING', label: 'Clearinghouse Automating' },
+  { value: 'CLEARINGHOUSE_COMPLETE', label: 'Clearinghouse Complete' },
+  { value: 'DONOR_PASS_PENDING', label: 'Donor Pass Pending' },
+  { value: 'DONOR_PASS_SENT', label: 'Donor Pass Sent' },
+  { value: 'TEST_IN_PROGRESS', label: 'Test In Progress' },
+  { value: 'RESULT_RECEIVED', label: 'Result Received' },
+  { value: 'RTD_COMPLETE', label: 'RTD Complete' },
+] as const;
+
 export const STATUS_LABELS: Record<string, string> = {
   INTAKE_PENDING: 'Consent Pending',
   PAYMENT_HOLD: 'Payment Hold',

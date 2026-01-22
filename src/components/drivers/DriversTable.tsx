@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +29,8 @@ interface DriversTableProps {
   onView: (driver: Driver) => void;
   onEdit: (driver: Driver) => void;
   onDelete: (driver: Driver) => void;
+  selectedIds?: Set<string>;
+  onSelectionChange?: (ids: Set<string>) => void;
 }
 
 export function DriversTable({
@@ -36,13 +39,44 @@ export function DriversTable({
   onView,
   onEdit,
   onDelete,
+  selectedIds = new Set(),
+  onSelectionChange,
 }: DriversTableProps) {
+  const isSelectable = !!onSelectionChange;
+  const allSelected = drivers.length > 0 && drivers.every((d) => selectedIds.has(d.id));
+  const someSelected = drivers.some((d) => selectedIds.has(d.id)) && !allSelected;
+
+  const handleSelectAll = (checked: boolean) => {
+    if (!onSelectionChange) return;
+    if (checked) {
+      const newSelection = new Set(selectedIds);
+      drivers.forEach((d) => newSelection.add(d.id));
+      onSelectionChange(newSelection);
+    } else {
+      const newSelection = new Set(selectedIds);
+      drivers.forEach((d) => newSelection.delete(d.id));
+      onSelectionChange(newSelection);
+    }
+  };
+
+  const handleSelectOne = (driverId: string, checked: boolean) => {
+    if (!onSelectionChange) return;
+    const newSelection = new Set(selectedIds);
+    if (checked) {
+      newSelection.add(driverId);
+    } else {
+      newSelection.delete(driverId);
+    }
+    onSelectionChange(newSelection);
+  };
+
   if (isLoading) {
     return (
       <div className="rounded-lg border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
+              {isSelectable && <TableHead className="w-[50px]" />}
               <TableHead>Driver</TableHead>
               <TableHead>CDL</TableHead>
               <TableHead>Step</TableHead>
@@ -55,6 +89,7 @@ export function DriversTable({
           <TableBody>
             {Array.from({ length: 10 }).map((_, i) => (
               <TableRow key={i}>
+                {isSelectable && <TableCell><Skeleton className="h-4 w-4" /></TableCell>}
                 <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-20" /></TableCell>
@@ -83,6 +118,20 @@ export function DriversTable({
       <Table>
         <TableHeader>
           <TableRow>
+            {isSelectable && (
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={allSelected}
+                  ref={(el) => {
+                    if (el) {
+                      (el as HTMLButtonElement & { indeterminate?: boolean }).indeterminate = someSelected;
+                    }
+                  }}
+                  onCheckedChange={(checked) => handleSelectAll(!!checked)}
+                  aria-label="Select all drivers"
+                />
+              </TableHead>
+            )}
             <TableHead>Driver</TableHead>
             <TableHead>CDL</TableHead>
             <TableHead>Step</TableHead>
@@ -97,6 +146,9 @@ export function DriversTable({
             <DriverRow
               key={driver.id}
               driver={driver}
+              isSelected={selectedIds.has(driver.id)}
+              isSelectable={isSelectable}
+              onSelect={(checked) => handleSelectOne(driver.id, checked)}
               onView={() => onView(driver)}
               onEdit={() => onEdit(driver)}
               onDelete={() => onDelete(driver)}
@@ -110,18 +162,33 @@ export function DriversTable({
 
 interface DriverRowProps {
   driver: Driver;
+  isSelected: boolean;
+  isSelectable: boolean;
+  onSelect: (checked: boolean) => void;
   onView: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }
 
-function DriverRow({ driver, onView, onEdit, onDelete }: DriverRowProps) {
+function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit, onDelete }: DriverRowProps) {
   const updatedAt = driver.updated_at
     ? formatDistanceToNow(new Date(driver.updated_at), { addSuffix: true })
     : 'Unknown';
 
   return (
-    <TableRow className="cursor-pointer hover:bg-muted/50" onClick={onView}>
+    <TableRow 
+      className={`cursor-pointer hover:bg-muted/50 ${isSelected ? 'bg-muted/30' : ''}`} 
+      onClick={onView}
+    >
+      {isSelectable && (
+        <TableCell onClick={(e) => e.stopPropagation()}>
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={(checked) => onSelect(!!checked)}
+            aria-label={`Select ${driver.first_name} ${driver.last_name}`}
+          />
+        </TableCell>
+      )}
       <TableCell>
         <div className="flex items-center gap-2">
           <div>

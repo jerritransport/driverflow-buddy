@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import {
   DriversPagination,
   DriverFormDialog,
   DeleteDriverDialog,
+  BulkActionsBar,
 } from '@/components/drivers';
 import { DriverDetailPanel } from '@/components/driver-detail/DriverDetailPanel';
 import { useDriversPaginated, DriverFilters as FilterType } from '@/hooks/useDriversManagement';
@@ -19,6 +20,9 @@ export default function Drivers() {
   const [filters, setFilters] = useState<FilterType>({});
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
+  
+  // Selection state for bulk actions
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   
   // Dialog states
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
@@ -64,10 +68,20 @@ export default function Drivers() {
     setFormDialogOpen(true);
   };
 
+  // Clear bulk selection
+  const handleClearSelection = useCallback(() => {
+    setSelectedIds(new Set());
+  }, []);
+
   // Calculate quick stats from data
   const totalDrivers = data?.totalCount ?? 0;
   const drivers = data?.drivers ?? [];
   const totalPages = data?.totalPages ?? 0;
+
+  // Get selected drivers for bulk actions
+  const selectedDrivers = useMemo(() => {
+    return drivers.filter((d) => selectedIds.has(d.id));
+  }, [drivers, selectedIds]);
 
   return (
     <AppLayout>
@@ -137,6 +151,8 @@ export default function Drivers() {
           onView={handleView}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          selectedIds={selectedIds}
+          onSelectionChange={setSelectedIds}
         />
 
         {/* Pagination */}
@@ -151,6 +167,14 @@ export default function Drivers() {
           />
         )}
       </div>
+
+      {/* Bulk Actions Bar */}
+      {selectedDrivers.length > 0 && (
+        <BulkActionsBar
+          selectedDrivers={selectedDrivers}
+          onClearSelection={handleClearSelection}
+        />
+      )}
 
       {/* Driver Detail Panel */}
       <DriverDetailPanel
