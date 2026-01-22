@@ -22,6 +22,50 @@ export interface DriversResult {
   totalPages: number;
 }
 
+/**
+ * Hook to fetch all drivers matching filters (for export, no pagination)
+ */
+export function useAllFilteredDrivers(filters: DriverFilters = {}, enabled = false) {
+  const { search, step, status, paymentStatus, paymentHold, requiresAlcoholTest } = filters;
+
+  return useQuery({
+    queryKey: ['drivers-all-filtered', filters],
+    queryFn: async (): Promise<Driver[]> => {
+      let query = supabase
+        .from('drivers')
+        .select('*')
+        .order('updated_at', { ascending: false });
+
+      if (step !== undefined) {
+        query = query.eq('current_step', step);
+      }
+      if (status) {
+        query = query.eq('status', status);
+      }
+      if (paymentStatus) {
+        query = query.eq('payment_status', paymentStatus);
+      }
+      if (paymentHold !== undefined) {
+        query = query.eq('payment_hold', paymentHold);
+      }
+      if (requiresAlcoholTest !== undefined) {
+        query = query.eq('requires_alcohol_test', requiresAlcoholTest);
+      }
+      if (search) {
+        query = query.or(
+          `first_name.ilike.%${search}%,last_name.ilike.%${search}%,cdl_number.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`
+        );
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data as Driver[];
+    },
+    enabled,
+    staleTime: 0, // Always refetch when enabled
+  });
+}
+
 export function useDriversPaginated(
   filters: DriverFilters = {},
   pagination: PaginationOptions = { page: 1, pageSize: 20 }
