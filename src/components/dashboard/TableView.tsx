@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import { useDrivers, Driver } from '@/hooks/useDrivers';
 import {
   Table,
@@ -16,9 +15,12 @@ import { getStepLabel } from '@/lib/constants';
 import { formatDistanceToNow } from 'date-fns';
 import { Eye, AlertTriangle, Wine } from 'lucide-react';
 
-export function TableView() {
+interface TableViewProps {
+  onDriverSelect?: (driverId: string) => void;
+}
+
+export function TableView({ onDriverSelect }: TableViewProps) {
   const { data: drivers, isLoading, error } = useDrivers();
-  const navigate = useNavigate();
 
   if (isLoading) {
     return (
@@ -85,7 +87,11 @@ export function TableView() {
         </TableHeader>
         <TableBody>
           {drivers.map((driver) => (
-            <DriverRow key={driver.id} driver={driver} onView={() => navigate(`/drivers/${driver.id}`)} />
+            <DriverRow 
+              key={driver.id} 
+              driver={driver} 
+              onView={() => onDriverSelect?.(driver.id)} 
+            />
           ))}
         </TableBody>
       </Table>
