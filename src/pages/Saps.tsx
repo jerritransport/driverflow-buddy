@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { SapListView, SapDetailPanel } from '@/components/sap';
-import { useSapPerformance } from '@/hooks/useSaps';
+import { SapListView, SapDetailPanel, SapFormDialog } from '@/components/sap';
+import { useSapPerformance, useSap, Sap } from '@/hooks/useSaps';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,11 @@ import { Card, CardContent } from '@/components/ui/card';
 export default function Saps() {
   const [selectedSapId, setSelectedSapId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const [editingSap, setEditingSap] = useState<Sap | null>(null);
+  
   const { data: saps, isLoading } = useSapPerformance();
+  const { data: selectedSapData } = useSap(editingSap?.id);
 
   const filteredSaps = saps?.filter((sap) => {
     if (!searchQuery) return true;
@@ -30,6 +34,17 @@ export default function Saps() {
   const totalDriversAssigned = saps?.reduce((sum, s) => sum + (s.total_drivers_assigned ?? 0), 0) ?? 0;
   const totalCompleted = saps?.reduce((sum, s) => sum + (s.rtd_completed_count ?? 0), 0) ?? 0;
 
+  const handleAddNew = () => {
+    setEditingSap(null);
+    setFormDialogOpen(true);
+  };
+
+  const handleEdit = (sapId: string) => {
+    // We need to fetch the full SAP data for editing
+    setEditingSap({ id: sapId } as Sap);
+    setFormDialogOpen(true);
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -41,7 +56,7 @@ export default function Saps() {
               Manage Substance Abuse Professionals and track performance
             </p>
           </div>
-          <Button className="gap-2">
+          <Button onClick={handleAddNew} className="gap-2">
             <Plus className="h-4 w-4" />
             Add SAP
           </Button>
@@ -97,6 +112,7 @@ export default function Saps() {
           <SapListView
             saps={filteredSaps ?? []}
             onSelectSap={setSelectedSapId}
+            onEditSap={handleEdit}
           />
         )}
 
@@ -105,6 +121,13 @@ export default function Saps() {
           sapId={selectedSapId}
           open={!!selectedSapId}
           onOpenChange={(open) => !open && setSelectedSapId(null)}
+        />
+
+        {/* Add/Edit SAP Dialog */}
+        <SapFormDialog
+          open={formDialogOpen}
+          onOpenChange={setFormDialogOpen}
+          sap={selectedSapData}
         />
       </div>
     </AppLayout>

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface Sap {
@@ -50,6 +50,9 @@ export interface SapDriver {
   sap_paperwork_received_at: string | null;
   created_at: string;
 }
+
+export type CreateSapData = Omit<Sap, 'id' | 'created_at' | 'updated_at' | 'total_drivers_referred'>;
+export type UpdateSapData = Partial<CreateSapData>;
 
 export function useSaps() {
   return useQuery({
@@ -118,5 +121,49 @@ export function useSapDrivers(sapId: string | undefined) {
       return data as SapDriver[];
     },
     enabled: !!sapId,
+  });
+}
+
+export function useCreateSap() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (data: CreateSapData) => {
+      const { data: newSap, error } = await supabase
+        .from('saps')
+        .insert(data)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return newSap;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['saps'] });
+      queryClient.invalidateQueries({ queryKey: ['sap-performance'] });
+    },
+  });
+}
+
+export function useUpdateSap() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ sapId, updates }: { sapId: string; updates: UpdateSapData }) => {
+      const { data, error } = await supabase
+        .from('saps')
+        .update(updates)
+        .eq('id', sapId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (_, { sapId }) => {
+      queryClient.invalidateQueries({ queryKey: ['saps'] });
+      queryClient.invalidateQueries({ queryKey: ['sap', sapId] });
+      queryClient.invalidateQueries({ queryKey: ['sap-performance'] });
+    },
   });
 }
