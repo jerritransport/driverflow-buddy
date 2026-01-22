@@ -4,9 +4,19 @@ import { SummaryCards } from '@/components/dashboard/SummaryCards';
 import { ViewToggle, ViewMode } from '@/components/dashboard/ViewToggle';
 import { TableView } from '@/components/dashboard/TableView';
 import { KanbanView } from '@/components/dashboard/KanbanView';
+import { DriverDetailPanel } from '@/components/driver-detail';
 
 export default function Dashboard() {
   const [viewMode, setViewMode] = useState<ViewMode>('table');
+  const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null);
+
+  const handleDriverSelect = (driverId: string) => {
+    setSelectedDriverId(driverId);
+  };
+
+  const handlePanelClose = () => {
+    setSelectedDriverId(null);
+  };
 
   return (
     <AppLayout>
@@ -28,9 +38,22 @@ export default function Dashboard() {
         {/* Driver Pipeline */}
         <div>
           <h2 className="mb-4 text-lg font-semibold">Driver Pipeline</h2>
-          {viewMode === 'table' ? <TableView /> : <KanbanView />}
+          {viewMode === 'table' ? (
+            <TableView onDriverSelect={handleDriverSelect} />
+          ) : (
+            <KanbanView onDriverSelect={handleDriverSelect} />
+          )}
         </div>
       </div>
+
+      {/* Driver Detail Panel */}
+      <DriverDetailPanel
+        driverId={selectedDriverId}
+        open={!!selectedDriverId}
+        onOpenChange={(open) => {
+          if (!open) handlePanelClose();
+        }}
+      />
     </AppLayout>
   );
 }

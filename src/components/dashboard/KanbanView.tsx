@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import { useDriversByStep, Driver } from '@/hooks/useDrivers';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -8,9 +7,12 @@ import { DRIVER_STEPS } from '@/lib/constants';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, Wine } from 'lucide-react';
 
-export function KanbanView() {
+interface KanbanViewProps {
+  onDriverSelect?: (driverId: string) => void;
+}
+
+export function KanbanView({ onDriverSelect }: KanbanViewProps) {
   const { data: driversByStep, isLoading, error } = useDriversByStep();
-  const navigate = useNavigate();
 
   if (isLoading) {
     return (
@@ -51,7 +53,7 @@ export function KanbanView() {
             step={step.step}
             label={step.label}
             drivers={drivers}
-            onDriverClick={(id) => navigate(`/drivers/${id}`)}
+            onDriverClick={(id) => onDriverSelect?.(id)}
           />
         );
       })}
