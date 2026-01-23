@@ -15,25 +15,87 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { GlobalSearch } from '@/components/layout/GlobalSearch';
 import { NotificationsDropdown } from '@/components/layout/NotificationsDropdown';
-import { Search, User, LogOut, Settings } from 'lucide-react';
+import { KeyboardShortcutsHelp } from '@/components/layout/KeyboardShortcutsHelp';
+import { Search, User, LogOut, Settings, Keyboard } from 'lucide-react';
 
 export function AppHeader() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false);
   const { user, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
 
-  // Global keyboard shortcut for search
+  // Global keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger shortcuts when typing in inputs
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
+      // Ctrl/Cmd + K - Open search
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         setSearchOpen(true);
+        return;
+      }
+
+      // ? - Show keyboard shortcuts help
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        setShortcutsHelpOpen(true);
+        return;
+      }
+
+      // G + key navigation
+      if (e.key === 'g') {
+        const handleNavKey = (navEvent: KeyboardEvent) => {
+          document.removeEventListener('keydown', handleNavKey);
+          
+          switch (navEvent.key) {
+            case 'd':
+              navEvent.preventDefault();
+              navigate('/dashboard');
+              break;
+            case 'r':
+              navEvent.preventDefault();
+              navigate('/drivers');
+              break;
+            case 's':
+              navEvent.preventDefault();
+              navigate('/saps');
+              break;
+            case 'c':
+              navEvent.preventDefault();
+              navigate('/clinics');
+              break;
+            case 'a':
+              navEvent.preventDefault();
+              navigate('/admin');
+              break;
+            case 'p':
+              navEvent.preventDefault();
+              navigate('/profile');
+              break;
+          }
+        };
+
+        const timeout = setTimeout(() => {
+          document.removeEventListener('keydown', handleNavKey);
+        }, 1000);
+
+        document.addEventListener('keydown', handleNavKey);
+        return () => clearTimeout(timeout);
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [navigate]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -63,6 +125,16 @@ export function AppHeader() {
         </Button>
 
         <div className="flex items-center gap-2">
+          {/* Keyboard Shortcuts Help */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShortcutsHelpOpen(true)}
+            title="Keyboard shortcuts (?)"
+          >
+            <Keyboard className="h-4 w-4" />
+          </Button>
+
           {/* Notifications Dropdown */}
           <NotificationsDropdown />
 
@@ -109,6 +181,9 @@ export function AppHeader() {
 
       {/* Global Search Dialog */}
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
+
+      {/* Keyboard Shortcuts Help Dialog */}
+      <KeyboardShortcutsHelp open={shortcutsHelpOpen} onOpenChange={setShortcutsHelpOpen} />
     </>
   );
 }

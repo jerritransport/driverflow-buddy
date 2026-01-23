@@ -1,20 +1,24 @@
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { SapListView, SapDetailPanel, SapFormDialog } from '@/components/sap';
-import { useSapPerformance, useSap, Sap } from '@/hooks/useSaps';
+import { useSapPerformance, useSap, Sap, useSaps } from '@/hooks/useSaps';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, Users, TrendingUp, CheckCircle2 } from 'lucide-react';
+import { Search, Plus, Users, TrendingUp, CheckCircle2, Download, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { exportSapsToCSV } from '@/lib/exportUtils';
+import { toast } from 'sonner';
 
 export default function Saps() {
   const [selectedSapId, setSelectedSapId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [editingSap, setEditingSap] = useState<Sap | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
   
   const { data: saps, isLoading } = useSapPerformance();
+  const { data: allSaps, isFetching: isFetchingAll } = useSaps();
   const { data: selectedSapData } = useSap(editingSap?.id);
 
   const filteredSaps = saps?.filter((sap) => {
@@ -45,6 +49,22 @@ export default function Saps() {
     setFormDialogOpen(true);
   };
 
+  const handleExport = () => {
+    if (!allSaps || allSaps.length === 0) {
+      toast.error('No SAPs to export');
+      return;
+    }
+    setIsExporting(true);
+    try {
+      exportSapsToCSV(allSaps, 'saps_export');
+      toast.success(`Exported ${allSaps.length} SAP${allSaps.length === 1 ? '' : 's'} to CSV`);
+    } catch (error) {
+      toast.error('Failed to export SAPs');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -56,10 +76,25 @@ export default function Saps() {
               Manage Substance Abuse Professionals and track performance
             </p>
           </div>
-          <Button onClick={handleAddNew} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Add SAP
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              onClick={handleExport} 
+              disabled={isExporting || isFetchingAll || !allSaps?.length}
+              className="gap-2"
+            >
+              {isExporting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              Export
+            </Button>
+            <Button onClick={handleAddNew} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add SAP
+            </Button>
+          </div>
         </div>
 
         {/* Summary Cards */}

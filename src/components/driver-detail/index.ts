@@ -5,3 +5,5 @@ export { PersonalInfoTab } from './PersonalInfoTab';
 export { PaymentHistoryTab } from './PaymentHistoryTab';
 export { DocumentsTab } from './DocumentsTab';
 export { ActivityLogTab } from './ActivityLogTab';
+export { RecordPaymentDialog } from './RecordPaymentDialog';
+export { GenerateDonorPassDialog } from './GenerateDonorPassDialog';
