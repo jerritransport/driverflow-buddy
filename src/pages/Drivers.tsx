@@ -11,7 +11,7 @@ import {
   BulkActionsBar,
 } from '@/components/drivers';
 import { DriverDetailPanel } from '@/components/driver-detail/DriverDetailPanel';
-import { useDriversPaginated, useAllFilteredDrivers, DriverFilters as FilterType } from '@/hooks/useDriversManagement';
+import { useDriversPaginated, useAllFilteredDrivers, DriverFilters as FilterType, SortOptions } from '@/hooks/useDriversManagement';
 import { Driver } from '@/hooks/useDrivers';
 import { exportDriversToCSV } from '@/lib/exportUtils';
 import { Plus, Users, AlertTriangle, Wine, CheckCircle, Download, Loader2 } from 'lucide-react';
@@ -22,6 +22,7 @@ export default function Drivers() {
   const [filters, setFilters] = useState<FilterType>({});
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
+  const [sort, setSort] = useState<SortOptions>({ field: 'updated_at', direction: 'desc' });
   
   // Selection state for bulk actions
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -37,11 +38,11 @@ export default function Drivers() {
   // Export state
   const [isExporting, setIsExporting] = useState(false);
 
-  // Fetch drivers with pagination
-  const { data, isLoading, error } = useDriversPaginated(filters, { page, pageSize });
+  // Fetch drivers with pagination and sorting
+  const { data, isLoading, error } = useDriversPaginated(filters, { page, pageSize }, sort);
   
   // Fetch all filtered drivers for export (only when exporting)
-  const { data: allDrivers, isFetching: isFetchingAll, refetch: refetchAll } = useAllFilteredDrivers(filters, isExporting);
+  const { data: allDrivers, isFetching: isFetchingAll, refetch: refetchAll } = useAllFilteredDrivers(filters, sort, isExporting);
 
   // Handle export completion
   useEffect(() => {
@@ -195,6 +196,8 @@ export default function Drivers() {
           onDelete={handleDelete}
           selectedIds={selectedIds}
           onSelectionChange={setSelectedIds}
+          sort={sort}
+          onSortChange={setSort}
         />
 
         {/* Pagination */}

@@ -21,7 +21,8 @@ import { StatusBadge } from '@/components/shared/StatusBadge';
 import { getStepLabel } from '@/lib/constants';
 import { formatDistanceToNow } from 'date-fns';
 import { Driver } from '@/hooks/useDrivers';
-import { Eye, MoreHorizontal, Pencil, Trash2, AlertTriangle, Wine } from 'lucide-react';
+import { SortField, SortOptions } from '@/hooks/useDriversManagement';
+import { Eye, MoreHorizontal, Pencil, Trash2, AlertTriangle, Wine, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 
 interface DriversTableProps {
   drivers: Driver[];
@@ -31,6 +32,8 @@ interface DriversTableProps {
   onDelete: (driver: Driver) => void;
   selectedIds?: Set<string>;
   onSelectionChange?: (ids: Set<string>) => void;
+  sort?: SortOptions;
+  onSortChange?: (sort: SortOptions) => void;
 }
 
 export function DriversTable({
@@ -41,10 +44,34 @@ export function DriversTable({
   onDelete,
   selectedIds = new Set(),
   onSelectionChange,
+  sort = { field: 'updated_at', direction: 'desc' },
+  onSortChange,
 }: DriversTableProps) {
   const isSelectable = !!onSelectionChange;
+  const isSortable = !!onSortChange;
   const allSelected = drivers.length > 0 && drivers.every((d) => selectedIds.has(d.id));
   const someSelected = drivers.some((d) => selectedIds.has(d.id)) && !allSelected;
+
+  const handleSort = (field: SortField) => {
+    if (!onSortChange) return;
+    
+    if (sort.field === field) {
+      // Toggle direction
+      onSortChange({ field, direction: sort.direction === 'asc' ? 'desc' : 'asc' });
+    } else {
+      // New field, default to descending for dates, ascending for others
+      onSortChange({ field, direction: field === 'updated_at' ? 'desc' : 'asc' });
+    }
+  };
+
+  const getSortIcon = (field: SortField) => {
+    if (sort.field !== field) {
+      return <ArrowUpDown className="ml-1 h-3 w-3 text-muted-foreground/50" />;
+    }
+    return sort.direction === 'asc' 
+      ? <ArrowUp className="ml-1 h-3 w-3" /> 
+      : <ArrowDown className="ml-1 h-3 w-3" />;
+  };
 
   const handleSelectAll = (checked: boolean) => {
     if (!onSelectionChange) return;
@@ -132,12 +159,56 @@ export function DriversTable({
                 />
               </TableHead>
             )}
-            <TableHead>Driver</TableHead>
+            <TableHead>
+              {isSortable ? (
+                <button
+                  onClick={() => handleSort('name')}
+                  className="inline-flex items-center hover:text-foreground transition-colors"
+                >
+                  Driver{getSortIcon('name')}
+                </button>
+              ) : (
+                'Driver'
+              )}
+            </TableHead>
             <TableHead>CDL</TableHead>
-            <TableHead>Step</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>
+              {isSortable ? (
+                <button
+                  onClick={() => handleSort('current_step')}
+                  className="inline-flex items-center hover:text-foreground transition-colors"
+                >
+                  Step{getSortIcon('current_step')}
+                </button>
+              ) : (
+                'Step'
+              )}
+            </TableHead>
+            <TableHead>
+              {isSortable ? (
+                <button
+                  onClick={() => handleSort('status')}
+                  className="inline-flex items-center hover:text-foreground transition-colors"
+                >
+                  Status{getSortIcon('status')}
+                </button>
+              ) : (
+                'Status'
+              )}
+            </TableHead>
             <TableHead>Payment</TableHead>
-            <TableHead>Updated</TableHead>
+            <TableHead>
+              {isSortable ? (
+                <button
+                  onClick={() => handleSort('updated_at')}
+                  className="inline-flex items-center hover:text-foreground transition-colors"
+                >
+                  Updated{getSortIcon('updated_at')}
+                </button>
+              ) : (
+                'Updated'
+              )}
+            </TableHead>
             <TableHead className="w-[80px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
