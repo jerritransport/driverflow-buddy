@@ -2,6 +2,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Driver } from './useDrivers';
 
+export type SortField = 'name' | 'current_step' | 'status' | 'updated_at';
+export type SortDirection = 'asc' | 'desc';
+
+export interface SortOptions {
+  field: SortField;
+  direction: SortDirection;
+}
+
 export interface DriverFilters {
   search?: string;
   step?: number;
@@ -28,16 +36,34 @@ export interface DriversResult {
 /**
  * Hook to fetch all drivers matching filters (for export, no pagination)
  */
-export function useAllFilteredDrivers(filters: DriverFilters = {}, enabled = false) {
+function applySort(query: any, sort: SortOptions) {
+  const ascending = sort.direction === 'asc';
+  
+  if (sort.field === 'name') {
+    // Sort by last_name, then first_name
+    return query
+      .order('last_name', { ascending })
+      .order('first_name', { ascending });
+  }
+  
+  return query.order(sort.field, { ascending });
+}
+
+export function useAllFilteredDrivers(
+  filters: DriverFilters = {},
+  sort: SortOptions = { field: 'updated_at', direction: 'desc' },
+  enabled = false
+) {
   const { search, step, status, paymentStatus, paymentHold, requiresAlcoholTest, dateField, dateFrom, dateTo } = filters;
 
   return useQuery({
-    queryKey: ['drivers-all-filtered', filters],
+    queryKey: ['drivers-all-filtered', filters, sort],
     queryFn: async (): Promise<Driver[]> => {
       let query = supabase
         .from('drivers')
-        .select('*')
-        .order('updated_at', { ascending: false });
+        .select('*');
+      
+      query = applySort(query, sort);
 
       if (step !== undefined) {
         query = query.eq('current_step', step);
@@ -77,13 +103,14 @@ export function useAllFilteredDrivers(filters: DriverFilters = {}, enabled = fal
 
 export function useDriversPaginated(
   filters: DriverFilters = {},
-  pagination: PaginationOptions = { page: 1, pageSize: 20 }
+  pagination: PaginationOptions = { page: 1, pageSize: 20 },
+  sort: SortOptions = { field: 'updated_at', direction: 'desc' }
 ) {
   const { search, step, status, paymentStatus, paymentHold, requiresAlcoholTest, dateField, dateFrom, dateTo } = filters;
   const { page, pageSize } = pagination;
 
   return useQuery({
-    queryKey: ['drivers-paginated', { filters, pagination }],
+    queryKey: ['drivers-paginated', { filters, pagination, sort }],
     queryFn: async (): Promise<DriversResult> => {
       // First get total count
       let countQuery = supabase
@@ -128,8 +155,9 @@ export function useDriversPaginated(
       let dataQuery = supabase
         .from('drivers')
         .select('*')
-        .order('updated_at', { ascending: false })
         .range(from, to);
+      
+      dataQuery = applySort(dataQuery, sort);
 
       // Apply same filters to data query
       if (step !== undefined) {
