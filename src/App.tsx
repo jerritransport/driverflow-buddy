@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Drivers from "./pages/Drivers";
 import Saps from "./pages/Saps";
 import Clinics from "./pages/Clinics";
+import Reports from "./pages/Reports";
 import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
@@ -63,6 +64,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Clinics />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/reports"
+              element={
+                <ProtectedRoute>
+                  <Reports />
                 </ProtectedRoute>
               }
             />
