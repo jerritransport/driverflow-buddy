@@ -21,6 +21,7 @@ import {
   LogOut,
   Truck,
   Shield,
+  BarChart3,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -29,6 +30,7 @@ const mainNavItems = [
   { title: 'Drivers', icon: Users, path: '/drivers' },
   { title: 'SAPs', icon: Stethoscope, path: '/saps' },
   { title: 'Clinics', icon: Building2, path: '/clinics' },
+  { title: 'Reports', icon: BarChart3, path: '/reports' },
 ];
 
 const adminNavItems = [
