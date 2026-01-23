@@ -9,6 +9,9 @@ export interface DriverFilters {
   paymentStatus?: string;
   paymentHold?: boolean;
   requiresAlcoholTest?: boolean;
+  dateField?: 'created_at' | 'updated_at';
+  dateFrom?: string;
+  dateTo?: string;
 }
 
 export interface PaginationOptions {
@@ -26,7 +29,7 @@ export interface DriversResult {
  * Hook to fetch all drivers matching filters (for export, no pagination)
  */
 export function useAllFilteredDrivers(filters: DriverFilters = {}, enabled = false) {
-  const { search, step, status, paymentStatus, paymentHold, requiresAlcoholTest } = filters;
+  const { search, step, status, paymentStatus, paymentHold, requiresAlcoholTest, dateField, dateFrom, dateTo } = filters;
 
   return useQuery({
     queryKey: ['drivers-all-filtered', filters],
@@ -56,13 +59,19 @@ export function useAllFilteredDrivers(filters: DriverFilters = {}, enabled = fal
           `first_name.ilike.%${search}%,last_name.ilike.%${search}%,cdl_number.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`
         );
       }
+      if (dateField && dateFrom) {
+        query = query.gte(dateField, dateFrom);
+      }
+      if (dateField && dateTo) {
+        query = query.lte(dateField, dateTo + 'T23:59:59.999Z');
+      }
 
       const { data, error } = await query;
       if (error) throw error;
       return data as Driver[];
     },
     enabled,
-    staleTime: 0, // Always refetch when enabled
+    staleTime: 0,
   });
 }
 
@@ -70,7 +79,7 @@ export function useDriversPaginated(
   filters: DriverFilters = {},
   pagination: PaginationOptions = { page: 1, pageSize: 20 }
 ) {
-  const { search, step, status, paymentStatus, paymentHold, requiresAlcoholTest } = filters;
+  const { search, step, status, paymentStatus, paymentHold, requiresAlcoholTest, dateField, dateFrom, dateTo } = filters;
   const { page, pageSize } = pagination;
 
   return useQuery({
@@ -102,6 +111,12 @@ export function useDriversPaginated(
           `first_name.ilike.%${search}%,last_name.ilike.%${search}%,cdl_number.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`
         );
       }
+      if (dateField && dateFrom) {
+        countQuery = countQuery.gte(dateField, dateFrom);
+      }
+      if (dateField && dateTo) {
+        countQuery = countQuery.lte(dateField, dateTo + 'T23:59:59.999Z');
+      }
 
       const { count, error: countError } = await countQuery;
       if (countError) throw countError;
@@ -131,6 +146,12 @@ export function useDriversPaginated(
       }
       if (requiresAlcoholTest !== undefined) {
         dataQuery = dataQuery.eq('requires_alcohol_test', requiresAlcoholTest);
+      }
+      if (dateField && dateFrom) {
+        dataQuery = dataQuery.gte(dateField, dateFrom);
+      }
+      if (dateField && dateTo) {
+        dataQuery = dataQuery.lte(dateField, dateTo + 'T23:59:59.999Z');
       }
       if (search) {
         dataQuery = dataQuery.or(

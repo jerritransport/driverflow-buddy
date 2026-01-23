@@ -8,9 +8,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { DRIVER_STEPS, STATUS_LABELS, PAYMENT_STATUS_LABELS } from '@/lib/constants';
 import { DriverFilters as Filters } from '@/hooks/useDriversManagement';
-import { Search, X, Filter } from 'lucide-react';
+import { Search, X, Filter, CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface DriverFiltersProps {
   filters: Filters;
@@ -164,6 +168,77 @@ export function DriverFilters({ filters, onFiltersChange }: DriverFiltersProps) 
             <SelectItem value="no">No Alcohol</SelectItem>
           </SelectContent>
         </Select>
+
+        {/* Date Field Selector */}
+        <Select
+          value={filters.dateField ?? 'none'}
+          onValueChange={(value) =>
+            updateFilter('dateField', value === 'none' ? undefined : value as 'created_at' | 'updated_at')
+          }
+        >
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Date Field" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">No Date Filter</SelectItem>
+            <SelectItem value="created_at">Created Date</SelectItem>
+            <SelectItem value="updated_at">Updated Date</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Date From */}
+        {filters.dateField && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-[140px] justify-start text-left font-normal",
+                  !filters.dateFrom && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {filters.dateFrom ? format(new Date(filters.dateFrom), "MMM d, yyyy") : "From"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={filters.dateFrom ? new Date(filters.dateFrom) : undefined}
+                onSelect={(date) => updateFilter('dateFrom', date ? format(date, 'yyyy-MM-dd') : undefined)}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+        )}
+
+        {/* Date To */}
+        {filters.dateField && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-[140px] justify-start text-left font-normal",
+                  !filters.dateTo && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {filters.dateTo ? format(new Date(filters.dateTo), "MMM d, yyyy") : "To"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={filters.dateTo ? new Date(filters.dateTo) : undefined}
+                onSelect={(date) => updateFilter('dateTo', date ? format(date, 'yyyy-MM-dd') : undefined)}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+        )}
       </div>
 
       {/* Active Filters */}
@@ -223,6 +298,22 @@ export function DriverFilters({ filters, onFiltersChange }: DriverFiltersProps) 
             <Badge variant="secondary" className="gap-1">
               {filters.requiresAlcoholTest ? 'Alcohol Required' : 'No Alcohol'}
               <button onClick={() => clearFilter('requiresAlcoholTest')}>
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          )}
+
+          {filters.dateField && (filters.dateFrom || filters.dateTo) && (
+            <Badge variant="secondary" className="gap-1">
+              {filters.dateField === 'created_at' ? 'Created' : 'Updated'}:{' '}
+              {filters.dateFrom && format(new Date(filters.dateFrom), "MMM d")}
+              {filters.dateFrom && filters.dateTo && ' - '}
+              {filters.dateTo && format(new Date(filters.dateTo), "MMM d")}
+              <button onClick={() => {
+                clearFilter('dateField');
+                clearFilter('dateFrom');
+                clearFilter('dateTo');
+              }}>
                 <X className="h-3 w-3" />
               </button>
             </Badge>
