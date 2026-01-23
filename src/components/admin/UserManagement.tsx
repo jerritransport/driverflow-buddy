@@ -20,9 +20,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Loader2, Search, Shield, User, UserCog } from 'lucide-react';
+import { Loader2, Search, Shield, User, UserCog, UserPlus, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
+import { InviteUserDialog } from './InviteUserDialog';
+import { DeleteUserDialog } from './DeleteUserDialog';
 
 export function UserManagement() {
   const { data: users, isLoading } = useUsersWithRoles();
@@ -34,6 +36,11 @@ export function UserManagement() {
     user: UserWithRole | null;
     newRole: 'admin' | 'staff';
   }>({ open: false, user: null, newRole: 'staff' });
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    user: UserWithRole | null;
+  }>({ open: false, user: null });
 
   const filteredUsers = users?.filter(
     (u) =>
@@ -81,6 +88,10 @@ export function UserManagement() {
                 Manage user accounts and their roles. {users?.length || 0} total users.
               </CardDescription>
             </div>
+            <Button onClick={() => setInviteDialogOpen(true)}>
+              <UserPlus className="mr-2 h-4 w-4" />
+              Add User
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -141,21 +152,32 @@ export function UserManagement() {
                         : '-'}
                     </TableCell>
                     <TableCell>
-                      <Select
-                        value={user.role}
-                        onValueChange={(value: 'admin' | 'staff') =>
-                          handleRoleChange(user, value)
-                        }
-                        disabled={user.id === currentUser?.id}
-                      >
-                        <SelectTrigger className="h-8 w-[120px]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="staff">Staff</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center gap-2">
+                        <Select
+                          value={user.role}
+                          onValueChange={(value: 'admin' | 'staff') =>
+                            handleRoleChange(user, value)
+                          }
+                          disabled={user.id === currentUser?.id}
+                        >
+                          <SelectTrigger className="h-8 w-[100px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="staff">Staff</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          disabled={user.id === currentUser?.id}
+                          onClick={() => setDeleteDialog({ open: true, user })}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -208,6 +230,14 @@ export function UserManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <InviteUserDialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen} />
+      
+      <DeleteUserDialog 
+        open={deleteDialog.open} 
+        onOpenChange={(open) => setDeleteDialog({ open, user: deleteDialog.user })} 
+        user={deleteDialog.user} 
+      />
     </>
   );
 }
