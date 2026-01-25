@@ -6,6 +6,7 @@ import { DRIVER_STEPS } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
 import { RecordPaymentDialog } from './RecordPaymentDialog';
 import { GenerateDonorPassDialog } from './GenerateDonorPassDialog';
+import { SetFollowUpDialog } from './SetFollowUpDialog';
 import { 
   ChevronRight, 
   Loader2, 
@@ -14,7 +15,8 @@ import {
   DollarSign, 
   FileText,
   Ban,
-  CheckCircle2
+  CheckCircle2,
+  Calendar
 } from 'lucide-react';
 
 interface QuickActionsProps {
@@ -29,6 +31,7 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
   
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [donorPassDialogOpen, setDonorPassDialogOpen] = useState(false);
+  const [followUpDialogOpen, setFollowUpDialogOpen] = useState(false);
 
   const currentStepInfo = DRIVER_STEPS.find(s => s.step === driver.current_step);
   const nextStepInfo = DRIVER_STEPS.find(s => s.step === driver.current_step + 1);
@@ -182,6 +185,17 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
             )}
           </Button>
         )}
+
+        {/* Set Follow-up */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setFollowUpDialogOpen(true)}
+          className="px-2"
+          title={driver.follow_up_date ? 'Edit Follow-up' : 'Set Follow-up'}
+        >
+          <Calendar className={`h-4 w-4 ${driver.follow_up_date ? 'text-primary' : 'text-muted-foreground'}`} />
+        </Button>
       </div>
 
       {/* Advance to Next Step */}
@@ -251,6 +265,13 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
         open={donorPassDialogOpen}
         onOpenChange={setDonorPassDialogOpen}
         driver={driver}
+      />
+
+      <SetFollowUpDialog
+        open={followUpDialogOpen}
+        onOpenChange={setFollowUpDialogOpen}
+        driver={driver}
+        onSuccess={onSuccess}
       />
     </div>
   );

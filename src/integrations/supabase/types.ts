@@ -365,6 +365,52 @@ export type Database = {
           },
         ]
       }
+      driver_notes: {
+        Row: {
+          created_at: string | null
+          driver_id: string
+          id: string
+          note_text: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          driver_id: string
+          id?: string
+          note_text: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          driver_id?: string
+          id?: string
+          note_text?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_notes_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "driver_full_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_notes_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_notes_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers_needing_attention"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drivers: {
         Row: {
           address_line1: string | null
@@ -372,8 +418,8 @@ export type Database = {
           amount_due: number | null
           amount_paid: number | null
           cdl_expiration: string | null
-          cdl_number: string
-          cdl_state: string
+          cdl_number: string | null
+          cdl_state: string | null
           city: string | null
           clearinghouse_designation_accepted: boolean | null
           clearinghouse_prohibited: boolean | null
@@ -381,14 +427,17 @@ export type Database = {
           clearinghouse_query_result: string | null
           created_at: string | null
           current_step: number
-          date_of_birth: string
+          date_of_birth: string | null
+          documents_uploaded: Json | null
           donor_pass_generated_at: string | null
           donor_pass_number: string | null
           email: string
           employer_contact: string | null
           employer_name: string | null
           first_name: string
-          gender: string
+          follow_up_date: string | null
+          follow_up_note: string | null
+          gender: string | null
           id: string
           last_name: string
           middle_name: string | null
@@ -418,8 +467,8 @@ export type Database = {
           amount_due?: number | null
           amount_paid?: number | null
           cdl_expiration?: string | null
-          cdl_number: string
-          cdl_state: string
+          cdl_number?: string | null
+          cdl_state?: string | null
           city?: string | null
           clearinghouse_designation_accepted?: boolean | null
           clearinghouse_prohibited?: boolean | null
@@ -427,14 +476,17 @@ export type Database = {
           clearinghouse_query_result?: string | null
           created_at?: string | null
           current_step?: number
-          date_of_birth: string
+          date_of_birth?: string | null
+          documents_uploaded?: Json | null
           donor_pass_generated_at?: string | null
           donor_pass_number?: string | null
           email: string
           employer_contact?: string | null
           employer_name?: string | null
           first_name: string
-          gender: string
+          follow_up_date?: string | null
+          follow_up_note?: string | null
+          gender?: string | null
           id?: string
           last_name: string
           middle_name?: string | null
@@ -464,8 +516,8 @@ export type Database = {
           amount_due?: number | null
           amount_paid?: number | null
           cdl_expiration?: string | null
-          cdl_number?: string
-          cdl_state?: string
+          cdl_number?: string | null
+          cdl_state?: string | null
           city?: string | null
           clearinghouse_designation_accepted?: boolean | null
           clearinghouse_prohibited?: boolean | null
@@ -473,14 +525,17 @@ export type Database = {
           clearinghouse_query_result?: string | null
           created_at?: string | null
           current_step?: number
-          date_of_birth?: string
+          date_of_birth?: string | null
+          documents_uploaded?: Json | null
           donor_pass_generated_at?: string | null
           donor_pass_number?: string | null
           email?: string
           employer_contact?: string | null
           employer_name?: string | null
           first_name?: string
-          gender?: string
+          follow_up_date?: string | null
+          follow_up_note?: string | null
+          gender?: string | null
           id?: string
           last_name?: string
           middle_name?: string | null
@@ -955,8 +1010,8 @@ export type Database = {
           amount_due: number | null
           amount_paid: number | null
           cdl_expiration: string | null
-          cdl_number: string
-          cdl_state: string
+          cdl_number: string | null
+          cdl_state: string | null
           city: string | null
           clearinghouse_designation_accepted: boolean | null
           clearinghouse_prohibited: boolean | null
@@ -964,14 +1019,17 @@ export type Database = {
           clearinghouse_query_result: string | null
           created_at: string | null
           current_step: number
-          date_of_birth: string
+          date_of_birth: string | null
+          documents_uploaded: Json | null
           donor_pass_generated_at: string | null
           donor_pass_number: string | null
           email: string
           employer_contact: string | null
           employer_name: string | null
           first_name: string
-          gender: string
+          follow_up_date: string | null
+          follow_up_note: string | null
+          gender: string | null
           id: string
           last_name: string
           middle_name: string | null
