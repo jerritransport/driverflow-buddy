@@ -125,6 +125,7 @@ export function useAdvanceDriverStep() {
       queryClient.invalidateQueries({ queryKey: ['driver', variables.driverId] });
       queryClient.invalidateQueries({ queryKey: ['drivers'] });
       queryClient.invalidateQueries({ queryKey: ['drivers-by-step'] });
+      queryClient.invalidateQueries({ queryKey: ['drivers-paginated'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-summary'] });
     },
   });

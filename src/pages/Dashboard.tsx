@@ -22,7 +22,7 @@ export default function Dashboard() {
     <AppLayout>
       <div className="space-y-6">
         {/* Page Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
             <p className="text-muted-foreground">
@@ -36,8 +36,13 @@ export default function Dashboard() {
         <SummaryCards />
 
         {/* Driver Pipeline */}
-        <div>
-          <h2 className="mb-4 text-lg font-semibold">Driver Pipeline</h2>
+        <div className="relative">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Driver Pipeline</h2>
+            <div className="sm:hidden">
+              <ViewToggle value={viewMode} onChange={setViewMode} />
+            </div>
+          </div>
           {viewMode === 'table' ? (
             <TableView onDriverSelect={handleDriverSelect} />
           ) : (

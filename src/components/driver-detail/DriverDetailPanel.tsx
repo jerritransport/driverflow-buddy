@@ -16,9 +16,12 @@ import { PersonalInfoTab } from './PersonalInfoTab';
 import { PaymentHistoryTab } from './PaymentHistoryTab';
 import { DocumentsTab } from './DocumentsTab';
 import { ActivityLogTab } from './ActivityLogTab';
+import { NotesTab } from './NotesTab';
+import { CommunicationActions } from './CommunicationActions';
 import { PaymentBadge } from '@/components/shared/PaymentBadge';
 import { StatusBadge } from '@/components/shared/StatusBadge';
-import { Phone, Mail, AlertTriangle, Wine } from 'lucide-react';
+import { Phone, Mail, AlertTriangle, Wine, Calendar } from 'lucide-react';
+import { format, isToday, isPast } from 'date-fns';
 
 interface DriverDetailPanelProps {
   driverId: string | null;
@@ -91,9 +94,23 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
               </div>
 
               {/* Status Badges */}
-              <div className="mt-4 flex items-center gap-2">
+              <div className="mt-4 flex flex-wrap items-center gap-2">
                 <StatusBadge status={driver.status} />
                 <PaymentBadge status={driver.payment_status} />
+                {driver.follow_up_date && (
+                  <Badge 
+                    variant={isPast(new Date(driver.follow_up_date)) && !isToday(new Date(driver.follow_up_date)) 
+                      ? "destructive" 
+                      : isToday(new Date(driver.follow_up_date)) 
+                        ? "default" 
+                        : "secondary"
+                    } 
+                    className="gap-1"
+                  >
+                    <Calendar className="h-3 w-3" />
+                    Follow-up: {format(new Date(driver.follow_up_date), 'MMM d')}
+                  </Badge>
+                )}
               </div>
 
               {/* Step Timeline */}
@@ -101,20 +118,30 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
 
               {/* Quick Actions */}
               <QuickActions driver={driver} />
+
+              {/* Communication Actions */}
+              <div className="mt-4 pt-4 border-t">
+                <CommunicationActions driver={driver} />
+              </div>
             </div>
 
             {/* Tabs */}
             <Tabs defaultValue="info" className="flex flex-1 flex-col overflow-hidden">
-              <TabsList className="mx-6 mt-4 grid w-auto grid-cols-4">
+              <TabsList className="mx-6 mt-4 grid w-auto grid-cols-5">
                 <TabsTrigger value="info">Info</TabsTrigger>
+                <TabsTrigger value="notes">Notes</TabsTrigger>
                 <TabsTrigger value="payments">Payments</TabsTrigger>
-                <TabsTrigger value="documents">Documents</TabsTrigger>
+                <TabsTrigger value="documents">Docs</TabsTrigger>
                 <TabsTrigger value="activity">Activity</TabsTrigger>
               </TabsList>
 
               <ScrollArea className="flex-1 px-6 py-4">
                 <TabsContent value="info" className="m-0">
                   <PersonalInfoTab driver={driver} />
+                </TabsContent>
+
+                <TabsContent value="notes" className="m-0">
+                  <NotesTab driverId={driver.id} />
                 </TabsContent>
 
                 <TabsContent value="payments" className="m-0">

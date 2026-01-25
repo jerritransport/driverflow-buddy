@@ -56,7 +56,7 @@ export function GenerateDonorPassDialog({ open, onOpenChange, driver }: Generate
       queryClient.invalidateQueries({ queryKey: ['drivers-paginated'] });
       queryClient.invalidateQueries({ queryKey: ['drivers-by-step'] });
 
-      toast.success(`Donor pass ${passNumber} generated successfully`);
+      toast.success(`Manual donor pass ${passNumber} generated - CRL automation pending`);
       onOpenChange(false);
     },
     onError: (error) => {

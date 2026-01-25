@@ -48,10 +48,10 @@ const driverFormSchema = z.object({
   middle_name: z.string().optional(),
   email: z.string().email('Invalid email address'),
   phone: z.string().min(10, 'Phone number must be at least 10 characters'),
-  gender: z.enum(['Male', 'Female', 'Other']),
-  date_of_birth: z.string().min(1, 'Date of birth is required'),
-  cdl_number: z.string().min(1, 'CDL number is required'),
-  cdl_state: z.string().min(2, 'CDL state is required'),
+  gender: z.enum(['Male', 'Female', 'Other']).optional(),
+  date_of_birth: z.string().optional(),
+  cdl_number: z.string().optional(),
+  cdl_state: z.string().optional(),
   cdl_expiration: z.string().optional(),
   address_line1: z.string().optional(),
   address_line2: z.string().optional(),
@@ -231,12 +231,12 @@ export function DriverFormDialog({
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
+              <FormField
                   control={form.control}
                   name="gender"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Gender *</FormLabel>
+                      <FormLabel>Gender</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -258,7 +258,7 @@ export function DriverFormDialog({
                   name="date_of_birth"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Date of Birth *</FormLabel>
+                      <FormLabel>Date of Birth</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} />
                       </FormControl>
@@ -278,7 +278,7 @@ export function DriverFormDialog({
                   name="cdl_number"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>CDL Number *</FormLabel>
+                      <FormLabel>CDL Number</FormLabel>
                       <FormControl>
                         <Input placeholder="D1234567" {...field} />
                       </FormControl>
@@ -291,7 +291,7 @@ export function DriverFormDialog({
                   name="cdl_state"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>CDL State *</FormLabel>
+                      <FormLabel>CDL State</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>

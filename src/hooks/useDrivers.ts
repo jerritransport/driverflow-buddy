@@ -9,10 +9,10 @@ export interface Driver {
   middle_name: string | null;
   email: string;
   phone: string;
-  gender: string;
-  date_of_birth: string;
-  cdl_number: string;
-  cdl_state: string;
+  gender: string | null;
+  date_of_birth: string | null;
+  cdl_number: string | null;
+  cdl_state: string | null;
   cdl_expiration: string | null;
   address_line1: string | null;
   address_line2: string | null;
@@ -45,6 +45,9 @@ export interface Driver {
   rtd_completed: boolean;
   rtd_completed_at: string | null;
   rtd_reported_to_fmcsa_at: string | null;
+  follow_up_date: string | null;
+  follow_up_note: string | null;
+  documents_uploaded: Record<string, boolean> | null;
   created_at: string;
   updated_at: string;
 }
@@ -124,7 +127,7 @@ export function useDriversByStep() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('drivers')
-        .select('id, first_name, last_name, cdl_number, status, current_step, payment_status, payment_hold, updated_at, requires_alcohol_test')
+        .select('id, first_name, last_name, cdl_number, status, current_step, payment_status, payment_hold, updated_at, requires_alcohol_test, follow_up_date, documents_uploaded')
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
