@@ -93,15 +93,15 @@ export function DriverFormDialog({
       middle_name: driver?.middle_name ?? '',
       email: driver?.email ?? '',
       phone: driver?.phone ?? '',
-      gender: (driver?.gender as 'Male' | 'Female' | 'Other') ?? 'Male',
+      gender: (driver?.gender as 'Male' | 'Female' | 'Other') ?? undefined,
       date_of_birth: driver?.date_of_birth ?? '',
       cdl_number: driver?.cdl_number ?? '',
-      cdl_state: driver?.cdl_state ?? '',
+      cdl_state: driver?.cdl_state ?? undefined,
       cdl_expiration: driver?.cdl_expiration ?? '',
       address_line1: driver?.address_line1 ?? '',
       address_line2: driver?.address_line2 ?? '',
       city: driver?.city ?? '',
-      state: driver?.state ?? '',
+      state: driver?.state ?? undefined,
       zip_code: driver?.zip_code ?? '',
       employer_name: driver?.employer_name ?? '',
       employer_contact: driver?.employer_contact ?? '',
@@ -237,7 +237,7 @@ export function DriverFormDialog({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Gender</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select gender" />
@@ -292,7 +292,7 @@ export function DriverFormDialog({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>CDL State</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="State" />
@@ -377,7 +377,7 @@ export function DriverFormDialog({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>State</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="State" />
