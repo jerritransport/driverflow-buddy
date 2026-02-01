@@ -15,21 +15,25 @@ import { useAuth } from '@/contexts/AuthContext';
 import { 
   LayoutDashboard, 
   Users, 
-  Building2, 
   Stethoscope, 
   Settings, 
   LogOut,
   Truck,
   Shield,
   BarChart3,
+  Calendar,
+  FileText,
+  FlaskConical,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const mainNavItems = [
   { title: 'Dashboard', icon: LayoutDashboard, path: '/' },
   { title: 'Drivers', icon: Users, path: '/drivers' },
+  { title: 'Follow-Ups', icon: Calendar, path: '/follow-ups' },
+  { title: 'Intake Forms', icon: FileText, path: '/intake-forms' },
   { title: 'SAPs', icon: Stethoscope, path: '/saps' },
-  { title: 'Clinics', icon: Building2, path: '/clinics' },
+  { title: 'Test Results', icon: FlaskConical, path: '/test-results' },
   { title: 'Reports', icon: BarChart3, path: '/reports' },
 ];
 

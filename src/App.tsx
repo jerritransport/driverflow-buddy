@@ -9,7 +9,9 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Drivers from "./pages/Drivers";
 import Saps from "./pages/Saps";
-import Clinics from "./pages/Clinics";
+import FollowUps from "./pages/FollowUps";
+import IntakeForms from "./pages/IntakeForms";
+import TestResults from "./pages/TestResults";
 import Reports from "./pages/Reports";
 import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
@@ -52,18 +54,34 @@ const App = () => (
               }
             />
             <Route
-              path="/admin"
+              path="/follow-ups"
               element={
-                <ProtectedRoute requireAdmin>
-                  <Admin />
+                <ProtectedRoute>
+                  <FollowUps />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/clinics"
+              path="/intake-forms"
               element={
                 <ProtectedRoute>
-                  <Clinics />
+                  <IntakeForms />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/test-results"
+              element={
+                <ProtectedRoute>
+                  <TestResults />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <Admin />
                 </ProtectedRoute>
               }
             />

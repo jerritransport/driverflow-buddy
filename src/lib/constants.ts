@@ -32,7 +32,7 @@ export const DRIVER_STATUSES = [
 
 export const STATUS_LABELS: Record<string, string> = {
   INTAKE_PENDING: 'Consent Pending',
-  PAYMENT_HOLD: 'Payment Hold',
+  PAYMENT_HOLD: 'Follow-Up', // Renamed from "Payment Hold" per client request
   PAYMENT_COMPLETE: 'Payment Complete',
   SAP_REQUEST_PENDING: 'SAP Request Pending',
   SAP_PAPERWORK_PENDING: 'SAP Paperwork Pending',

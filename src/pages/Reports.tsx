@@ -4,7 +4,6 @@ import {
   PaymentAnalyticsChart,
   StepDistributionChart,
   SapPerformanceChart,
-  ClinicPerformanceChart,
 } from '@/components/reports';
 import { BarChart3 } from 'lucide-react';
 
@@ -40,11 +39,6 @@ export default function Reports() {
 
           {/* SAP Performance */}
           <SapPerformanceChart />
-
-          {/* Clinic Performance - Full width */}
-          <div className="lg:col-span-2">
-            <ClinicPerformanceChart />
-          </div>
         </div>
       </div>
     </AppLayout>

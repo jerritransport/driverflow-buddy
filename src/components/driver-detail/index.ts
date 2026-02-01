@@ -7,3 +7,7 @@ export { DocumentsTab } from './DocumentsTab';
 export { ActivityLogTab } from './ActivityLogTab';
 export { RecordPaymentDialog } from './RecordPaymentDialog';
 export { GenerateDonorPassDialog } from './GenerateDonorPassDialog';
+export { SetFollowUpDialog } from './SetFollowUpDialog';
+export { NotesTab } from './NotesTab';
+export { TestResultsSection } from './TestResultsSection';
+export { CommunicationActions } from './CommunicationActions';

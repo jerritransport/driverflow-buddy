@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Driver } from '@/hooks/useDrivers';
+import { useState, useEffect } from 'react';
+import { Driver, useDriver } from '@/hooks/useDrivers';
 import { useUpdateDriver } from '@/hooks/useDriverDetails';
 import {
   Dialog,
@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Calendar, Loader2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -20,21 +21,34 @@ import { format } from 'date-fns';
 interface SetFollowUpDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  driver: Driver;
+  driver?: Driver;
+  driverId?: string;
   onSuccess?: () => void;
 }
 
-export function SetFollowUpDialog({ open, onOpenChange, driver, onSuccess }: SetFollowUpDialogProps) {
+export function SetFollowUpDialog({ open, onOpenChange, driver: driverProp, driverId, onSuccess }: SetFollowUpDialogProps) {
   const updateDriver = useUpdateDriver();
   
-  const [followUpDate, setFollowUpDate] = useState(
-    driver.follow_up_date || format(new Date(), 'yyyy-MM-dd')
-  );
-  const [followUpNote, setFollowUpNote] = useState(driver.follow_up_note || '');
+  // Fetch driver if only driverId is provided
+  const { data: fetchedDriver, isLoading: driverLoading } = useDriver(driverId && !driverProp ? driverId : undefined);
+  const driver = driverProp || fetchedDriver;
+  
+  const [followUpDate, setFollowUpDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [followUpNote, setFollowUpNote] = useState('');
 
-  const hasExistingFollowUp = !!driver.follow_up_date;
+  // Update state when driver data loads
+  useEffect(() => {
+    if (driver) {
+      setFollowUpDate(driver.follow_up_date || format(new Date(), 'yyyy-MM-dd'));
+      setFollowUpNote(driver.follow_up_note || '');
+    }
+  }, [driver]);
+
+  const hasExistingFollowUp = !!driver?.follow_up_date;
 
   const handleSave = async () => {
+    if (!driver) return;
+    
     try {
       await updateDriver.mutateAsync({
         driverId: driver.id,
@@ -53,6 +67,8 @@ export function SetFollowUpDialog({ open, onOpenChange, driver, onSuccess }: Set
   };
 
   const handleClear = async () => {
+    if (!driver) return;
+    
     try {
       await updateDriver.mutateAsync({
         driverId: driver.id,
@@ -81,33 +97,44 @@ export function SetFollowUpDialog({ open, onOpenChange, driver, onSuccess }: Set
             Set Follow-Up Reminder
           </DialogTitle>
           <DialogDescription>
-            Schedule a follow-up for {driver.first_name} {driver.last_name}
+            {driver ? (
+              <>Schedule a follow-up for {driver.first_name} {driver.last_name}</>
+            ) : (
+              'Loading driver...'
+            )}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="followUpDate">Follow-Up Date</Label>
-            <Input
-              id="followUpDate"
-              type="date"
-              value={followUpDate}
-              onChange={(e) => setFollowUpDate(e.target.value)}
-              min={format(new Date(), 'yyyy-MM-dd')}
-            />
+        {driverLoading ? (
+          <div className="space-y-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-24 w-full" />
           </div>
+        ) : driver ? (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="followUpDate">Follow-Up Date</Label>
+              <Input
+                id="followUpDate"
+                type="date"
+                value={followUpDate}
+                onChange={(e) => setFollowUpDate(e.target.value)}
+                min={format(new Date(), 'yyyy-MM-dd')}
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="followUpNote">Note / Reason</Label>
-            <Textarea
-              id="followUpNote"
-              placeholder="e.g., Call to confirm payment, Check on SAP paperwork..."
-              value={followUpNote}
-              onChange={(e) => setFollowUpNote(e.target.value)}
-              className="min-h-[100px]"
-            />
+            <div className="space-y-2">
+              <Label htmlFor="followUpNote">Note / Reason</Label>
+              <Textarea
+                id="followUpNote"
+                placeholder="e.g., Call to confirm payment, Check on SAP paperwork..."
+                value={followUpNote}
+                onChange={(e) => setFollowUpNote(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
           </div>
-        </div>
+        ) : null}
 
         <DialogFooter className="gap-2 sm:gap-0">
           {hasExistingFollowUp && (
@@ -127,7 +154,7 @@ export function SetFollowUpDialog({ open, onOpenChange, driver, onSuccess }: Set
           </Button>
           <Button
             onClick={handleSave}
-            disabled={updateDriver.isPending || !followUpDate}
+            disabled={updateDriver.isPending || !followUpDate || !driver}
           >
             {updateDriver.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Save Follow-Up

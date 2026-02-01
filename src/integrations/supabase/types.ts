@@ -415,8 +415,10 @@ export type Database = {
         Row: {
           address_line1: string | null
           address_line2: string | null
+          alcohol_result_url: string | null
           amount_due: number | null
           amount_paid: number | null
+          ccf_url: string | null
           cdl_expiration: string | null
           cdl_number: string | null
           cdl_state: string | null
@@ -425,6 +427,7 @@ export type Database = {
           clearinghouse_prohibited: boolean | null
           clearinghouse_query_conducted_at: string | null
           clearinghouse_query_result: string | null
+          collection_date: string | null
           created_at: string | null
           current_step: number
           date_of_birth: string | null
@@ -448,6 +451,7 @@ export type Database = {
           rtd_completed: boolean | null
           rtd_completed_at: string | null
           rtd_reported_to_fmcsa_at: string | null
+          sample_id: string | null
           sap_id: string | null
           sap_paperwork_received_at: string | null
           state: string | null
@@ -457,15 +461,19 @@ export type Database = {
           test_result: string | null
           test_result_date: string | null
           test_scheduled_date: string | null
+          test_status: string | null
           test_type: string | null
           updated_at: string | null
+          urine_result_url: string | null
           zip_code: string | null
         }
         Insert: {
           address_line1?: string | null
           address_line2?: string | null
+          alcohol_result_url?: string | null
           amount_due?: number | null
           amount_paid?: number | null
+          ccf_url?: string | null
           cdl_expiration?: string | null
           cdl_number?: string | null
           cdl_state?: string | null
@@ -474,6 +482,7 @@ export type Database = {
           clearinghouse_prohibited?: boolean | null
           clearinghouse_query_conducted_at?: string | null
           clearinghouse_query_result?: string | null
+          collection_date?: string | null
           created_at?: string | null
           current_step?: number
           date_of_birth?: string | null
@@ -497,6 +506,7 @@ export type Database = {
           rtd_completed?: boolean | null
           rtd_completed_at?: string | null
           rtd_reported_to_fmcsa_at?: string | null
+          sample_id?: string | null
           sap_id?: string | null
           sap_paperwork_received_at?: string | null
           state?: string | null
@@ -506,15 +516,19 @@ export type Database = {
           test_result?: string | null
           test_result_date?: string | null
           test_scheduled_date?: string | null
+          test_status?: string | null
           test_type?: string | null
           updated_at?: string | null
+          urine_result_url?: string | null
           zip_code?: string | null
         }
         Update: {
           address_line1?: string | null
           address_line2?: string | null
+          alcohol_result_url?: string | null
           amount_due?: number | null
           amount_paid?: number | null
+          ccf_url?: string | null
           cdl_expiration?: string | null
           cdl_number?: string | null
           cdl_state?: string | null
@@ -523,6 +537,7 @@ export type Database = {
           clearinghouse_prohibited?: boolean | null
           clearinghouse_query_conducted_at?: string | null
           clearinghouse_query_result?: string | null
+          collection_date?: string | null
           created_at?: string | null
           current_step?: number
           date_of_birth?: string | null
@@ -546,6 +561,7 @@ export type Database = {
           rtd_completed?: boolean | null
           rtd_completed_at?: string | null
           rtd_reported_to_fmcsa_at?: string | null
+          sample_id?: string | null
           sap_id?: string | null
           sap_paperwork_received_at?: string | null
           state?: string | null
@@ -555,8 +571,10 @@ export type Database = {
           test_result?: string | null
           test_result_date?: string | null
           test_scheduled_date?: string | null
+          test_status?: string | null
           test_type?: string | null
           updated_at?: string | null
+          urine_result_url?: string | null
           zip_code?: string | null
         }
         Relationships: [
@@ -601,6 +619,61 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "driver_full_details"
             referencedColumns: ["clinic_id"]
+          },
+        ]
+      }
+      intake_forms: {
+        Row: {
+          cdl_attachment_url: string | null
+          created_at: string | null
+          driver_id: string | null
+          form_pdf_url: string | null
+          id: string
+          source: string | null
+          status: string | null
+          submission_date: string | null
+        }
+        Insert: {
+          cdl_attachment_url?: string | null
+          created_at?: string | null
+          driver_id?: string | null
+          form_pdf_url?: string | null
+          id?: string
+          source?: string | null
+          status?: string | null
+          submission_date?: string | null
+        }
+        Update: {
+          cdl_attachment_url?: string | null
+          created_at?: string | null
+          driver_id?: string | null
+          form_pdf_url?: string | null
+          id?: string
+          source?: string | null
+          status?: string | null
+          submission_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intake_forms_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "driver_full_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "intake_forms_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "intake_forms_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers_needing_attention"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1007,8 +1080,10 @@ export type Database = {
         Returns: {
           address_line1: string | null
           address_line2: string | null
+          alcohol_result_url: string | null
           amount_due: number | null
           amount_paid: number | null
+          ccf_url: string | null
           cdl_expiration: string | null
           cdl_number: string | null
           cdl_state: string | null
@@ -1017,6 +1092,7 @@ export type Database = {
           clearinghouse_prohibited: boolean | null
           clearinghouse_query_conducted_at: string | null
           clearinghouse_query_result: string | null
+          collection_date: string | null
           created_at: string | null
           current_step: number
           date_of_birth: string | null
@@ -1040,6 +1116,7 @@ export type Database = {
           rtd_completed: boolean | null
           rtd_completed_at: string | null
           rtd_reported_to_fmcsa_at: string | null
+          sample_id: string | null
           sap_id: string | null
           sap_paperwork_received_at: string | null
           state: string | null
@@ -1049,8 +1126,10 @@ export type Database = {
           test_result: string | null
           test_result_date: string | null
           test_scheduled_date: string | null
+          test_status: string | null
           test_type: string | null
           updated_at: string | null
+          urine_result_url: string | null
           zip_code: string | null
         }[]
         SetofOptions: {

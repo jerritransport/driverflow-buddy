@@ -105,9 +105,9 @@ export function SummaryCards() {
         icon={<Users className="h-5 w-5 text-muted-foreground" />}
       />
       <SummaryCard
-        title="Needs Attention"
+        title="Needs Follow-Up"
         value={summary.payment_hold_count || 0}
-        subtitle="Drivers on hold"
+        subtitle="Action required"
         icon={<AlertTriangle className="h-5 w-5 text-[hsl(var(--status-danger))]" />}
         variant="danger"
       />
