@@ -209,10 +209,10 @@ export interface CreateDriverData {
   middle_name?: string;
   email: string;
   phone: string;
-  gender: string;
-  date_of_birth: string;
-  cdl_number: string;
-  cdl_state: string;
+  gender?: string;
+  date_of_birth?: string;
+  cdl_number?: string;
+  cdl_state?: string;
   cdl_expiration?: string;
   address_line1?: string;
   address_line2?: string;
