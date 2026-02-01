@@ -1,6 +1,7 @@
 import { Driver } from '@/hooks/useDrivers';
 import { format } from 'date-fns';
 import { User, MapPin, Briefcase, FileText, Calendar, Phone, Mail } from 'lucide-react';
+import { TestResultsSection } from './TestResultsSection';
 
 interface PersonalInfoTabProps {
   driver: Driver;
@@ -70,6 +71,9 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
           </div>
         </section>
       )}
+
+      {/* Test Results Section */}
+      <TestResultsSection driver={driver} />
     </div>
   );
 }

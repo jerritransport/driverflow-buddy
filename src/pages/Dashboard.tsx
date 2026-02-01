@@ -4,6 +4,7 @@ import { SummaryCards } from '@/components/dashboard/SummaryCards';
 import { ViewToggle, ViewMode } from '@/components/dashboard/ViewToggle';
 import { TableView } from '@/components/dashboard/TableView';
 import { KanbanView } from '@/components/dashboard/KanbanView';
+import { QuickStatsPanel } from '@/components/dashboard/QuickStatsPanel';
 import { DriverDetailPanel } from '@/components/driver-detail';
 
 export default function Dashboard() {
@@ -35,19 +36,27 @@ export default function Dashboard() {
         {/* Summary Cards */}
         <SummaryCards />
 
-        {/* Driver Pipeline */}
-        <div className="relative">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Driver Pipeline</h2>
-            <div className="sm:hidden">
-              <ViewToggle value={viewMode} onChange={setViewMode} />
+        {/* Driver Pipeline with Quick Stats Sidebar */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Main Content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Driver Pipeline</h2>
+              <div className="sm:hidden">
+                <ViewToggle value={viewMode} onChange={setViewMode} />
+              </div>
             </div>
+            {viewMode === 'table' ? (
+              <TableView onDriverSelect={handleDriverSelect} />
+            ) : (
+              <KanbanView onDriverSelect={handleDriverSelect} />
+            )}
           </div>
-          {viewMode === 'table' ? (
-            <TableView onDriverSelect={handleDriverSelect} />
-          ) : (
-            <KanbanView onDriverSelect={handleDriverSelect} />
-          )}
+
+          {/* Quick Stats Sidebar - Hidden on mobile */}
+          <div className="hidden lg:block lg:w-64 shrink-0">
+            <QuickStatsPanel />
+          </div>
         </div>
       </div>
 
