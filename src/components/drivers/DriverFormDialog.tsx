@@ -112,17 +112,35 @@ export function DriverFormDialog({
 
   const onSubmit = async (values: DriverFormValues) => {
     try {
+      // Clean empty strings to undefined for optional fields
+      const cleanedValues = {
+        ...values,
+        middle_name: values.middle_name || undefined,
+        gender: values.gender || undefined,
+        date_of_birth: values.date_of_birth || undefined,
+        cdl_number: values.cdl_number || undefined,
+        cdl_state: values.cdl_state || undefined,
+        cdl_expiration: values.cdl_expiration || undefined,
+        address_line1: values.address_line1 || undefined,
+        address_line2: values.address_line2 || undefined,
+        city: values.city || undefined,
+        state: values.state || undefined,
+        zip_code: values.zip_code || undefined,
+        employer_name: values.employer_name || undefined,
+        employer_contact: values.employer_contact || undefined,
+      };
+
       if (isEditing && driver) {
         await updateDriver.mutateAsync({
           driverId: driver.id,
-          updates: values,
+          updates: cleanedValues,
         });
         toast({
           title: 'Driver Updated',
           description: `${values.first_name} ${values.last_name} has been updated.`,
         });
       } else {
-        await createDriver.mutateAsync(values as CreateDriverData);
+        await createDriver.mutateAsync(cleanedValues as CreateDriverData);
         toast({
           title: 'Driver Created',
           description: `${values.first_name} ${values.last_name} has been added.`,

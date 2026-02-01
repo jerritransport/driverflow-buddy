@@ -230,10 +230,32 @@ export function useCreateDriver() {
 
   return useMutation({
     mutationFn: async (data: CreateDriverData) => {
+      // Sanitize data: convert empty strings to null for optional fields
+      const sanitizedData = {
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        phone: data.phone,
+        middle_name: data.middle_name || null,
+        gender: data.gender || null,
+        date_of_birth: data.date_of_birth || null,
+        cdl_number: data.cdl_number || null,
+        cdl_state: data.cdl_state || null,
+        cdl_expiration: data.cdl_expiration || null,
+        address_line1: data.address_line1 || null,
+        address_line2: data.address_line2 || null,
+        city: data.city || null,
+        state: data.state || null,
+        zip_code: data.zip_code || null,
+        employer_name: data.employer_name || null,
+        employer_contact: data.employer_contact || null,
+        requires_alcohol_test: data.requires_alcohol_test ?? false,
+      };
+
       const { data: driver, error } = await supabase
         .from('drivers')
         .insert({
-          ...data,
+          ...sanitizedData,
           status: 'INTAKE_PENDING',
           current_step: 1,
           payment_status: 'UNPAID',
