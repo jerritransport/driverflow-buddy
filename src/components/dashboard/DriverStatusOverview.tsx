@@ -28,7 +28,7 @@ export function DriverStatusOverview() {
       ).length || 0;
 
       const followUp = drivers?.filter(d => 
-        d.status === 'FOLLOW_UP' || 
+        d.status === 'PAYMENT_HOLD' || 
         (d.follow_up_date && d.follow_up_date >= today)
       ).length || 0;
 
