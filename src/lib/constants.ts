@@ -1,12 +1,12 @@
 // Driver status and step mappings
 export const DRIVER_STEPS = [
-  { step: 1, label: 'Consent', statuses: ['INTAKE_PENDING'] },
+  { step: 1, label: 'Consent Form', statuses: ['INTAKE_PENDING'] },
   { step: 2, label: 'Payment', statuses: ['PAYMENT_HOLD', 'PAYMENT_COMPLETE'] },
   { step: 3, label: 'SAP Paperwork', statuses: ['SAP_REQUEST_PENDING', 'SAP_PAPERWORK_PENDING', 'ALCOHOL_FEE_PENDING'] },
-  { step: 4, label: 'Clearinghouse', statuses: ['CLEARINGHOUSE_PENDING', 'CLEARINGHOUSE_AUTOMATING', 'CLEARINGHOUSE_COMPLETE'] },
-  { step: 5, label: 'Drug Test', statuses: ['DONOR_PASS_PENDING', 'DONOR_PASS_SENT'] },
+  { step: 4, label: 'Designation', statuses: ['CLEARINGHOUSE_PENDING', 'CLEARINGHOUSE_AUTOMATING', 'CLEARINGHOUSE_COMPLETE'] },
+  { step: 5, label: 'Donor Pass', statuses: ['DONOR_PASS_PENDING', 'DONOR_PASS_SENT'] },
   { step: 6, label: 'Results', statuses: ['TEST_IN_PROGRESS', 'RESULT_RECEIVED'] },
-  { step: 7, label: 'Complete', statuses: ['RTD_COMPLETE'] },
+  { step: 7, label: 'Step 5 Complete', statuses: ['RTD_COMPLETE'] },
 ] as const;
 
 // Workflow steps for UI (same as DRIVER_STEPS but simpler format)
@@ -37,9 +37,9 @@ export const STATUS_LABELS: Record<string, string> = {
   SAP_REQUEST_PENDING: 'SAP Request Pending',
   SAP_PAPERWORK_PENDING: 'SAP Paperwork Pending',
   ALCOHOL_FEE_PENDING: 'Alcohol Fee Pending',
-  CLEARINGHOUSE_PENDING: 'Clearinghouse Pending',
-  CLEARINGHOUSE_AUTOMATING: 'Clearinghouse Automating',
-  CLEARINGHOUSE_COMPLETE: 'Clearinghouse Complete',
+  CLEARINGHOUSE_PENDING: 'Designation Pending',
+  CLEARINGHOUSE_AUTOMATING: 'Designation Automating',
+  CLEARINGHOUSE_COMPLETE: 'Designation Complete',
   DONOR_PASS_PENDING: 'Donor Pass Pending',
   DONOR_PASS_SENT: 'Donor Pass Sent',
   TEST_IN_PROGRESS: 'Test In Progress',
