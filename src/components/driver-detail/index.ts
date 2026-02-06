@@ -8,6 +8,7 @@ export { ActivityLogTab } from './ActivityLogTab';
 export { RecordPaymentDialog } from './RecordPaymentDialog';
 export { GenerateDonorPassDialog } from './GenerateDonorPassDialog';
 export { SetFollowUpDialog } from './SetFollowUpDialog';
+export { SendAlcoholPaymentDialog } from './SendAlcoholPaymentDialog';
 export { NotesTab } from './NotesTab';
 export { TestResultsSection } from './TestResultsSection';
 export { CommunicationActions } from './CommunicationActions';

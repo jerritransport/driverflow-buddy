@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { RecordPaymentDialog } from './RecordPaymentDialog';
 import { GenerateDonorPassDialog } from './GenerateDonorPassDialog';
 import { SetFollowUpDialog } from './SetFollowUpDialog';
+import { SendAlcoholPaymentDialog } from './SendAlcoholPaymentDialog';
 import { 
   ChevronRight, 
   Loader2, 
@@ -16,7 +17,8 @@ import {
   FileText,
   Ban,
   CheckCircle2,
-  Calendar
+  Calendar,
+  Wine
 } from 'lucide-react';
 
 interface QuickActionsProps {
@@ -32,6 +34,7 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [donorPassDialogOpen, setDonorPassDialogOpen] = useState(false);
   const [followUpDialogOpen, setFollowUpDialogOpen] = useState(false);
+  const [alcoholPaymentDialogOpen, setAlcoholPaymentDialogOpen] = useState(false);
 
   const currentStepInfo = DRIVER_STEPS.find(s => s.step === driver.current_step);
   const nextStepInfo = DRIVER_STEPS.find(s => s.step === driver.current_step + 1);
@@ -40,6 +43,7 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
   const isComplete = driver.current_step === 7 || driver.rtd_completed;
   const canGenerateDonorPass = driver.current_step >= 4 && !driver.donor_pass_number;
   const hasBalance = (driver.amount_due ?? 0) > (driver.amount_paid ?? 0);
+  const showAlcoholPaymentButton = driver.requires_alcohol_test && driver.current_step === 3;
 
   const handleAdvance = async () => {
     if (!nextStepInfo) return;
@@ -131,6 +135,28 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
                 Clear Hold
               </>
             )}
+          </Button>
+        </div>
+      )}
+
+      {/* Alcohol Test Payment Alert */}
+      {showAlcoholPaymentButton && (
+        <div className="flex items-center gap-2 rounded-lg bg-[hsl(var(--status-warning))]/10 p-3">
+          <Wine className="h-5 w-5 text-[hsl(var(--status-warning))]" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-[hsl(var(--status-warning))]">Alcohol Test Required</p>
+            <p className="text-xs text-muted-foreground">
+              SAP has indicated this driver needs an alcohol test
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setAlcoholPaymentDialogOpen(true)}
+            className="shrink-0 border-[hsl(var(--status-warning))] text-[hsl(var(--status-warning))] hover:bg-[hsl(var(--status-warning))]/10"
+          >
+            <DollarSign className="mr-1 h-4 w-4" />
+            Send Payment Link
           </Button>
         </div>
       )}
@@ -270,6 +296,13 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
       <SetFollowUpDialog
         open={followUpDialogOpen}
         onOpenChange={setFollowUpDialogOpen}
+        driver={driver}
+        onSuccess={onSuccess}
+      />
+
+      <SendAlcoholPaymentDialog
+        open={alcoholPaymentDialogOpen}
+        onOpenChange={setAlcoholPaymentDialogOpen}
         driver={driver}
         onSuccess={onSuccess}
       />
