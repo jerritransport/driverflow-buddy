@@ -182,10 +182,10 @@ export function DriverFormDialog({
       onOpenChange(false);
       form.reset();
       onSuccess?.();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Error',
-        description: `Failed to ${isEditing ? 'update' : 'create'} driver.`,
+        description: error?.message || `Failed to ${isEditing ? 'update' : 'create'} driver.`,
         variant: 'destructive',
       });
     }
