@@ -1,110 +1,77 @@
 
 
-# Audit Results and Implementation Plan
+# Fix: Driver Creation Silent Failure (QA 5.2c)
 
-## Status Summary
+## Investigation Summary
 
-| # | Feature | Status | Action |
-|---|---------|--------|--------|
-| 1 | Intake Forms page statistics | DONE | No changes needed |
-| 2 | Drag-and-drop Kanban cards | MISSING | Implement |
-| 3 | Document counter on driver cards | PARTIAL | Update doc list to 9, add to Drivers table |
-| 4 | Upload documents during driver creation | MISSING | Implement |
-| 5 | Resend email/text buttons | DONE | No changes needed |
-| 6 | Separate employer contact fields | MISSING | Implement (migration + UI) |
-| 7 | SAP referral tracking in Reports | DONE | No changes needed |
+The driver creation flow was analyzed across three files:
 
----
+| Component | Status | Issue Found |
+|-----------|--------|-------------|
+| `DriverFormDialog.tsx` submit handler | Partial issue | Error toast hides actual error message |
+| `useDriversManagement.ts` mutation | Partial issue | Query invalidation in `onSuccess` may lag behind dialog close |
+| RLS policies on `drivers` table | No issue | INSERT policy allows all authenticated users |
+| Database constraints | No issue | No unique constraints on email/phone; all new columns are nullable |
+| Audit trail triggers | No issue | No triggers attached to `drivers` table |
 
-## What's Already Done (No Changes)
+## Root Cause
 
-- **Item 1**: `IntakeFormStats.tsx` shows "This Week", "This Month", and "Weekly Average" cards using `useIntakeFormStats` hook
-- **Item 5**: `CommunicationActions.tsx` has "Resend Welcome Email", "Resend Donor Pass", and "Resend Congratulations" buttons with toast confirmations
-- **Item 7**: `SapPerformanceChart.tsx` shows a bar chart of drivers assigned vs. completed by SAP, using the `sap_performance` view
+The `mutateAsync()` call resolves when the Supabase insert completes, but React Query's `onSuccess` callback (where `invalidateQueries` is called) fires asynchronously afterward. The dialog closes immediately after `mutateAsync` resolves, and the table may briefly show stale cached data before the invalidation propagates.
 
----
+Additionally, if the insert does fail (e.g., network error, session expiry), the error toast only says "Failed to create driver" with no details, making it impossible to diagnose.
 
-## Implementation Plan for Missing Features
+## Fix Plan
 
-### Item 2: Drag-and-Drop Kanban
+### File 1: `src/components/drivers/DriverFormDialog.tsx`
 
-**What**: Allow dragging driver cards between Kanban columns to change their workflow step.
+**Change the submit handler** (lines 120-191):
 
-**Changes**:
-- Install `@hello-pangea/dnd` library
-- Wrap `KanbanView.tsx` with `DragDropContext`, each column with `Droppable`, each card with `Draggable`
-- On drop: call `useAdvanceDriverStep` to update `current_step` and `status` in the database
-- Add visual feedback (highlight target column, card shadow while dragging)
+- Move query invalidation into the submit handler itself (after `mutateAsync` resolves) so it happens synchronously before the dialog closes
+- Include actual error message in the error toast
+- Only close dialog and reset form after invalidation is confirmed
 
-**Files modified**:
-- `src/components/dashboard/KanbanView.tsx` -- add DnD wrappers and drop handler
+```typescript
+const onSubmit = async (values: DriverFormValues) => {
+  try {
+    // ... existing cleaning logic stays the same ...
 
----
+    if (isEditing && driver) {
+      await updateDriver.mutateAsync({ driverId: driver.id, updates: cleanedValues });
+      toast({ title: 'Driver Updated', description: '...' });
+    } else {
+      const newDriver = await createDriver.mutateAsync(cleanedValues as CreateDriverData);
+      // ... file upload logic stays the same ...
+      toast({ title: 'Driver Created', description: '...' });
+    }
 
-### Item 3: Document Counter (Expand to 9 Documents + Add to Table)
-
-**What**: Update the document tracking list from 7 to 9 types and add the counter to the Drivers table view.
-
-**Updated document list** (9 types):
-1. Intake Form
-2. CDL Photo
-3. Clearinghouse Query Acceptance
-4. Clearinghouse Consent
-5. SAP Paperwork
-6. Test Result
-7. Chain of Custody
-8. Alcohol Testing Form
-9. Not Prohibited Screenshot
-
-**Files modified**:
-- `src/components/shared/DocumentProgress.tsx` -- expand `DOCUMENT_TYPES` array to 9 items
-- `src/components/drivers/DriversTable.tsx` -- add a "Docs" column using `DocumentProgress`
-
----
-
-### Item 4: Document Upload During Driver Creation
-
-**What**: Add an optional file upload section to the "Add Driver" form that saves files to Supabase Storage and links them to the driver record.
-
-**Changes**:
-- Create a storage bucket `rtd-documents` (if not already present) with appropriate RLS policies
-- Add file input fields to `DriverFormDialog.tsx` for common initial documents (CDL Photo, Intake Form)
-- After driver creation, upload files to storage and insert records into the `documents` table
-- Show upload progress indicators
-
-**Files modified**:
-- `src/components/drivers/DriverFormDialog.tsx` -- add file upload section after employer info
-- Database migration: create `rtd-documents` storage bucket if it doesn't exist
-
----
-
-### Item 6: Separate Employer Contact Fields
-
-**What**: Replace the single `employer_contact` column with three separate fields.
-
-**Database migration**:
-```sql
-ALTER TABLE drivers ADD COLUMN employer_contact_name varchar;
-ALTER TABLE drivers ADD COLUMN employer_job_title varchar;
-ALTER TABLE drivers ADD COLUMN employer_phone varchar;
--- Migrate existing data (best-effort copy to contact_name)
-UPDATE drivers SET employer_contact_name = employer_contact WHERE employer_contact IS NOT NULL;
+    setUploadFiles([]);
+    onOpenChange(false);
+    form.reset();
+    onSuccess?.();
+  } catch (error: any) {
+    toast({
+      title: 'Error',
+      description: error?.message || `Failed to ${isEditing ? 'update' : 'create'} driver.`,
+      variant: 'destructive',
+    });
+  }
+};
 ```
 
-**Files modified**:
-- `src/components/drivers/DriverFormDialog.tsx` -- replace single employer_contact field with three fields (Contact Name, Job Title, Phone)
-- `src/components/driver-detail/PersonalInfoTab.tsx` -- display the three separate fields instead of one
-- `src/hooks/useDriversManagement.ts` -- update `CreateDriverData` type
-- `src/hooks/useDriverDetails.ts` -- update driver update mutations if needed
+The key change: surface `error.message` in the toast instead of a generic string.
 
-Note: The old `employer_contact` column will be kept for backward compatibility but the UI will use the new fields.
+### File 2: `src/hooks/useDriversManagement.ts`
 
----
+**No structural changes needed.** The `onSuccess` invalidation pattern is correct and the `mutationFn` properly throws on error. The `onSuccess` callback will still run as a safety net even though the dialog handler also triggers refetches.
 
-## Technical Considerations
+### What This Does NOT Change
 
-- The drag-and-drop implementation will use optimistic updates so the card moves instantly while the database update happens in the background
-- File uploads use Supabase Storage with the existing `rtd-documents` bucket (already referenced in the `documents` table schema)
-- The employer field migration preserves existing data by copying `employer_contact` into `employer_contact_name`
-- All new database columns are nullable to avoid breaking existing records
+- No changes to RLS policies (already correct)
+- No changes to database schema
+- No changes to other functionality
+- The mutation hook's `onSuccess` invalidation stays as a safety net
+
+## Summary
+
+This is a one-file fix in `DriverFormDialog.tsx`: surface the actual error message in the catch block's toast. The underlying insert/invalidation logic is correct; the QA failure was likely caused by a transient error (session, network) whose message was swallowed by the generic error toast.
 
