@@ -5,15 +5,17 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-// Document types to track
+// Document types to track (9 total)
 export const DOCUMENT_TYPES = [
   'Intake Form',
   'CDL Photo',
-  'Clearinghouse Query',
+  'Clearinghouse Query Acceptance',
   'Clearinghouse Consent',
   'SAP Paperwork',
   'Test Result',
   'Chain of Custody',
+  'Alcohol Testing Form',
+  'Not Prohibited Screenshot',
 ] as const;
 
 export type DocumentType = typeof DOCUMENT_TYPES[number];

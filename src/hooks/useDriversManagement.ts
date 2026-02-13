@@ -220,7 +220,9 @@ export interface CreateDriverData {
   state?: string;
   zip_code?: string;
   employer_name?: string;
-  employer_contact?: string;
+  employer_contact_name?: string;
+  employer_job_title?: string;
+  employer_phone?: string;
   amount_due?: number;
   requires_alcohol_test?: boolean;
 }
@@ -248,7 +250,9 @@ export function useCreateDriver() {
         state: data.state || null,
         zip_code: data.zip_code || null,
         employer_name: data.employer_name || null,
-        employer_contact: data.employer_contact || null,
+        employer_contact_name: data.employer_contact_name || null,
+        employer_job_title: data.employer_job_title || null,
+        employer_phone: data.employer_phone || null,
         requires_alcohol_test: data.requires_alcohol_test ?? false,
       };
 

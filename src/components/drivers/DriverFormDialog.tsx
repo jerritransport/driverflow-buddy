@@ -1,6 +1,8 @@
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
   DialogContent,
@@ -32,7 +34,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useCreateDriver, CreateDriverData } from '@/hooks/useDriversManagement';
 import { useUpdateDriver } from '@/hooks/useDriverDetails';
 import { Driver } from '@/hooks/useDrivers';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Upload, X } from 'lucide-react';
 
 const US_STATES = [
   'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
@@ -59,7 +61,9 @@ const driverFormSchema = z.object({
   state: z.string().optional(),
   zip_code: z.string().optional(),
   employer_name: z.string().optional(),
-  employer_contact: z.string().optional(),
+  employer_contact_name: z.string().optional(),
+  employer_job_title: z.string().optional(),
+  employer_phone: z.string().optional(),
   amount_due: z.coerce.number().min(0).optional(),
   requires_alcohol_test: z.boolean().optional(),
 });
@@ -82,7 +86,8 @@ export function DriverFormDialog({
   const { toast } = useToast();
   const createDriver = useCreateDriver();
   const updateDriver = useUpdateDriver();
-
+  const [uploadFiles, setUploadFiles] = useState<{ file: File; type: string }[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const isEditing = !!driver;
 
   const form = useForm<DriverFormValues>({
@@ -104,7 +109,9 @@ export function DriverFormDialog({
       state: driver?.state ?? undefined,
       zip_code: driver?.zip_code ?? '',
       employer_name: driver?.employer_name ?? '',
-      employer_contact: driver?.employer_contact ?? '',
+      employer_contact_name: (driver as any)?.employer_contact_name ?? driver?.employer_contact ?? '',
+      employer_job_title: (driver as any)?.employer_job_title ?? '',
+      employer_phone: (driver as any)?.employer_phone ?? '',
       amount_due: driver?.amount_due ?? 450,
       requires_alcohol_test: driver?.requires_alcohol_test ?? false,
     },
@@ -127,7 +134,9 @@ export function DriverFormDialog({
         state: values.state || undefined,
         zip_code: values.zip_code || undefined,
         employer_name: values.employer_name || undefined,
-        employer_contact: values.employer_contact || undefined,
+        employer_contact_name: values.employer_contact_name || undefined,
+        employer_job_title: values.employer_job_title || undefined,
+        employer_phone: values.employer_phone || undefined,
       };
 
       if (isEditing && driver) {
@@ -140,12 +149,36 @@ export function DriverFormDialog({
           description: `${values.first_name} ${values.last_name} has been updated.`,
         });
       } else {
-        await createDriver.mutateAsync(cleanedValues as CreateDriverData);
+        const newDriver = await createDriver.mutateAsync(cleanedValues as CreateDriverData);
+        
+        // Upload files if any
+        if (uploadFiles.length > 0 && newDriver?.id) {
+          for (const { file, type } of uploadFiles) {
+            const storagePath = `${newDriver.id}/${Date.now()}_${file.name}`;
+            const { error: uploadError } = await supabase.storage
+              .from('rtd-documents')
+              .upload(storagePath, file);
+            
+            if (!uploadError) {
+              await supabase.from('documents').insert({
+                driver_id: newDriver.id,
+                document_type: type,
+                file_name: file.name,
+                file_size_bytes: file.size,
+                mime_type: file.type,
+                storage_path: storagePath,
+                storage_bucket: 'rtd-documents',
+              });
+            }
+          }
+        }
+        
         toast({
           title: 'Driver Created',
           description: `${values.first_name} ${values.last_name} has been added.`,
         });
       }
+      setUploadFiles([]);
       onOpenChange(false);
       form.reset();
       onSuccess?.();
@@ -448,12 +481,40 @@ export function DriverFormDialog({
                 />
                 <FormField
                   control={form.control}
-                  name="employer_contact"
+                  name="employer_contact_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Employer Contact</FormLabel>
+                      <FormLabel>Contact Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="HR Manager: (555) 987-6543" {...field} />
+                        <Input placeholder="Jane Smith" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="employer_job_title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Job Title</FormLabel>
+                      <FormControl>
+                        <Input placeholder="HR Manager" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="employer_phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Contact Phone</FormLabel>
+                      <FormControl>
+                        <Input placeholder="(555) 987-6543" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -502,6 +563,60 @@ export function DriverFormDialog({
                 />
               </div>
             </div>
+
+            {/* Document Uploads (new drivers only) */}
+            {!isEditing && (
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium text-muted-foreground">Documents (Optional)</h3>
+                <div className="space-y-3">
+                  {uploadFiles.map((uf, index) => (
+                    <div key={index} className="flex items-center gap-2 rounded-lg border bg-muted/30 p-2 text-sm">
+                      <Upload className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <span className="truncate flex-1">{uf.file.name}</span>
+                      <span className="text-xs text-muted-foreground shrink-0">{uf.type}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 shrink-0"
+                        onClick={() => setUploadFiles(prev => prev.filter((_, i) => i !== index))}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    accept="image/*,.pdf,.doc,.docx"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        // Auto-detect type from name or default to CDL Photo
+                        const type = file.name.toLowerCase().includes('cdl') ? 'CDL Photo'
+                          : file.name.toLowerCase().includes('intake') ? 'Intake Form'
+                          : 'CDL Photo';
+                        setUploadFiles(prev => [...prev, { file, type }]);
+                      }
+                      e.target.value = '';
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    Attach Document
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    Attach CDL photo, intake form, or other documents. You can also upload later from the driver detail panel.
+                  </p>
+                </div>
+              </div>
+            )}
 
             <DialogFooter>
               <Button
