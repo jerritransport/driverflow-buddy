@@ -436,7 +436,10 @@ export type Database = {
           donor_pass_number: string | null
           email: string
           employer_contact: string | null
+          employer_contact_name: string | null
+          employer_job_title: string | null
           employer_name: string | null
+          employer_phone: string | null
           first_name: string
           follow_up_date: string | null
           follow_up_note: string | null
@@ -491,7 +494,10 @@ export type Database = {
           donor_pass_number?: string | null
           email: string
           employer_contact?: string | null
+          employer_contact_name?: string | null
+          employer_job_title?: string | null
           employer_name?: string | null
+          employer_phone?: string | null
           first_name: string
           follow_up_date?: string | null
           follow_up_note?: string | null
@@ -546,7 +552,10 @@ export type Database = {
           donor_pass_number?: string | null
           email?: string
           employer_contact?: string | null
+          employer_contact_name?: string | null
+          employer_job_title?: string | null
           employer_name?: string | null
+          employer_phone?: string | null
           first_name?: string
           follow_up_date?: string | null
           follow_up_note?: string | null
@@ -1101,7 +1110,10 @@ export type Database = {
           donor_pass_number: string | null
           email: string
           employer_contact: string | null
+          employer_contact_name: string | null
+          employer_job_title: string | null
           employer_name: string | null
+          employer_phone: string | null
           first_name: string
           follow_up_date: string | null
           follow_up_note: string | null

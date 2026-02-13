@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { PaymentBadge } from '@/components/shared/PaymentBadge';
 import { StatusBadge } from '@/components/shared/StatusBadge';
+import { DocumentProgress } from '@/components/shared/DocumentProgress';
 import { getStepLabel } from '@/lib/constants';
 import { formatDistanceToNow } from 'date-fns';
 import { Driver } from '@/hooks/useDrivers';
@@ -197,6 +198,7 @@ export function DriversTable({
               )}
             </TableHead>
             <TableHead>Payment</TableHead>
+            <TableHead>Docs</TableHead>
             <TableHead>
               {isSortable ? (
                 <button
@@ -295,6 +297,9 @@ function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit,
       </TableCell>
       <TableCell>
         <PaymentBadge status={driver.payment_status} />
+      </TableCell>
+      <TableCell>
+        <DocumentProgress documentsUploaded={driver.documents_uploaded} />
       </TableCell>
       <TableCell className="text-sm text-muted-foreground">
         {updatedAt}

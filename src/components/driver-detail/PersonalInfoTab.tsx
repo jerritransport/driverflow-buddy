@@ -59,7 +59,7 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
       </section>
 
       {/* Employer Information */}
-      {(driver.employer_name || driver.employer_contact) && (
+      {(driver.employer_name || (driver as any).employer_contact_name || driver.employer_contact) && (
         <section>
           <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
             <Briefcase className="h-4 w-4" />
@@ -67,7 +67,9 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
           </h4>
           <div className="grid gap-3 rounded-lg border bg-muted/30 p-4">
             <InfoRow label="Employer Name" value={driver.employer_name} />
-            <InfoRow label="Employer Contact" value={driver.employer_contact} />
+            <InfoRow label="Contact Name" value={(driver as any).employer_contact_name || driver.employer_contact} />
+            <InfoRow label="Job Title" value={(driver as any).employer_job_title} />
+            <InfoRow label="Contact Phone" value={(driver as any).employer_phone} icon={<Phone className="h-3 w-3" />} />
           </div>
         </section>
       )}
