@@ -15,7 +15,7 @@ export const WORKFLOW_STEPS = DRIVER_STEPS.map(s => ({ step: s.step, label: s.la
 // All possible driver statuses for dropdowns
 export const DRIVER_STATUSES = [
   { value: 'INTAKE_PENDING', label: 'Consent Pending' },
-  { value: 'PAYMENT_HOLD', label: 'Payment Hold' },
+  { value: 'PAYMENT_HOLD', label: 'Follow-Up' },
   { value: 'PAYMENT_COMPLETE', label: 'Payment Complete' },
   { value: 'SAP_REQUEST_PENDING', label: 'SAP Request Pending' },
   { value: 'SAP_PAPERWORK_PENDING', label: 'SAP Paperwork Pending' },
