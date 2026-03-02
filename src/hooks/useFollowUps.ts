@@ -29,8 +29,8 @@ export function useFollowUps({ filter, search }: UseFollowUpsOptions) {
       let query = supabase
         .from('drivers')
         .select('id, first_name, last_name, phone, email, current_step, status, follow_up_date, follow_up_note')
-        .not('follow_up_date', 'is', null)
-        .order('follow_up_date', { ascending: true });
+        .or('follow_up_date.not.is.null,status.ilike.PAYMENT_HOLD,status.ilike.FOLLOW_UP')
+        .order('follow_up_date', { ascending: true, nullsFirst: false });
 
       // Apply filter
       if (filter === 'today') {
@@ -68,14 +68,19 @@ export function useFollowUpStats() {
       // Get all follow-ups in one query
       const { data, error } = await supabase
         .from('drivers')
-        .select('follow_up_date')
-        .not('follow_up_date', 'is', null);
+        .select('follow_up_date, status')
+        .or('follow_up_date.not.is.null,status.ilike.PAYMENT_HOLD,status.ilike.FOLLOW_UP');
 
       if (error) throw error;
 
       const dueToday = data.filter(d => d.follow_up_date === today).length;
       const overdue = data.filter(d => d.follow_up_date && d.follow_up_date < today).length;
-      const thisWeek = data.filter(d => d.follow_up_date && d.follow_up_date >= today && d.follow_up_date <= weekEnd).length;
+      const thisWeek = data.filter(d => {
+        if (d.follow_up_date) return d.follow_up_date >= today && d.follow_up_date <= weekEnd;
+        // Drivers matched by status only (no date) count as "this week"
+        const s = d.status?.toUpperCase();
+        return s === 'PAYMENT_HOLD' || s === 'FOLLOW_UP';
+      }).length;
 
       return { dueToday, overdue, thisWeek };
     },
