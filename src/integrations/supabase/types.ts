@@ -457,6 +457,7 @@ export type Database = {
           sample_id: string | null
           sap_id: string | null
           sap_paperwork_received_at: string | null
+          SSN: string | null
           state: string | null
           status: string
           test_clinic_id: string | null
@@ -515,6 +516,7 @@ export type Database = {
           sample_id?: string | null
           sap_id?: string | null
           sap_paperwork_received_at?: string | null
+          SSN?: string | null
           state?: string | null
           status?: string
           test_clinic_id?: string | null
@@ -573,6 +575,7 @@ export type Database = {
           sample_id?: string | null
           sap_id?: string | null
           sap_paperwork_received_at?: string | null
+          SSN?: string | null
           state?: string | null
           status?: string
           test_clinic_id?: string | null
@@ -1131,6 +1134,7 @@ export type Database = {
           sample_id: string | null
           sap_id: string | null
           sap_paperwork_received_at: string | null
+          SSN: string | null
           state: string | null
           status: string
           test_clinic_id: string | null
