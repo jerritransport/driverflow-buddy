@@ -1,4 +1,5 @@
 import { useDriver } from '@/hooks/useDrivers';
+import { useAdvanceDriverStep } from '@/hooks/useDriverDetails';
 import {
   Sheet,
   SheetContent,
@@ -22,6 +23,8 @@ import { PaymentBadge } from '@/components/shared/PaymentBadge';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { Phone, Mail, AlertTriangle, Wine, Calendar } from 'lucide-react';
 import { format, isToday, isPast } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
+import { DRIVER_STEPS } from '@/lib/constants';
 
 interface DriverDetailPanelProps {
   driverId: string | null;
@@ -31,6 +34,31 @@ interface DriverDetailPanelProps {
 
 export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetailPanelProps) {
   const { data: driver, isLoading, error } = useDriver(driverId ?? undefined);
+  const advanceStep = useAdvanceDriverStep();
+  const { toast } = useToast();
+
+  const handleStepRevert = async (step: number) => {
+    if (!driver) return;
+    const stepInfo = DRIVER_STEPS.find(s => s.step === step);
+    if (!stepInfo) return;
+    try {
+      await advanceStep.mutateAsync({
+        driverId: driver.id,
+        newStep: step,
+        newStatus: stepInfo.statuses[0],
+      });
+      toast({
+        title: 'Step Reverted',
+        description: `Driver moved back to Step ${step}: ${stepInfo.label}`,
+      });
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'Failed to revert step',
+        variant: 'destructive',
+      });
+    }
+  };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -114,7 +142,7 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
               </div>
 
               {/* Step Timeline */}
-              <StepTimeline currentStep={driver.current_step} status={driver.status} />
+              <StepTimeline currentStep={driver.current_step} status={driver.status} onStepClick={handleStepRevert} />
 
               {/* Quick Actions */}
               <QuickActions driver={driver} />
