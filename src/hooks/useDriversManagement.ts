@@ -225,6 +225,9 @@ export interface CreateDriverData {
   employer_phone?: string;
   amount_due?: number;
   requires_alcohol_test?: boolean;
+  sap_id?: string;
+  follow_up_date?: string;
+  follow_up_note?: string;
 }
 
 export function useCreateDriver() {
@@ -254,6 +257,7 @@ export function useCreateDriver() {
         employer_job_title: data.employer_job_title || null,
         employer_phone: data.employer_phone || null,
         requires_alcohol_test: data.requires_alcohol_test ?? false,
+        sap_id: data.sap_id || null,
       };
 
       const { data: driver, error } = await supabase
@@ -266,6 +270,8 @@ export function useCreateDriver() {
           payment_hold: false,
           amount_paid: 0,
           amount_due: data.amount_due ?? 450,
+          follow_up_date: data.follow_up_date || null,
+          follow_up_note: data.follow_up_note || null,
         })
         .select()
         .single();

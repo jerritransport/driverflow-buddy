@@ -30,11 +30,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateDriver, CreateDriverData } from '@/hooks/useDriversManagement';
 import { useUpdateDriver } from '@/hooks/useDriverDetails';
 import { Driver } from '@/hooks/useDrivers';
-import { Loader2, Upload, X } from 'lucide-react';
+import { useSaps, useCreateSap } from '@/hooks/useSaps';
+import { Loader2, Upload, X, Plus } from 'lucide-react';
+import { addDays, format } from 'date-fns';
 
 const US_STATES = [
   'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
@@ -44,12 +48,34 @@ const US_STATES = [
   'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
 ];
 
+// US phone: must be 10 digits (after stripping formatting), stored as +1XXXXXXXXXX
+const phoneRegex = /^\+?1?\s*\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
+
+function normalizeUSPhone(phone: string): string {
+  const digits = phone.replace(/\D/g, '');
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length === 11 && digits.startsWith('1')) return `+${digits}`;
+  return phone;
+}
+
+function formatPhoneDisplay(value: string): string {
+  const digits = value.replace(/\D/g, '');
+  // Remove leading 1 for display formatting
+  const local = digits.startsWith('1') && digits.length > 10 ? digits.slice(1) : digits;
+  if (local.length <= 3) return local;
+  if (local.length <= 6) return `(${local.slice(0, 3)}) ${local.slice(3)}`;
+  return `(${local.slice(0, 3)}) ${local.slice(3, 6)}-${local.slice(6, 10)}`;
+}
+
 const driverFormSchema = z.object({
-  first_name: z.string().min(1, 'First name is required'),
-  last_name: z.string().min(1, 'Last name is required'),
-  middle_name: z.string().optional(),
-  email: z.string().email('Invalid email address'),
-  phone: z.string().min(10, 'Phone number must be at least 10 characters'),
+  first_name: z.string().trim().min(1, 'First name is required').max(100),
+  last_name: z.string().trim().min(1, 'Last name is required').max(100),
+  middle_name: z.string().max(100).optional(),
+  email: z.string().trim().email('Invalid email address').max(255),
+  phone: z.string().min(1, 'Phone number is required').refine(
+    (val) => phoneRegex.test(val),
+    { message: 'Enter a valid US phone number, e.g. (555) 123-4567' }
+  ),
   gender: z.enum(['Male', 'Female', 'Other']).optional(),
   date_of_birth: z.string().optional(),
   cdl_number: z.string().optional(),
@@ -66,6 +92,8 @@ const driverFormSchema = z.object({
   employer_phone: z.string().optional(),
   amount_due: z.coerce.number().min(0).optional(),
   requires_alcohol_test: z.boolean().optional(),
+  sap_requirement: z.enum(['none', 'needs_sap']).optional(),
+  sap_id: z.string().optional(),
 });
 
 type DriverFormValues = z.infer<typeof driverFormSchema>;
@@ -75,6 +103,67 @@ interface DriverFormDialogProps {
   onOpenChange: (open: boolean) => void;
   driver?: Driver | null;
   onSuccess?: () => void;
+}
+
+// Inline mini form for quick SAP creation
+function InlineSapForm({ onCreated, onCancel }: { onCreated: (id: string) => void; onCancel: () => void }) {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const createSap = useCreateSap();
+  const { toast } = useToast();
+
+  const handleCreate = async () => {
+    if (!firstName || !lastName || !email) {
+      toast({ title: 'Required', description: 'Name and email are required.', variant: 'destructive' });
+      return;
+    }
+    try {
+      const sap = await createSap.mutateAsync({
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        phone: phone ? normalizeUSPhone(phone) : null,
+        is_active: true,
+        organization: null,
+        certification_number: null,
+        certification_expiration: null,
+        address_line1: null,
+        address_line2: null,
+        city: null,
+        state: null,
+        zip_code: null,
+      });
+      toast({ title: 'SAP Created', description: `${firstName} ${lastName} added.` });
+      onCreated(sap.id);
+    } catch (err: any) {
+      toast({ title: 'Error', description: err?.message || 'Failed to create SAP', variant: 'destructive' });
+    }
+  };
+
+  return (
+    <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+      <p className="text-sm font-medium">Add New SAP Counselor</p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Input placeholder="First Name *" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+        <Input placeholder="Last Name *" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+        <Input type="email" placeholder="Email *" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <Input
+          placeholder="Phone (US +1)"
+          value={phone}
+          onChange={(e) => setPhone(formatPhoneDisplay(e.target.value))}
+        />
+      </div>
+      <div className="flex gap-2">
+        <Button type="button" size="sm" onClick={handleCreate} disabled={createSap.isPending}>
+          {createSap.isPending && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}
+          Save SAP
+        </Button>
+        <Button type="button" size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>
+      </div>
+    </div>
+  );
 }
 
 export function DriverFormDialog({
@@ -89,6 +178,10 @@ export function DriverFormDialog({
   const [uploadFiles, setUploadFiles] = useState<{ file: File; type: string }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isEditing = !!driver;
+  const [showAddSap, setShowAddSap] = useState(false);
+
+  const { data: saps } = useSaps();
+  const activeSaps = saps?.filter(s => s.is_active) || [];
 
   const form = useForm<DriverFormValues>({
     resolver: zodResolver(driverFormSchema),
@@ -114,14 +207,18 @@ export function DriverFormDialog({
       employer_phone: (driver as any)?.employer_phone ?? '',
       amount_due: driver?.amount_due ?? 450,
       requires_alcohol_test: driver?.requires_alcohol_test ?? false,
+      sap_requirement: driver?.sap_id ? 'needs_sap' : 'none',
+      sap_id: driver?.sap_id ?? undefined,
     },
   });
 
+  const sapRequirement = form.watch('sap_requirement');
+
   const onSubmit = async (values: DriverFormValues) => {
     try {
-      // Clean empty strings to undefined for optional fields
       const cleanedValues = {
         ...values,
+        phone: normalizeUSPhone(values.phone),
         middle_name: values.middle_name || undefined,
         gender: values.gender || undefined,
         date_of_birth: values.date_of_birth || undefined,
@@ -136,20 +233,43 @@ export function DriverFormDialog({
         employer_name: values.employer_name || undefined,
         employer_contact_name: values.employer_contact_name || undefined,
         employer_job_title: values.employer_job_title || undefined,
-        employer_phone: values.employer_phone || undefined,
+        employer_phone: values.employer_phone ? normalizeUSPhone(values.employer_phone) : undefined,
+        sap_id: values.sap_requirement === 'needs_sap' ? values.sap_id || undefined : undefined,
       };
+
+      // Determine follow-up date based on SAP requirement
+      let follow_up_date: string | undefined;
+      let follow_up_note: string | undefined;
+      if (values.sap_requirement === 'needs_sap' && !isEditing) {
+        follow_up_date = format(addDays(new Date(), 3), 'yyyy-MM-dd');
+        follow_up_note = 'Follow-up: Confirm SAP counselor setup';
+      }
+
+      // Remove form-only fields before sending
+      const { sap_requirement, ...dataToSend } = cleanedValues;
 
       if (isEditing && driver) {
         await updateDriver.mutateAsync({
           driverId: driver.id,
-          updates: cleanedValues,
+          updates: {
+            ...dataToSend,
+            ...(follow_up_date ? { follow_up_date, follow_up_note } : {}),
+          },
         });
         toast({
           title: 'Driver Updated',
           description: `${values.first_name} ${values.last_name} has been updated.`,
         });
       } else {
-        const newDriver = await createDriver.mutateAsync(cleanedValues as CreateDriverData);
+        const createData = {
+          ...dataToSend,
+          first_name: values.first_name,
+          last_name: values.last_name,
+          email: values.email,
+          phone: normalizeUSPhone(values.phone),
+          ...(follow_up_date ? { follow_up_date, follow_up_note } : {}),
+        } as CreateDriverData;
+        const newDriver = await createDriver.mutateAsync(createData);
         
         // Upload files if any
         if (uploadFiles.length > 0 && newDriver?.id) {
@@ -175,10 +295,11 @@ export function DriverFormDialog({
         
         toast({
           title: 'Driver Created',
-          description: `${values.first_name} ${values.last_name} has been added.`,
+          description: `${values.first_name} ${values.last_name} has been added.${values.sap_requirement === 'needs_sap' ? ' SAP follow-up set for 3 days.' : ''}`,
         });
       }
       setUploadFiles([]);
+      setShowAddSap(false);
       onOpenChange(false);
       form.reset();
       onSuccess?.();
@@ -271,10 +392,18 @@ export function DriverFormDialog({
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone *</FormLabel>
+                      <FormLabel>Phone * (US +1)</FormLabel>
                       <FormControl>
-                        <Input placeholder="(555) 123-4567" {...field} />
+                        <Input
+                          placeholder="(555) 123-4567"
+                          value={field.value}
+                          onChange={(e) => field.onChange(formatPhoneDisplay(e.target.value))}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                          ref={field.ref}
+                        />
                       </FormControl>
+                      <FormDescription>US numbers only (+1)</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -514,13 +643,122 @@ export function DriverFormDialog({
                     <FormItem>
                       <FormLabel>Contact Phone</FormLabel>
                       <FormControl>
-                        <Input placeholder="(555) 987-6543" {...field} />
+                        <Input
+                          placeholder="(555) 987-6543"
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(formatPhoneDisplay(e.target.value))}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                          ref={field.ref}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
+            </div>
+
+            {/* SAP Counselor */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground">SAP Counselor</h3>
+
+              <FormField
+                control={form.control}
+                name="sap_requirement"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SAP Requirement</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        value={field.value || 'none'}
+                        onValueChange={field.onChange}
+                        className="flex flex-col gap-2"
+                      >
+                        <div className="flex items-center gap-2">
+                          <RadioGroupItem value="none" id="sap-none" />
+                          <Label htmlFor="sap-none" className="font-normal">No SAP Needed</Label>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <RadioGroupItem value="needs_sap" id="sap-needs" />
+                          <Label htmlFor="sap-needs" className="font-normal">Needs SAP Counselor</Label>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
+                    {field.value === 'needs_sap' && (
+                      <FormDescription>
+                        A 3-day follow-up will be set to confirm SAP setup, then 7 days to confirm completion.
+                      </FormDescription>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {sapRequirement === 'needs_sap' && (
+                <div className="space-y-3">
+                  <FormField
+                    control={form.control}
+                    name="sap_id"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Select SAP Counselor</FormLabel>
+                        <div className="flex gap-2">
+                          <Select onValueChange={field.onChange} value={field.value || ""}>
+                            <FormControl>
+                              <SelectTrigger className="flex-1">
+                                <SelectValue placeholder="Choose a SAP counselor" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {activeSaps.map((sap) => (
+                                <SelectItem key={sap.id} value={sap.id}>
+                                  {sap.first_name} {sap.last_name}
+                                  {sap.organization ? ` — ${sap.organization}` : ''}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setShowAddSap(true)}
+                            title="Add new SAP"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {showAddSap && (
+                    <InlineSapForm
+                      onCreated={(id) => {
+                        form.setValue('sap_id', id);
+                        setShowAddSap(false);
+                      }}
+                      onCancel={() => setShowAddSap(false)}
+                    />
+                  )}
+
+                  {/* Show selected SAP info */}
+                  {form.watch('sap_id') && (() => {
+                    const selected = activeSaps.find(s => s.id === form.watch('sap_id'));
+                    if (!selected) return null;
+                    return (
+                      <div className="rounded-lg border bg-muted/20 p-3 text-sm space-y-1">
+                        <p className="font-medium">{selected.first_name} {selected.last_name}</p>
+                        <p className="text-muted-foreground">{selected.email}</p>
+                        {selected.phone && <p className="text-muted-foreground">{selected.phone}</p>}
+                        {selected.organization && <p className="text-muted-foreground">{selected.organization}</p>}
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
             </div>
 
             {/* Billing & Options */}
@@ -593,7 +831,6 @@ export function DriverFormDialog({
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        // Auto-detect type from name or default to CDL Photo
                         const type = file.name.toLowerCase().includes('cdl') ? 'CDL Photo'
                           : file.name.toLowerCase().includes('intake') ? 'Intake Form'
                           : 'CDL Photo';
