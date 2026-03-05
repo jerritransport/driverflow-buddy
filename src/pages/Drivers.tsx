@@ -153,9 +153,9 @@ export default function Drivers() {
           />
           <QuickStatCard
             icon={AlertTriangle}
-            label="On Payment Hold"
-            value={drivers.filter((d) => d.payment_hold).length.toString()}
-            iconColor="text-destructive"
+            label="Pending Final Balance"
+            value={drivers.filter((d) => d.payment_status === 'UNPAID' || d.payment_status === 'DEPOSIT').length.toString()}
+            iconColor="text-[hsl(var(--status-warning))]"
           />
           <QuickStatCard
             icon={Wine}
