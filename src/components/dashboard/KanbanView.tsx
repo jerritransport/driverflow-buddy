@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useDriversByStep, Driver } from '@/hooks/useDrivers';
 import { useDriverNotesCount } from '@/hooks/useDriverNotes';
 import { useAdvanceDriverStep } from '@/hooks/useDriverDetails';
@@ -7,18 +8,35 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { PaymentBadge } from '@/components/shared/PaymentBadge';
 import { DocumentProgress } from '@/components/shared/DocumentProgress';
 import { DRIVER_STEPS } from '@/lib/constants';
-import { formatDistanceToNow, isToday, isPast, format } from 'date-fns';
+import { formatDistanceToNow, isToday, isPast, format, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
 import { AlertTriangle, Wine, MessageSquare, Calendar } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { DateRange } from 'react-day-picker';
 
 interface KanbanViewProps {
   onDriverSelect?: (driverId: string) => void;
+  dateRange?: DateRange;
 }
 
-export function KanbanView({ onDriverSelect }: KanbanViewProps) {
-  const { data: driversByStep, isLoading, error } = useDriversByStep();
+export function KanbanView({ onDriverSelect, dateRange }: KanbanViewProps) {
+  const { data: rawDriversByStep, isLoading, error } = useDriversByStep();
+
+  const driversByStep = useMemo(() => {
+    if (!rawDriversByStep || !dateRange?.from) return rawDriversByStep;
+    const filtered: Record<number, Driver[]> = {};
+    for (const [step, drivers] of Object.entries(rawDriversByStep)) {
+      filtered[Number(step)] = drivers.filter((d) => {
+        const created = new Date(d.created_at);
+        return isWithinInterval(created, {
+          start: startOfDay(dateRange.from!),
+          end: dateRange.to ? endOfDay(dateRange.to) : endOfDay(new Date()),
+        });
+      });
+    }
+    return filtered;
+  }, [rawDriversByStep, dateRange]);
   const advanceStep = useAdvanceDriverStep();
   const { toast } = useToast();
   const queryClient = useQueryClient();

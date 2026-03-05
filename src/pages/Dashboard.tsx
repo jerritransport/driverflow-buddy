@@ -5,11 +5,15 @@ import { ViewToggle, ViewMode } from '@/components/dashboard/ViewToggle';
 import { TableView } from '@/components/dashboard/TableView';
 import { KanbanView } from '@/components/dashboard/KanbanView';
 import { QuickStatsPanel } from '@/components/dashboard/QuickStatsPanel';
+import { RevenueOutstandingPanel } from '@/components/dashboard/RevenueOutstandingPanel';
+import { DateRangePicker } from '@/components/dashboard/DateRangePicker';
 import { DriverDetailPanel } from '@/components/driver-detail';
+import { DateRange } from 'react-day-picker';
 
 export default function Dashboard() {
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   const handleDriverSelect = (driverId: string) => {
     setSelectedDriverId(driverId);
@@ -30,13 +34,16 @@ export default function Dashboard() {
               Return-to-Duty driver pipeline overview
             </p>
           </div>
-          <ViewToggle value={viewMode} onChange={setViewMode} />
+          <div className="flex items-center gap-2">
+            <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
+            <ViewToggle value={viewMode} onChange={setViewMode} />
+          </div>
         </div>
 
-        {/* Summary Cards */}
-        <SummaryCards />
+        {/* Summary Cards (4 cards, no Revenue/Outstanding) */}
+        <SummaryCards dateRange={dateRange} />
 
-        {/* Driver Pipeline with Quick Stats Sidebar */}
+        {/* Driver Pipeline with Sidebar */}
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Main Content */}
           <div className="flex-1 min-w-0">
@@ -47,15 +54,16 @@ export default function Dashboard() {
               </div>
             </div>
             {viewMode === 'table' ? (
-              <TableView onDriverSelect={handleDriverSelect} />
+              <TableView onDriverSelect={handleDriverSelect} dateRange={dateRange} />
             ) : (
-              <KanbanView onDriverSelect={handleDriverSelect} />
+              <KanbanView onDriverSelect={handleDriverSelect} dateRange={dateRange} />
             )}
           </div>
 
-          {/* Quick Stats Sidebar - Hidden on mobile */}
-          <div className="hidden lg:block lg:w-64 shrink-0">
+          {/* Sidebar */}
+          <div className="hidden lg:block lg:w-64 shrink-0 space-y-4">
             <QuickStatsPanel />
+            <RevenueOutstandingPanel dateRange={dateRange} />
           </div>
         </div>
       </div>

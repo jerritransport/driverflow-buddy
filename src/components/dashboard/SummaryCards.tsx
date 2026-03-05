@@ -1,13 +1,12 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { useDashboardSummary } from '@/hooks/useDashboardSummary';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DateRange } from 'react-day-picker';
 import { 
   Users, 
   AlertTriangle, 
-  DollarSign, 
   CheckCircle, 
   Clock,
-  TrendingUp 
 } from 'lucide-react';
 
 interface SummaryCardProps {
@@ -64,13 +63,17 @@ function SummaryCardSkeleton() {
   );
 }
 
-export function SummaryCards() {
+interface SummaryCardsProps {
+  dateRange?: DateRange;
+}
+
+export function SummaryCards({ dateRange }: SummaryCardsProps) {
   const { data: summary, isLoading, error } = useDashboardSummary();
 
   if (isLoading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-        {Array.from({ length: 6 }).map((_, i) => (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
           <SummaryCardSkeleton key={i} />
         ))}
       </div>
@@ -87,17 +90,8 @@ export function SummaryCards() {
     );
   }
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount || 0);
-  };
-
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <SummaryCard
         title="Total Drivers"
         value={summary.total_drivers || 0}
@@ -124,19 +118,6 @@ export function SummaryCards() {
         subtitle={`${summary.completed_last_7_days || 0} this week`}
         icon={<CheckCircle className="h-5 w-5 text-[hsl(var(--status-success))]" />}
         variant="success"
-      />
-      <SummaryCard
-        title="Revenue"
-        value={formatCurrency(summary.total_revenue || 0)}
-        subtitle="Collected"
-        icon={<DollarSign className="h-5 w-5 text-[hsl(var(--status-success))]" />}
-        variant="success"
-      />
-      <SummaryCard
-        title="Outstanding"
-        value={formatCurrency(summary.total_outstanding || 0)}
-        subtitle="Pending payment"
-        icon={<TrendingUp className="h-5 w-5 text-muted-foreground" />}
       />
     </div>
   );
