@@ -1085,7 +1085,7 @@ export type Database = {
       }
       calculate_completion_time: {
         Args: { driver_uuid: string }
-        Returns: unknown
+        Returns: string
       }
       get_driver_by_cdl: {
         Args: { cdl: string; cdl_st?: string }

@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useDrivers, Driver } from '@/hooks/useDrivers';
 import {
   Table,
@@ -12,15 +13,28 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { PaymentBadge } from '@/components/shared/PaymentBadge';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { getStepLabel } from '@/lib/constants';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
 import { Eye, AlertTriangle, Wine } from 'lucide-react';
+import { DateRange } from 'react-day-picker';
 
 interface TableViewProps {
   onDriverSelect?: (driverId: string) => void;
+  dateRange?: DateRange;
 }
 
-export function TableView({ onDriverSelect }: TableViewProps) {
-  const { data: drivers, isLoading, error } = useDrivers();
+export function TableView({ onDriverSelect, dateRange }: TableViewProps) {
+  const { data: allDrivers, isLoading, error } = useDrivers();
+
+  const drivers = useMemo(() => {
+    if (!allDrivers || !dateRange?.from) return allDrivers;
+    return allDrivers.filter((d) => {
+      const created = new Date(d.created_at);
+      return isWithinInterval(created, {
+        start: startOfDay(dateRange.from!),
+        end: dateRange.to ? endOfDay(dateRange.to) : endOfDay(new Date()),
+      });
+    });
+  }, [allDrivers, dateRange]);
 
   if (isLoading) {
     return (
