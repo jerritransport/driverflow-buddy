@@ -31,7 +31,7 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateSap, useUpdateSap, Sap } from '@/hooks/useSaps';
 import { Loader2 } from 'lucide-react';
-import { isValidUSPhone, normalizeUSPhone, formatPhoneInput } from '@/lib/phoneUtils';
+import { isValidUSPhone, normalizeUSPhone, formatPhoneFinal } from '@/lib/phoneUtils';
 
 const US_STATES = [
   'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
@@ -239,8 +239,11 @@ export function SapFormDialog({
                         <Input
                           placeholder="+1 (555) 010-3456"
                           value={field.value || ''}
-                          onChange={(e) => field.onChange(formatPhoneInput(e.target.value))}
-                          onBlur={field.onBlur}
+                          onChange={(e) => field.onChange(e.target.value)}
+                          onBlur={() => {
+                            field.onBlur();
+                            if (field.value) field.onChange(formatPhoneFinal(field.value));
+                          }}
                           name={field.name}
                         />
                       </FormControl>

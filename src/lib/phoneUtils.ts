@@ -24,9 +24,14 @@ export function normalizeUSPhone(phone: string): string {
 
 /** Format a phone value as the user types: +1 (555) 010-3456 */
 export function formatPhoneInput(value: string): string {
+  // Allow free-form typing - only strip non-digit except + at start
+  return value;
+}
+
+/** Format a raw phone value into display format: +1 (555) 010-3456 */
+export function formatPhoneFinal(value: string): string {
   const digits = value.replace(/\D/g, '');
   
-  // Determine the 10 local digits
   let local: string;
   if (digits.length > 10 && digits.startsWith('1')) {
     local = digits.slice(1, 11);

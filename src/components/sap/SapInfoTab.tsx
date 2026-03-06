@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Sap, useUpdateSap } from '@/hooks/useSaps';
 import { format } from 'date-fns';
 import { Mail, Phone, MapPin, Award, Calendar, Building2, Pencil, Check, X } from 'lucide-react';
-import { formatPhoneDisplay, formatPhoneInput, normalizeUSPhone, isValidUSPhone } from '@/lib/phoneUtils';
+import { formatPhoneDisplay, formatPhoneFinal, normalizeUSPhone, isValidUSPhone } from '@/lib/phoneUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
@@ -119,7 +119,7 @@ export function SapInfoTab({ sap }: SapInfoTabProps) {
               <EditRow label="First Name" value={formData.first_name} onChange={v => updateField('first_name', v)} />
               <EditRow label="Last Name" value={formData.last_name} onChange={v => updateField('last_name', v)} />
               <EditRow label="Email" value={formData.email} onChange={v => updateField('email', v)} type="email" />
-              <EditRow label="Phone" value={formData.phone} onChange={v => updateField('phone', formatPhoneInput(v))} type="tel" />
+              <EditRow label="Phone" value={formData.phone} onChange={v => updateField('phone', v)} onBlur={() => updateField('phone', formatPhoneFinal(formData.phone))} type="tel" />
             </>
           ) : (
             <>
@@ -240,10 +240,11 @@ function InfoRow({ label, value, icon }: { label: string; value: string | null; 
   );
 }
 
-function EditRow({ label, value, onChange, type = 'text' }: { 
+function EditRow({ label, value, onChange, onBlur, type = 'text' }: { 
   label: string; 
   value: string; 
   onChange: (v: string) => void;
+  onBlur?: () => void;
   type?: string;
 }) {
   return (
@@ -252,6 +253,7 @@ function EditRow({ label, value, onChange, type = 'text' }: {
       <Input 
         value={value} 
         onChange={e => onChange(e.target.value)} 
+        onBlur={onBlur}
         type={type}
         className="h-8 w-40 text-sm"
       />
