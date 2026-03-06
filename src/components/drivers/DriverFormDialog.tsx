@@ -39,6 +39,7 @@ import { Driver } from '@/hooks/useDrivers';
 import { useSaps, useCreateSap } from '@/hooks/useSaps';
 import { Loader2, Upload, X, Plus } from 'lucide-react';
 import { addDays, format } from 'date-fns';
+import { isValidUSPhone, normalizeUSPhone, formatPhoneFinal } from '@/lib/phoneUtils';
 
 const US_STATES = [
   'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
@@ -48,32 +49,13 @@ const US_STATES = [
   'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
 ];
 
-// US phone: must be 10 digits (after stripping formatting), stored as +1XXXXXXXXXX
-const phoneRegex = /^\+?1?\s*\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
-
-function normalizeUSPhone(phone: string): string {
-  const digits = phone.replace(/\D/g, '');
-  if (digits.length === 10) return `+1${digits}`;
-  if (digits.length === 11 && digits.startsWith('1')) return `+${digits}`;
-  return phone;
-}
-
-function formatPhoneDisplay(value: string): string {
-  const digits = value.replace(/\D/g, '');
-  // Remove leading 1 for display formatting
-  const local = digits.startsWith('1') && digits.length > 10 ? digits.slice(1) : digits;
-  if (local.length <= 3) return local;
-  if (local.length <= 6) return `(${local.slice(0, 3)}) ${local.slice(3)}`;
-  return `(${local.slice(0, 3)}) ${local.slice(3, 6)}-${local.slice(6, 10)}`;
-}
-
 const driverFormSchema = z.object({
   first_name: z.string().trim().min(1, 'First name is required').max(100),
   last_name: z.string().trim().min(1, 'Last name is required').max(100),
   middle_name: z.string().max(100).optional(),
   email: z.string().trim().email('Invalid email address').max(255),
   phone: z.string().min(1, 'Phone number is required').refine(
-    (val) => phoneRegex.test(val),
+    (val) => isValidUSPhone(val),
     { message: 'Enter a valid US phone number, e.g. (555) 123-4567' }
   ),
   gender: z.enum(['Male', 'Female', 'Other']).optional(),
@@ -152,7 +134,8 @@ function InlineSapForm({ onCreated, onCancel }: { onCreated: (id: string) => voi
         <Input
           placeholder="Phone (US +1)"
           value={phone}
-          onChange={(e) => setPhone(formatPhoneDisplay(e.target.value))}
+          onChange={(e) => setPhone(e.target.value)}
+          onBlur={() => { if (phone) setPhone(formatPhoneFinal(phone)); }}
         />
       </div>
       <div className="flex gap-2">
@@ -395,10 +378,13 @@ export function DriverFormDialog({
                       <FormLabel>Phone * (US +1)</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="(555) 123-4567"
+                          placeholder="+1 (555) 123-4567"
                           value={field.value}
-                          onChange={(e) => field.onChange(formatPhoneDisplay(e.target.value))}
-                          onBlur={field.onBlur}
+                          onChange={(e) => field.onChange(e.target.value)}
+                          onBlur={() => {
+                            field.onBlur();
+                            if (field.value) field.onChange(formatPhoneFinal(field.value));
+                          }}
                           name={field.name}
                           ref={field.ref}
                         />
@@ -644,10 +630,13 @@ export function DriverFormDialog({
                       <FormLabel>Contact Phone</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="(555) 987-6543"
+                          placeholder="+1 (555) 987-6543"
                           value={field.value || ''}
-                          onChange={(e) => field.onChange(formatPhoneDisplay(e.target.value))}
-                          onBlur={field.onBlur}
+                          onChange={(e) => field.onChange(e.target.value)}
+                          onBlur={() => {
+                            field.onBlur();
+                            if (field.value) field.onChange(formatPhoneFinal(field.value));
+                          }}
                           name={field.name}
                           ref={field.ref}
                         />

@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { TestResultsSection } from './TestResultsSection';
+import { formatPhoneDisplay, formatPhoneFinal, normalizeUSPhone, isValidUSPhone } from '@/lib/phoneUtils';
 
 interface PersonalInfoTabProps {
   driver: Driver;
@@ -37,6 +38,15 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
 
   const saveSection = async () => {
     if (!editingSection) return;
+    
+    // Validate phone if contact section
+    if (editingSection === 'contact' && formData.phone) {
+      if (!isValidUSPhone(formData.phone)) {
+        toast.error('Enter a valid US phone number');
+        return;
+      }
+      formData.phone = normalizeUSPhone(formData.phone);
+    }
     
     // Convert empty strings to null for optional fields
     const sanitized: Record<string, unknown> = {};
@@ -118,7 +128,7 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
               <EditRow label="Middle Name" value={formData.middle_name} onChange={v => updateField('middle_name', v)} />
               <EditRow label="Last Name" value={formData.last_name} onChange={v => updateField('last_name', v)} />
               <EditRow label="Email" value={formData.email} onChange={v => updateField('email', v)} type="email" />
-              <EditRow label="Phone" value={formData.phone} onChange={v => updateField('phone', v)} type="tel" />
+              <EditRow label="Phone" value={formData.phone} onChange={v => updateField('phone', v)} onBlur={() => { if (formData.phone) updateField('phone', formatPhoneFinal(formData.phone)); }} type="tel" />
               <div className="flex items-center justify-between gap-4">
                 <span className="text-xs text-muted-foreground">Gender</span>
                 <Select value={formData.gender} onValueChange={v => updateField('gender', v)}>
@@ -138,7 +148,7 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
             <>
               <InfoRow label="Full Name" value={`${driver.first_name} ${driver.middle_name || ''} ${driver.last_name}`.trim()} />
               <InfoRow label="Email" value={driver.email} icon={<Mail className="h-3 w-3" />} />
-              <InfoRow label="Phone" value={driver.phone} icon={<Phone className="h-3 w-3" />} />
+              <InfoRow label="Phone" value={formatPhoneDisplay(driver.phone)} icon={<Phone className="h-3 w-3" />} />
               <InfoRow label="Gender" value={driver.gender} />
               <InfoRow label="Date of Birth" value={formatDate(driver.date_of_birth)} icon={<Calendar className="h-3 w-3" />} />
             </>
@@ -262,10 +272,11 @@ function InfoRow({ label, value, icon }: { label: string; value: string | null; 
   );
 }
 
-function EditRow({ label, value, onChange, type = 'text' }: { 
+function EditRow({ label, value, onChange, onBlur, type = 'text' }: { 
   label: string; 
   value: string; 
   onChange: (v: string) => void;
+  onBlur?: () => void;
   type?: string;
 }) {
   return (
@@ -274,6 +285,7 @@ function EditRow({ label, value, onChange, type = 'text' }: {
       <Input 
         value={value} 
         onChange={e => onChange(e.target.value)} 
+        onBlur={onBlur}
         type={type}
         className="h-8 w-40 text-sm"
       />
