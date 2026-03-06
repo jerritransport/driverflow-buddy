@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Sap, useUpdateSap } from '@/hooks/useSaps';
 import { format } from 'date-fns';
 import { Mail, Phone, MapPin, Award, Calendar, Building2, Pencil, Check, X } from 'lucide-react';
+import { formatPhoneDisplay, formatPhoneInput, normalizeUSPhone, isValidUSPhone } from '@/lib/phoneUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
@@ -37,7 +38,15 @@ export function SapInfoTab({ sap }: SapInfoTabProps) {
     
     const sanitized: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(formData)) {
-      sanitized[key] = value === '' ? null : value;
+      if (key === 'phone' && value) {
+        if (!isValidUSPhone(value as string)) {
+          toast.error('Enter a valid US phone number');
+          return;
+        }
+        sanitized[key] = normalizeUSPhone(value as string);
+      } else {
+        sanitized[key] = value === '' ? null : value;
+      }
     }
 
     try {
@@ -110,13 +119,13 @@ export function SapInfoTab({ sap }: SapInfoTabProps) {
               <EditRow label="First Name" value={formData.first_name} onChange={v => updateField('first_name', v)} />
               <EditRow label="Last Name" value={formData.last_name} onChange={v => updateField('last_name', v)} />
               <EditRow label="Email" value={formData.email} onChange={v => updateField('email', v)} type="email" />
-              <EditRow label="Phone" value={formData.phone} onChange={v => updateField('phone', v)} type="tel" />
+              <EditRow label="Phone" value={formData.phone} onChange={v => updateField('phone', formatPhoneInput(v))} type="tel" />
             </>
           ) : (
             <>
               <InfoRow label="Name" value={`${sap.first_name} ${sap.last_name}`} />
               <InfoRow label="Email" value={sap.email} />
-              <InfoRow label="Phone" value={sap.phone} icon={<Phone className="h-3 w-3" />} />
+              <InfoRow label="Phone" value={formatPhoneDisplay(sap.phone)} icon={<Phone className="h-3 w-3" />} />
             </>
           )}
         </div>

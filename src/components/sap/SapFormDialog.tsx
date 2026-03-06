@@ -31,6 +31,7 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateSap, useUpdateSap, Sap } from '@/hooks/useSaps';
 import { Loader2 } from 'lucide-react';
+import { isValidUSPhone, normalizeUSPhone, formatPhoneInput } from '@/lib/phoneUtils';
 
 const US_STATES = [
   'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
@@ -44,7 +45,10 @@ const sapFormSchema = z.object({
   first_name: z.string().min(1, 'First name is required'),
   last_name: z.string().min(1, 'Last name is required'),
   email: z.string().email('Invalid email address'),
-  phone: z.string().optional(),
+  phone: z.string().optional().refine(
+    (val) => !val || isValidUSPhone(val),
+    { message: 'Enter a valid US phone number' }
+  ),
   organization: z.string().optional(),
   certification_number: z.string().optional(),
   certification_expiration: z.string().optional(),
@@ -123,7 +127,7 @@ export function SapFormDialog({
         first_name: values.first_name,
         last_name: values.last_name,
         email: values.email,
-        phone: values.phone || null,
+        phone: values.phone ? normalizeUSPhone(values.phone) : null,
         organization: values.organization || null,
         certification_number: values.certification_number || null,
         certification_expiration: values.certification_expiration || null,
@@ -231,7 +235,13 @@ export function SapFormDialog({
                     <FormItem>
                       <FormLabel>Phone</FormLabel>
                       <FormControl>
-                        <Input placeholder="(555) 123-4567" {...field} />
+                        <Input
+                          placeholder="+1 (555) 010-3456"
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(formatPhoneInput(e.target.value))}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
