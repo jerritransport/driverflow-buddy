@@ -157,10 +157,11 @@ export function SapFormDialog({
       }
       onOpenChange(false);
       onSuccess?.();
-    } catch (error) {
+    } catch (error: any) {
+      const message = error?.message || `Failed to ${isEditing ? 'update' : 'create'} SAP.`;
       toast({
         title: 'Error',
-        description: `Failed to ${isEditing ? 'update' : 'create'} SAP.`,
+        description: message,
         variant: 'destructive',
       });
     }
