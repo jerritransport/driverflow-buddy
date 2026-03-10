@@ -577,16 +577,16 @@ export function DriverFormDialog({
               </div>
             </div>
 
-            {/* Employer */}
+            {/* SAP Counselor Info */}
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground">Employer Information</h3>
+              <h3 className="text-sm font-medium text-muted-foreground">SAP Counselor Info</h3>
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="employer_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Employer Name</FormLabel>
+                      <FormLabel>Name</FormLabel>
                       <FormControl>
                         <Input placeholder="ABC Trucking" {...field} />
                       </FormControl>
@@ -599,35 +599,22 @@ export function DriverFormDialog({
                   name="employer_contact_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Contact Name</FormLabel>
+                      <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="Jane Smith" {...field} />
+                        <Input type="email" placeholder="jane@example.com" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="employer_job_title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Job Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="HR Manager" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <div className="grid gap-4 sm:grid-cols-1">
                 <FormField
                   control={form.control}
                   name="employer_phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Contact Phone</FormLabel>
+                      <FormLabel>Phone</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="+1 (555) 987-6543"

@@ -220,34 +220,31 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
         </div>
       </section>
 
-      {/* Employer Information */}
+      {/* SAP Counselor Info */}
       {(driver.employer_name || (driver as any).employer_contact_name || driver.employer_contact || isEditing('employer')) && (
         <section>
           <SectionHeader 
             icon={Briefcase} 
-            title="Employer Information" 
+            title="SAP Counselor Info" 
             section="employer"
             initialData={{
               employer_name: driver.employer_name || '',
               employer_contact_name: (driver as any).employer_contact_name || driver.employer_contact || '',
-              employer_job_title: (driver as any).employer_job_title || '',
               employer_phone: (driver as any).employer_phone || '',
             }}
           />
           <div className="grid gap-3 rounded-lg border bg-muted/30 p-4">
             {isEditing('employer') ? (
               <>
-                <EditRow label="Employer Name" value={formData.employer_name} onChange={v => updateField('employer_name', v)} />
-                <EditRow label="Contact Name" value={formData.employer_contact_name} onChange={v => updateField('employer_contact_name', v)} />
-                <EditRow label="Job Title" value={formData.employer_job_title} onChange={v => updateField('employer_job_title', v)} />
-                <EditRow label="Contact Phone" value={formData.employer_phone} onChange={v => updateField('employer_phone', v)} type="tel" />
+                <EditRow label="Name" value={formData.employer_name} onChange={v => updateField('employer_name', v)} />
+                <EditRow label="Email" value={formData.employer_contact_name} onChange={v => updateField('employer_contact_name', v)} />
+                <EditRow label="Phone" value={formData.employer_phone} onChange={v => updateField('employer_phone', v)} type="tel" />
               </>
             ) : (
               <>
-                <InfoRow label="Employer Name" value={driver.employer_name} />
-                <InfoRow label="Contact Name" value={(driver as any).employer_contact_name || driver.employer_contact} />
-                <InfoRow label="Job Title" value={(driver as any).employer_job_title} />
-                <InfoRow label="Contact Phone" value={(driver as any).employer_phone} icon={<Phone className="h-3 w-3" />} />
+                <InfoRow label="Name" value={driver.employer_name} />
+                <InfoRow label="Email" value={(driver as any).employer_contact_name || driver.employer_contact} />
+                <InfoRow label="Phone" value={(driver as any).employer_phone} icon={<Phone className="h-3 w-3" />} />
               </>
             )}
           </div>
