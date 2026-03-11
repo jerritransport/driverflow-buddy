@@ -849,6 +849,63 @@ export type Database = {
         }
         Relationships: []
       }
+      tenants: {
+        Row: {
+          company_name: string
+          contact_email: string
+          created_at: string | null
+          crl_company_search_term: string | null
+          crl_login_email: string | null
+          crl_password: string | null
+          crl_portal_url: string | null
+          gmail_address: string | null
+          gmail_refresh_token: string | null
+          id: string
+          is_active: boolean
+          twilio_account_sid: string | null
+          twilio_auth_token: string | null
+          twilio_phone_number: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          company_name: string
+          contact_email: string
+          created_at?: string | null
+          crl_company_search_term?: string | null
+          crl_login_email?: string | null
+          crl_password?: string | null
+          crl_portal_url?: string | null
+          gmail_address?: string | null
+          gmail_refresh_token?: string | null
+          id?: string
+          is_active?: boolean
+          twilio_account_sid?: string | null
+          twilio_auth_token?: string | null
+          twilio_phone_number?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          company_name?: string
+          contact_email?: string
+          created_at?: string | null
+          crl_company_search_term?: string | null
+          crl_login_email?: string | null
+          crl_password?: string | null
+          crl_portal_url?: string | null
+          gmail_address?: string | null
+          gmail_refresh_token?: string | null
+          id?: string
+          is_active?: boolean
+          twilio_account_sid?: string | null
+          twilio_auth_token?: string | null
+          twilio_phone_number?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
