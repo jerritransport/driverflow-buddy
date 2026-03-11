@@ -197,6 +197,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     role,
     isLoading,
     isAdmin: role === 'admin',
+    isStudent: role === 'student',
+    tenantId,
     signIn,
     signUp,
     signOut,
