@@ -47,11 +47,6 @@ export function StudentDetailPanel({ tenantId, open, onOpenChange, onEdit }: Stu
 
       const redirectUrl = `${window.location.origin}/auth/gmail/callback`;
 
-      const { data, error } = await supabase.functions.invoke('gmail-oauth', {
-        body: { tenant_id: tenant.id, redirect_url: redirectUrl },
-        headers: { 'Content-Type': 'application/json' },
-      });
-
       // Manually add action param since invoke doesn't support query params
       // We'll use fetch directly instead
       const resp = await fetch(
