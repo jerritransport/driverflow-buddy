@@ -75,6 +75,7 @@ const driverFormSchema = z.object({
   employer_phone: z.string().optional(),
   amount_due: z.coerce.number().min(0).optional(),
   requires_alcohol_test: z.boolean().optional(),
+  tenant_id: z.string().optional(),
   sap_requirement: z.enum(['none', 'needs_sap']).optional(),
   sap_id: z.string().optional(),
 });
