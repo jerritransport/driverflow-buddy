@@ -460,6 +460,7 @@ export type Database = {
           SSN: string | null
           state: string | null
           status: string
+          tenant_id: string | null
           test_clinic_id: string | null
           test_completed_at: string | null
           test_result: string | null
@@ -519,6 +520,7 @@ export type Database = {
           SSN?: string | null
           state?: string | null
           status?: string
+          tenant_id?: string | null
           test_clinic_id?: string | null
           test_completed_at?: string | null
           test_result?: string | null
@@ -578,6 +580,7 @@ export type Database = {
           SSN?: string | null
           state?: string | null
           status?: string
+          tenant_id?: string | null
           test_clinic_id?: string | null
           test_completed_at?: string | null
           test_result?: string | null
@@ -609,6 +612,13 @@ export type Database = {
             columns: ["sap_id"]
             isOneToOne: false
             referencedRelation: "saps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drivers_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
           {
@@ -846,6 +856,66 @@ export type Database = {
           total_drivers_referred?: number | null
           updated_at?: string | null
           zip_code?: string | null
+        }
+        Relationships: []
+      }
+      tenants: {
+        Row: {
+          company_name: string
+          contact_email: string
+          contact_phone: string | null
+          created_at: string | null
+          crl_company_search_term: string | null
+          crl_login_email: string | null
+          crl_password: string | null
+          crl_portal_url: string | null
+          gmail_address: string | null
+          gmail_refresh_token: string | null
+          id: string
+          is_active: boolean
+          twilio_account_sid: string | null
+          twilio_auth_token: string | null
+          twilio_phone_number: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          company_name: string
+          contact_email: string
+          contact_phone?: string | null
+          created_at?: string | null
+          crl_company_search_term?: string | null
+          crl_login_email?: string | null
+          crl_password?: string | null
+          crl_portal_url?: string | null
+          gmail_address?: string | null
+          gmail_refresh_token?: string | null
+          id?: string
+          is_active?: boolean
+          twilio_account_sid?: string | null
+          twilio_auth_token?: string | null
+          twilio_phone_number?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          company_name?: string
+          contact_email?: string
+          contact_phone?: string | null
+          created_at?: string | null
+          crl_company_search_term?: string | null
+          crl_login_email?: string | null
+          crl_password?: string | null
+          crl_portal_url?: string | null
+          gmail_address?: string | null
+          gmail_refresh_token?: string | null
+          id?: string
+          is_active?: boolean
+          twilio_account_sid?: string | null
+          twilio_auth_token?: string | null
+          twilio_phone_number?: string | null
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1137,6 +1207,7 @@ export type Database = {
           SSN: string | null
           state: string | null
           status: string
+          tenant_id: string | null
           test_clinic_id: string | null
           test_completed_at: string | null
           test_result: string | null
