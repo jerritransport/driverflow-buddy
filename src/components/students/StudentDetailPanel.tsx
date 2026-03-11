@@ -256,25 +256,7 @@ export function StudentDetailPanel({ tenantId, open, onOpenChange, onEdit }: Stu
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-sm">
-                      <MessageSquare className="h-4 w-4" /> Twilio
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Status</span>
-                      {credentialStatus(tenant.twilio_account_sid)}
-                    </div>
-                    {tenant.twilio_phone_number && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Phone Number</span>
-                        <span className="text-sm">{formatPhoneDisplay(tenant.twilio_phone_number)}</span>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                <TwilioConfigCard tenant={tenant} />
 
                 <Card>
                   <CardHeader>

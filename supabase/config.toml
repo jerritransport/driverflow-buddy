@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.gmail-oauth]
 verify_jwt = false
+
+[functions.test-twilio]
+verify_jwt = false
