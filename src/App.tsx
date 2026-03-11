@@ -16,6 +16,7 @@ import Reports from "./pages/Reports";
 import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import Students from "./pages/Students";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
