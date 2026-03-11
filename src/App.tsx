@@ -14,6 +14,7 @@ import IntakeForms from "./pages/IntakeForms";
 import TestResults from "./pages/TestResults";
 import Reports from "./pages/Reports";
 import Admin from "./pages/Admin";
+import Students from "./pages/Students";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
