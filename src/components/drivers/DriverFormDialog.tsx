@@ -37,6 +37,7 @@ import { useCreateDriver, CreateDriverData } from '@/hooks/useDriversManagement'
 import { useUpdateDriver } from '@/hooks/useDriverDetails';
 import { Driver } from '@/hooks/useDrivers';
 import { useSaps, useCreateSap } from '@/hooks/useSaps';
+import { useTenants } from '@/hooks/useTenants';
 import { Loader2, Upload, X, Plus } from 'lucide-react';
 import { addDays, format } from 'date-fns';
 import { isValidUSPhone, normalizeUSPhone, formatPhoneFinal } from '@/lib/phoneUtils';
