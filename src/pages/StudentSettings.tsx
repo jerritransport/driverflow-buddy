@@ -1,25 +1,18 @@
-import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTenant } from '@/hooks/useTenants';
 import { TwilioConfigCard } from '@/components/students/TwilioConfigCard';
 import { CrlConfigCard } from '@/components/students/CrlConfigCard';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Mail, MessageSquare, Globe, CheckCircle2, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Mail } from 'lucide-react';
 
 export default function StudentSettings() {
-  const { tenantId, user } = useAuth();
+  const { tenantId } = useAuth();
   const { data: tenant, isLoading } = useTenant(tenantId);
-  const navigate = useNavigate();
-  const [showWizard, setShowWizard] = useState(false);
-
-  // Show wizard if tenant has no credentials configured yet
-  const isFirstTime = tenant && !tenant.gmail_refresh_token && !tenant.twilio_account_sid && !tenant.crl_login_email;
 
   if (isLoading) {
     return (
@@ -37,52 +30,6 @@ export default function StudentSettings() {
       <AppLayout>
         <div className="flex h-64 items-center justify-center">
           <p className="text-muted-foreground">No tenant record found for your account.</p>
-        </div>
-      </AppLayout>
-    );
-  }
-
-  if (isFirstTime && !showWizard) {
-    // Show the setup wizard prompt
-    return (
-      <AppLayout>
-        <div className="mx-auto max-w-2xl space-y-6 py-8">
-          <div className="text-center space-y-2">
-            <h1 className="text-2xl font-bold tracking-tight">Welcome to {tenant.company_name}!</h1>
-            <p className="text-muted-foreground">
-              Let's set up your service credentials so you can start managing drivers.
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            <SetupStep
-              number={1}
-              title="Connect Gmail"
-              description="Connect your Gmail account to send emails to drivers automatically."
-              icon={<Mail className="h-5 w-5" />}
-            />
-            <SetupStep
-              number={2}
-              title="Configure Twilio"
-              description="Set up Twilio for automated SMS messages to drivers."
-              icon={<MessageSquare className="h-5 w-5" />}
-            />
-            <SetupStep
-              number={3}
-              title="Configure CRL Portal"
-              description="Add your CRL Portal login credentials for test result automation."
-              icon={<Globe className="h-5 w-5" />}
-            />
-          </div>
-
-          <div className="flex justify-center gap-3 pt-4">
-            <Button onClick={() => setShowWizard(true)} className="gap-2">
-              Start Setup <ArrowRight className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/')}>
-              Skip for Now
-            </Button>
-          </div>
         </div>
       </AppLayout>
     );
@@ -144,26 +91,6 @@ export default function StudentSettings() {
   );
 }
 
-function SetupStep({ number, title, description, icon }: {
-  number: number;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-}) {
-  return (
-    <Card>
-      <CardContent className="flex items-center gap-4 p-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-          {icon}
-        </div>
-        <div className="flex-1">
-          <p className="font-medium">Step {number}: {title}</p>
-          <p className="text-sm text-muted-foreground">{description}</p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
 
 function GmailConfigSection({ tenant }: { tenant: any }) {
   const isConnected = !!tenant.gmail_refresh_token;

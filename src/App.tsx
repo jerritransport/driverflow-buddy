@@ -20,6 +20,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Students from "./pages/Students";
 import StudentSettings from "./pages/StudentSettings";
+import StudentSetupWizard from "./pages/StudentSetupWizard";
 import GmailCallback from "./pages/GmailCallback";
 import NotFound from "./pages/NotFound";
 
@@ -129,6 +130,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <StudentSettings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/setup"
+              element={
+                <ProtectedRoute>
+                  <StudentSetupWizard />
                 </ProtectedRoute>
               }
             />
