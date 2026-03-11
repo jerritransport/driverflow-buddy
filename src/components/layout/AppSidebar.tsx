@@ -51,7 +51,11 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const { signOut, isAdmin, isStudent, user } = useAuth();
 
-  const mainNavItems = allNavItems.filter(item => !item.adminOnly || !isStudent);
+  const mainNavItems = allNavItems.filter(item => {
+    if (item.adminOnly && isStudent) return false;
+    if ((item as any).studentOnly && !isStudent) return false;
+    return true;
+  });
 
   const handleSignOut = async () => {
     await signOut();
