@@ -56,6 +56,12 @@ Deno.serve(async (req) => {
       )
     }
 
+    // Update role from default 'staff' to 'student'
+    await supabaseAdmin
+      .from('user_roles')
+      .update({ role: 'student' })
+      .eq('user_id', userId)
+
     // 2. Create tenant record (inactive by default, requires admin approval)
     const { data: tenant, error: tenantError } = await supabaseAdmin
       .from('tenants')
