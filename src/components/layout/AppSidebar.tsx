@@ -37,6 +37,7 @@ const allNavItems = [
   { title: 'SAPs', icon: Stethoscope, path: '/saps', adminOnly: true },
   { title: 'Test Results', icon: FlaskConical, path: '/test-results', adminOnly: true },
   { title: 'Reports', icon: BarChart3, path: '/reports', adminOnly: true },
+  { title: 'My Settings', icon: Settings, path: '/my-settings', studentOnly: true },
 ];
 
 const adminNavItems = [
