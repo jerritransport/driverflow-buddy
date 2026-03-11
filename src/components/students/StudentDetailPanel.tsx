@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +11,8 @@ import {
 } from '@/components/ui/table';
 import { useTenant, useTenantDrivers, useUpdateTenant } from '@/hooks/useTenants';
 import { useToast } from '@/hooks/use-toast';
-import { Building2, Info, Users, Key, Pencil, Mail, Phone, MessageSquare, Globe } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Building2, Info, Users, Key, Pencil, Mail, Phone, MessageSquare, Globe, Loader2, Unplug } from 'lucide-react';
 import { formatPhoneDisplay } from '@/lib/phoneUtils';
 import { format } from 'date-fns';
 import { StatusBadge } from '@/components/shared/StatusBadge';
