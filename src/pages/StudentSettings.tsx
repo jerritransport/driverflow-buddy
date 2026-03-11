@@ -13,9 +13,6 @@ export default function StudentSettings() {
   const { tenantId } = useAuth();
   const { data: tenant, isLoading } = useTenant(tenantId);
 
-  // Show wizard if tenant has no credentials configured yet
-  const isFirstTime = tenant && !tenant.gmail_refresh_token && !tenant.twilio_account_sid && !tenant.crl_login_email;
-
   if (isLoading) {
     return (
       <AppLayout>
@@ -32,52 +29,6 @@ export default function StudentSettings() {
       <AppLayout>
         <div className="flex h-64 items-center justify-center">
           <p className="text-muted-foreground">No tenant record found for your account.</p>
-        </div>
-      </AppLayout>
-    );
-  }
-
-  if (isFirstTime && !showWizard) {
-    // Show the setup wizard prompt
-    return (
-      <AppLayout>
-        <div className="mx-auto max-w-2xl space-y-6 py-8">
-          <div className="text-center space-y-2">
-            <h1 className="text-2xl font-bold tracking-tight">Welcome to {tenant.company_name}!</h1>
-            <p className="text-muted-foreground">
-              Let's set up your service credentials so you can start managing drivers.
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            <SetupStep
-              number={1}
-              title="Connect Gmail"
-              description="Connect your Gmail account to send emails to drivers automatically."
-              icon={<Mail className="h-5 w-5" />}
-            />
-            <SetupStep
-              number={2}
-              title="Configure Twilio"
-              description="Set up Twilio for automated SMS messages to drivers."
-              icon={<MessageSquare className="h-5 w-5" />}
-            />
-            <SetupStep
-              number={3}
-              title="Configure CRL Portal"
-              description="Add your CRL Portal login credentials for test result automation."
-              icon={<Globe className="h-5 w-5" />}
-            />
-          </div>
-
-          <div className="flex justify-center gap-3 pt-4">
-            <Button onClick={() => setShowWizard(true)} className="gap-2">
-              Start Setup <ArrowRight className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/')}>
-              Skip for Now
-            </Button>
-          </div>
         </div>
       </AppLayout>
     );
