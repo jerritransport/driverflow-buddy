@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +11,9 @@ import {
 } from '@/components/ui/table';
 import { useTenant, useTenantDrivers, useUpdateTenant } from '@/hooks/useTenants';
 import { useToast } from '@/hooks/use-toast';
-import { Building2, Info, Users, Key, Pencil, Mail, Phone, MessageSquare, Globe } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
+import { Building2, Info, Users, Key, Pencil, Mail, Phone, MessageSquare, Globe, Loader2, Unplug } from 'lucide-react';
 import { formatPhoneDisplay } from '@/lib/phoneUtils';
 import { format } from 'date-fns';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -27,8 +30,87 @@ export function StudentDetailPanel({ tenantId, open, onOpenChange, onEdit }: Stu
   const { data: drivers, isLoading: driversLoading } = useTenantDrivers(tenantId);
   const updateTenant = useUpdateTenant();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [gmailLoading, setGmailLoading] = useState(false);
 
   if (!tenantId) return null;
+
+  const handleConnectGmail = async () => {
+    if (!tenant) return;
+    setGmailLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({ title: 'Error', description: 'You must be logged in.', variant: 'destructive' });
+        return;
+      }
+
+      const redirectUrl = `${window.location.origin}/auth/gmail/callback`;
+
+      // Manually add action param since invoke doesn't support query params
+      // We'll use fetch directly instead
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gmail-oauth?action=initiate`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({ tenant_id: tenant.id, redirect_url: redirectUrl }),
+        }
+      );
+
+      const result = await resp.json();
+
+      if (!resp.ok || !result.auth_url) {
+        throw new Error(result.error || 'Failed to initiate OAuth');
+      }
+
+      // Redirect to Google consent screen
+      window.location.href = result.auth_url;
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Failed to connect Gmail.', variant: 'destructive' });
+      setGmailLoading(false);
+    }
+  };
+
+  const handleDisconnectGmail = async () => {
+    if (!tenant) return;
+    setGmailLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({ title: 'Error', description: 'You must be logged in.', variant: 'destructive' });
+        return;
+      }
+
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gmail-oauth?action=disconnect`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({ tenant_id: tenant.id }),
+        }
+      );
+
+      const result = await resp.json();
+      if (!resp.ok) throw new Error(result.error || 'Failed to disconnect');
+
+      toast({ title: 'Gmail Disconnected', description: 'Gmail OAuth credentials have been removed.' });
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      queryClient.invalidateQueries({ queryKey: ['tenant', tenant.id] });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Failed to disconnect Gmail.', variant: 'destructive' });
+    } finally {
+      setGmailLoading(false);
+    }
+  };
 
   const handleToggleActive = async () => {
     if (!tenant) return;
@@ -135,7 +217,7 @@ export function StudentDetailPanel({ tenantId, open, onOpenChange, onEdit }: Stu
                       <Mail className="h-4 w-4" /> Gmail
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-2">
+                  <CardContent className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Status</span>
                       {credentialStatus(tenant.gmail_refresh_token)}
@@ -146,6 +228,30 @@ export function StudentDetailPanel({ tenantId, open, onOpenChange, onEdit }: Stu
                         <span className="text-sm">{tenant.gmail_address}</span>
                       </div>
                     )}
+                    <div className="pt-1">
+                      {tenant.gmail_refresh_token ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full gap-2"
+                          onClick={handleDisconnectGmail}
+                          disabled={gmailLoading}
+                        >
+                          {gmailLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Unplug className="h-4 w-4" />}
+                          Disconnect Gmail
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          className="w-full gap-2"
+                          onClick={handleConnectGmail}
+                          disabled={gmailLoading}
+                        >
+                          {gmailLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+                          Connect Gmail
+                        </Button>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
 
