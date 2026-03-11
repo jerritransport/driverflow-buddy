@@ -91,26 +91,6 @@ export default function StudentSettings() {
   );
 }
 
-function SetupStep({ number, title, description, icon }: {
-  number: number;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-}) {
-  return (
-    <Card>
-      <CardContent className="flex items-center gap-4 p-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-          {icon}
-        </div>
-        <div className="flex-1">
-          <p className="font-medium">Step {number}: {title}</p>
-          <p className="text-sm text-muted-foreground">{description}</p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
 
 function GmailConfigSection({ tenant }: { tenant: any }) {
   const isConnected = !!tenant.gmail_refresh_token;
