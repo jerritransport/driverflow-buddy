@@ -78,13 +78,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(currentSession?.user ?? null);
 
         if (currentSession?.user) {
-          // Use setTimeout to prevent potential Supabase deadlock
           setTimeout(async () => {
             const userRole = await fetchUserRole(currentSession.user.id);
             setRole(userRole);
+            if (userRole === 'student') {
+              const tid = await fetchTenantId(currentSession.user.id);
+              setTenantId(tid);
+            } else {
+              setTenantId(null);
+            }
           }, 0);
         } else {
           setRole(null);
+          setTenantId(null);
         }
 
         setIsLoading(false);
