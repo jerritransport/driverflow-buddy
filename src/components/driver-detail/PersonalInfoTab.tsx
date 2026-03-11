@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Driver } from '@/hooks/useDrivers';
 import { useUpdateDriver } from '@/hooks/useDriverDetails';
+import { useTenants } from '@/hooks/useTenants';
 import { format } from 'date-fns';
-import { User, MapPin, Briefcase, FileText, Calendar, Phone, Mail, Pencil, Check, X } from 'lucide-react';
+import { User, MapPin, Briefcase, FileText, Calendar, Phone, Mail, Pencil, Check, X, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
