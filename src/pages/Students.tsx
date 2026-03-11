@@ -177,6 +177,11 @@ export default function Students() {
                             <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEdit(t.id); }}>
                               <Pencil className="mr-2 h-4 w-4" /> Edit
                             </DropdownMenuItem>
+                            {!t.is_active && (
+                              <DropdownMenuItem onClick={(e) => handleApprove(t.id, e)}>
+                                <ShieldCheck className="mr-2 h-4 w-4" /> Approve
+                              </DropdownMenuItem>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
