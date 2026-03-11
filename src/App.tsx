@@ -133,6 +133,14 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/setup"
+              element={
+                <ProtectedRoute>
+                  <StudentSetupWizard />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/auth/gmail/callback" element={<GmailCallback />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
