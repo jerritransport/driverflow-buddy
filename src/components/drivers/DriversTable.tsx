@@ -300,6 +300,11 @@ function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit,
         <PaymentBadge status={driver.payment_status} />
       </TableCell>
       <TableCell>
+        <span className="text-sm text-muted-foreground">
+          {driver.tenant_name || '—'}
+        </span>
+      </TableCell>
+      <TableCell>
         <DocumentProgress documentsUploaded={driver.documents_uploaded} />
       </TableCell>
       <TableCell className="text-sm text-muted-foreground">
