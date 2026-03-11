@@ -1226,6 +1226,7 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_user_tenant_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1233,6 +1234,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_student: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "staff" | "student"
