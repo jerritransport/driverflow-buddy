@@ -223,6 +223,7 @@ export function DriverFormDialog({
         employer_job_title: values.employer_job_title || undefined,
         employer_phone: values.employer_phone ? normalizeUSPhone(values.employer_phone) : undefined,
         sap_id: values.sap_requirement === 'needs_sap' ? values.sap_id || undefined : undefined,
+        tenant_id: values.tenant_id || undefined,
       };
 
       // Determine follow-up date based on SAP requirement
