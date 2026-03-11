@@ -29,8 +29,93 @@ export function StudentDetailPanel({ tenantId, open, onOpenChange, onEdit }: Stu
   const { data: drivers, isLoading: driversLoading } = useTenantDrivers(tenantId);
   const updateTenant = useUpdateTenant();
   const { toast } = useToast();
+  const [gmailLoading, setGmailLoading] = useState(false);
 
   if (!tenantId) return null;
+
+  const handleConnectGmail = async () => {
+    if (!tenant) return;
+    setGmailLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({ title: 'Error', description: 'You must be logged in.', variant: 'destructive' });
+        return;
+      }
+
+      const redirectUrl = `${window.location.origin}/auth/gmail/callback`;
+
+      const { data, error } = await supabase.functions.invoke('gmail-oauth', {
+        body: { tenant_id: tenant.id, redirect_url: redirectUrl },
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      // Manually add action param since invoke doesn't support query params
+      // We'll use fetch directly instead
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gmail-oauth?action=initiate`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({ tenant_id: tenant.id, redirect_url: redirectUrl }),
+        }
+      );
+
+      const result = await resp.json();
+
+      if (!resp.ok || !result.auth_url) {
+        throw new Error(result.error || 'Failed to initiate OAuth');
+      }
+
+      // Redirect to Google consent screen
+      window.location.href = result.auth_url;
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Failed to connect Gmail.', variant: 'destructive' });
+      setGmailLoading(false);
+    }
+  };
+
+  const handleDisconnectGmail = async () => {
+    if (!tenant) return;
+    setGmailLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({ title: 'Error', description: 'You must be logged in.', variant: 'destructive' });
+        return;
+      }
+
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gmail-oauth?action=disconnect`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({ tenant_id: tenant.id }),
+        }
+      );
+
+      const result = await resp.json();
+      if (!resp.ok) throw new Error(result.error || 'Failed to disconnect');
+
+      toast({ title: 'Gmail Disconnected', description: 'Gmail OAuth credentials have been removed.' });
+      // Refetch tenant data
+      updateTenant.reset();
+      // Force re-fetch by invalidating
+      const { useQueryClient } = await import('@tanstack/react-query');
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Failed to disconnect Gmail.', variant: 'destructive' });
+    } finally {
+      setGmailLoading(false);
+    }
+  };
 
   const handleToggleActive = async () => {
     if (!tenant) return;
