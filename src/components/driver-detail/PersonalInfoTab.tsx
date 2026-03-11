@@ -254,6 +254,46 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
         </section>
       )}
 
+      {/* Tenant Assignment */}
+      <section>
+        <div className="mb-3 flex items-center gap-2">
+          <h4 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <Building2 className="h-4 w-4" />
+            Tenant Assignment
+          </h4>
+        </div>
+        <div className="grid gap-3 rounded-lg border bg-muted/30 p-4">
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-xs text-muted-foreground">Assigned Tenant</span>
+            <Select
+              value={driver.tenant_id || ''}
+              onValueChange={async (value) => {
+                try {
+                  await updateDriver.mutateAsync({
+                    driverId: driver.id,
+                    updates: { tenant_id: value || null },
+                  });
+                  toast.success('Tenant updated');
+                } catch (err: any) {
+                  toast.error(`Failed to update tenant: ${err.message}`);
+                }
+              }}
+            >
+              <SelectTrigger className="h-8 w-48 text-sm">
+                <SelectValue placeholder="Unassigned" />
+              </SelectTrigger>
+              <SelectContent>
+                {activeTenants.map((t) => (
+                  <SelectItem key={t.id} value={t.id}>
+                    {t.company_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </section>
+
       {/* Test Results Section */}
       <TestResultsSection driver={driver} />
     </div>
