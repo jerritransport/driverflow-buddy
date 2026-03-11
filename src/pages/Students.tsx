@@ -93,13 +93,9 @@ export default function Students() {
         {/* Summary Cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <SummaryCard icon={Building2} label="Total Students" value={totalTenants} subtext={`${activeTenants} active`} />
+          <SummaryCard icon={Clock} label="Pending Approval" value={pendingCount} />
           <SummaryCard icon={Users} label="Gmail Connected" value={gmailConfigured} />
           <SummaryCard icon={CheckCircle2} label="Twilio Configured" value={twilioConfigured} />
-          <SummaryCard
-            icon={CheckCircle2}
-            label="CRL Configured"
-            value={tenants?.filter(t => t.crl_login_email).length ?? 0}
-          />
         </div>
 
         {/* Search */}
