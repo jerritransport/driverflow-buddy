@@ -460,6 +460,7 @@ export type Database = {
           SSN: string | null
           state: string | null
           status: string
+          tenant_id: string | null
           test_clinic_id: string | null
           test_completed_at: string | null
           test_result: string | null
@@ -519,6 +520,7 @@ export type Database = {
           SSN?: string | null
           state?: string | null
           status?: string
+          tenant_id?: string | null
           test_clinic_id?: string | null
           test_completed_at?: string | null
           test_result?: string | null
@@ -578,6 +580,7 @@ export type Database = {
           SSN?: string | null
           state?: string | null
           status?: string
+          tenant_id?: string | null
           test_clinic_id?: string | null
           test_completed_at?: string | null
           test_result?: string | null
@@ -609,6 +612,13 @@ export type Database = {
             columns: ["sap_id"]
             isOneToOne: false
             referencedRelation: "saps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drivers_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
           {
@@ -853,6 +863,7 @@ export type Database = {
         Row: {
           company_name: string
           contact_email: string
+          contact_phone: string | null
           created_at: string | null
           crl_company_search_term: string | null
           crl_login_email: string | null
@@ -871,6 +882,7 @@ export type Database = {
         Insert: {
           company_name: string
           contact_email: string
+          contact_phone?: string | null
           created_at?: string | null
           crl_company_search_term?: string | null
           crl_login_email?: string | null
@@ -889,6 +901,7 @@ export type Database = {
         Update: {
           company_name?: string
           contact_email?: string
+          contact_phone?: string | null
           created_at?: string | null
           crl_company_search_term?: string | null
           crl_login_email?: string | null
@@ -1194,6 +1207,7 @@ export type Database = {
           SSN: string | null
           state: string | null
           status: string
+          tenant_id: string | null
           test_clinic_id: string | null
           test_completed_at: string | null
           test_result: string | null
