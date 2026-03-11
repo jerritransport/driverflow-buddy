@@ -167,6 +167,8 @@ export function DriverFormDialog({
 
   const { data: saps } = useSaps();
   const activeSaps = saps?.filter(s => s.is_active) || [];
+  const { data: tenants } = useTenants();
+  const activeTenants = tenants?.filter(t => t.is_active) || [];
 
   const form = useForm<DriverFormValues>({
     resolver: zodResolver(driverFormSchema),
