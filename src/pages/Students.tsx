@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { useTenants, Tenant } from '@/hooks/useTenants';
+import { useTenants, useUpdateTenant, Tenant } from '@/hooks/useTenants';
 import { StudentFormDialog } from '@/components/students/StudentFormDialog';
 import { StudentDetailPanel } from '@/components/students/StudentDetailPanel';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,9 +14,10 @@ import {
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, Plus, Building2, Users, CheckCircle2, MoreHorizontal, Eye, Pencil } from 'lucide-react';
+import { Search, Plus, Building2, Users, CheckCircle2, MoreHorizontal, Eye, Pencil, ShieldCheck, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { formatPhoneDisplay } from '@/lib/phoneUtils';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Students() {
   const [searchQuery, setSearchQuery] = useState('');
