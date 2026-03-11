@@ -26,6 +26,20 @@ export default function Students() {
   const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null);
 
   const { data: tenants, isLoading } = useTenants();
+  const updateTenant = useUpdateTenant();
+  const { toast } = useToast();
+
+  const pendingCount = tenants?.filter(t => !t.is_active).length ?? 0;
+
+  const handleApprove = async (tenantId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await updateTenant.mutateAsync({ tenantId, updates: { is_active: true } });
+      toast({ title: 'Student Approved', description: 'The student account has been activated.' });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err?.message || 'Failed to approve.', variant: 'destructive' });
+    }
+  };
 
   const filtered = tenants?.filter((t) => {
     if (!searchQuery) return true;
