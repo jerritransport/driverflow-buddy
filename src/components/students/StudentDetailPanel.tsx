@@ -259,25 +259,7 @@ export function StudentDetailPanel({ tenantId, open, onOpenChange, onEdit }: Stu
 
                 <TwilioConfigCard tenant={tenant} />
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-sm">
-                      <Globe className="h-4 w-4" /> CRL Portal
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Status</span>
-                      {credentialStatus(tenant.crl_login_email)}
-                    </div>
-                    {tenant.crl_portal_url && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Portal URL</span>
-                        <span className="text-sm truncate max-w-[200px]">{tenant.crl_portal_url}</span>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                <CrlConfigCard tenant={tenant} />
               </TabsContent>
 
               {/* Drivers Tab */}
