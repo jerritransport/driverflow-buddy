@@ -108,10 +108,8 @@ export function StudentDetailPanel({ tenantId, open, onOpenChange, onEdit }: Stu
       if (!resp.ok) throw new Error(result.error || 'Failed to disconnect');
 
       toast({ title: 'Gmail Disconnected', description: 'Gmail OAuth credentials have been removed.' });
-      // Refetch tenant data
-      updateTenant.reset();
-      // Force re-fetch by invalidating
-      const { useQueryClient } = await import('@tanstack/react-query');
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      queryClient.invalidateQueries({ queryKey: ['tenant', tenant.id] });
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Failed to disconnect Gmail.', variant: 'destructive' });
     } finally {
