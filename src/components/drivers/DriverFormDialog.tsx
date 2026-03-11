@@ -743,6 +743,36 @@ export function DriverFormDialog({
               )}
             </div>
 
+            {/* Tenant Assignment */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground">Tenant Assignment</h3>
+              <FormField
+                control={form.control}
+                name="tenant_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Assign to Tenant</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select tenant" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {activeTenants.map((tenant) => (
+                          <SelectItem key={tenant.id} value={tenant.id}>
+                            {tenant.company_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>Assign this driver to a student's business</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             {/* Billing & Options */}
             <div className="space-y-4">
               <h3 className="text-sm font-medium text-muted-foreground">Billing & Options</h3>
