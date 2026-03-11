@@ -103,7 +103,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(existingSession?.user ?? null);
 
       if (existingSession?.user) {
-        fetchUserRole(existingSession.user.id).then(setRole);
+        fetchUserRole(existingSession.user.id).then(async (r) => {
+          setRole(r);
+          if (r === 'student') {
+            const tid = await fetchTenantId(existingSession.user.id);
+            setTenantId(tid);
+          }
+        });
       }
 
       setIsLoading(false);
