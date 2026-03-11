@@ -30,6 +30,7 @@ export function StudentDetailPanel({ tenantId, open, onOpenChange, onEdit }: Stu
   const { data: drivers, isLoading: driversLoading } = useTenantDrivers(tenantId);
   const updateTenant = useUpdateTenant();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [gmailLoading, setGmailLoading] = useState(false);
 
   if (!tenantId) return null;
