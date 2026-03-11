@@ -17,6 +17,7 @@ import { Building2, Info, Users, Key, Pencil, Mail, Phone, MessageSquare, Globe,
 import { formatPhoneDisplay } from '@/lib/phoneUtils';
 import { format } from 'date-fns';
 import { StatusBadge } from '@/components/shared/StatusBadge';
+import { TwilioConfigCard } from './TwilioConfigCard';
 
 interface StudentDetailPanelProps {
   tenantId: string | null;
