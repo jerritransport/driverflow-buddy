@@ -21,6 +21,8 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
   const [editingSection, setEditingSection] = useState<EditableSection>(null);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const updateDriver = useUpdateDriver();
+  const { data: tenants } = useTenants();
+  const activeTenants = tenants?.filter(t => t.is_active) || [];
 
   const formatDate = (date: string | null) => {
     if (!date) return 'N/A';
