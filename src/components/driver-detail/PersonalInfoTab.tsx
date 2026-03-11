@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Driver } from '@/hooks/useDrivers';
 import { useUpdateDriver } from '@/hooks/useDriverDetails';
+import { useTenants } from '@/hooks/useTenants';
 import { format } from 'date-fns';
-import { User, MapPin, Briefcase, FileText, Calendar, Phone, Mail, Pencil, Check, X } from 'lucide-react';
+import { User, MapPin, Briefcase, FileText, Calendar, Phone, Mail, Pencil, Check, X, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -20,6 +21,8 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
   const [editingSection, setEditingSection] = useState<EditableSection>(null);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const updateDriver = useUpdateDriver();
+  const { data: tenants } = useTenants();
+  const activeTenants = tenants?.filter(t => t.is_active) || [];
 
   const formatDate = (date: string | null) => {
     if (!date) return 'N/A';
@@ -250,6 +253,46 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
           </div>
         </section>
       )}
+
+      {/* Tenant Assignment */}
+      <section>
+        <div className="mb-3 flex items-center gap-2">
+          <h4 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <Building2 className="h-4 w-4" />
+            Tenant Assignment
+          </h4>
+        </div>
+        <div className="grid gap-3 rounded-lg border bg-muted/30 p-4">
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-xs text-muted-foreground">Assigned Tenant</span>
+            <Select
+              value={driver.tenant_id || ''}
+              onValueChange={async (value) => {
+                try {
+                  await updateDriver.mutateAsync({
+                    driverId: driver.id,
+                    updates: { tenant_id: value || null },
+                  });
+                  toast.success('Tenant updated');
+                } catch (err: any) {
+                  toast.error(`Failed to update tenant: ${err.message}`);
+                }
+              }}
+            >
+              <SelectTrigger className="h-8 w-48 text-sm">
+                <SelectValue placeholder="Unassigned" />
+              </SelectTrigger>
+              <SelectContent>
+                {activeTenants.map((t) => (
+                  <SelectItem key={t.id} value={t.id}>
+                    {t.company_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </section>
 
       {/* Test Results Section */}
       <TestResultsSection driver={driver} />

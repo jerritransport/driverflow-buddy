@@ -29,6 +29,7 @@ export interface Driver {
   amount_paid: number;
   requires_alcohol_test: boolean;
   sap_id: string | null;
+  tenant_id: string | null;
   test_clinic_id: string | null;
   donor_pass_number: string | null;
   donor_pass_generated_at: string | null;
@@ -50,6 +51,8 @@ export interface Driver {
   documents_uploaded: Record<string, boolean> | null;
   created_at: string;
   updated_at: string;
+  // Joined field
+  tenant_name?: string;
 }
 
 interface UseDriversOptions {
@@ -71,7 +74,7 @@ export function useDrivers(options: UseDriversOptions = {}) {
     queryFn: async () => {
       let query = supabase
         .from('drivers')
-        .select('*')
+        .select('*, tenants:tenant_id(company_name)')
         .order('updated_at', { ascending: false })
         .limit(limit);
 
@@ -96,7 +99,12 @@ export function useDrivers(options: UseDriversOptions = {}) {
       const { data, error } = await query;
 
       if (error) throw error;
-      return data as Driver[];
+      // Flatten tenant name
+      return (data as any[]).map(d => ({
+        ...d,
+        tenant_name: d.tenants?.company_name || null,
+        tenants: undefined,
+      })) as Driver[];
     },
     refetchInterval: 30000,
   });

@@ -37,6 +37,7 @@ import { useCreateDriver, CreateDriverData } from '@/hooks/useDriversManagement'
 import { useUpdateDriver } from '@/hooks/useDriverDetails';
 import { Driver } from '@/hooks/useDrivers';
 import { useSaps, useCreateSap } from '@/hooks/useSaps';
+import { useTenants } from '@/hooks/useTenants';
 import { Loader2, Upload, X, Plus } from 'lucide-react';
 import { addDays, format } from 'date-fns';
 import { isValidUSPhone, normalizeUSPhone, formatPhoneFinal } from '@/lib/phoneUtils';
@@ -74,6 +75,7 @@ const driverFormSchema = z.object({
   employer_phone: z.string().optional(),
   amount_due: z.coerce.number().min(0).optional(),
   requires_alcohol_test: z.boolean().optional(),
+  tenant_id: z.string().optional(),
   sap_requirement: z.enum(['none', 'needs_sap']).optional(),
   sap_id: z.string().optional(),
 });
@@ -165,6 +167,8 @@ export function DriverFormDialog({
 
   const { data: saps } = useSaps();
   const activeSaps = saps?.filter(s => s.is_active) || [];
+  const { data: tenants } = useTenants();
+  const activeTenants = tenants?.filter(t => t.is_active) || [];
 
   const form = useForm<DriverFormValues>({
     resolver: zodResolver(driverFormSchema),
@@ -190,6 +194,7 @@ export function DriverFormDialog({
       employer_phone: (driver as any)?.employer_phone ?? '',
       amount_due: driver?.amount_due ?? 450,
       requires_alcohol_test: driver?.requires_alcohol_test ?? false,
+      tenant_id: driver?.tenant_id ?? undefined,
       sap_requirement: driver?.sap_id ? 'needs_sap' : 'none',
       sap_id: driver?.sap_id ?? undefined,
     },
@@ -218,6 +223,7 @@ export function DriverFormDialog({
         employer_job_title: values.employer_job_title || undefined,
         employer_phone: values.employer_phone ? normalizeUSPhone(values.employer_phone) : undefined,
         sap_id: values.sap_requirement === 'needs_sap' ? values.sap_id || undefined : undefined,
+        tenant_id: values.tenant_id || undefined,
       };
 
       // Determine follow-up date based on SAP requirement
@@ -735,6 +741,36 @@ export function DriverFormDialog({
                   })()}
                 </div>
               )}
+            </div>
+
+            {/* Tenant Assignment */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground">Tenant Assignment</h3>
+              <FormField
+                control={form.control}
+                name="tenant_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Assign to Tenant</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select tenant" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {activeTenants.map((tenant) => (
+                          <SelectItem key={tenant.id} value={tenant.id}>
+                            {tenant.company_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>Assign this driver to a student's business</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             {/* Billing & Options */}

@@ -198,6 +198,7 @@ export function DriversTable({
               )}
             </TableHead>
             <TableHead>Payment</TableHead>
+            <TableHead>Tenant</TableHead>
             <TableHead>Docs</TableHead>
             <TableHead>
               {isSortable ? (
@@ -297,6 +298,11 @@ function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit,
       </TableCell>
       <TableCell>
         <PaymentBadge status={driver.payment_status} />
+      </TableCell>
+      <TableCell>
+        <span className="text-sm text-muted-foreground">
+          {driver.tenant_name || '—'}
+        </span>
       </TableCell>
       <TableCell>
         <DocumentProgress documentsUploaded={driver.documents_uploaded} />
