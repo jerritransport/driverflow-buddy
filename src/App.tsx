@@ -19,6 +19,7 @@ import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Students from "./pages/Students";
+import StudentSettings from "./pages/StudentSettings";
 import GmailCallback from "./pages/GmailCallback";
 import NotFound from "./pages/NotFound";
 
@@ -120,6 +121,14 @@ const App = () => (
               element={
                 <ProtectedRoute requireAdmin>
                   <Students />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-settings"
+              element={
+                <ProtectedRoute>
+                  <StudentSettings />
                 </ProtectedRoute>
               }
             />

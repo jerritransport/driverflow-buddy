@@ -29,15 +29,15 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const mainNavItems = [
-  { title: 'Dashboard', icon: LayoutDashboard, path: '/' },
-  { title: 'Drivers', icon: Users, path: '/drivers' },
-  { title: 'Follow-Ups', icon: Calendar, path: '/follow-ups' },
-  { title: 'Intake Forms', icon: FileText, path: '/intake-forms' },
-  { title: 'SAPs', icon: Stethoscope, path: '/saps' },
-  
-  { title: 'Test Results', icon: FlaskConical, path: '/test-results' },
-  { title: 'Reports', icon: BarChart3, path: '/reports' },
+const allNavItems = [
+  { title: 'Dashboard', icon: LayoutDashboard, path: '/', adminOnly: false },
+  { title: 'Drivers', icon: Users, path: '/drivers', adminOnly: false },
+  { title: 'Follow-Ups', icon: Calendar, path: '/follow-ups', adminOnly: false },
+  { title: 'Intake Forms', icon: FileText, path: '/intake-forms', adminOnly: true },
+  { title: 'SAPs', icon: Stethoscope, path: '/saps', adminOnly: true },
+  { title: 'Test Results', icon: FlaskConical, path: '/test-results', adminOnly: true },
+  { title: 'Reports', icon: BarChart3, path: '/reports', adminOnly: true },
+  { title: 'My Settings', icon: Settings, path: '/my-settings', studentOnly: true },
 ];
 
 const adminNavItems = [
@@ -49,7 +49,13 @@ const adminNavItems = [
 export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut, isAdmin, user } = useAuth();
+  const { signOut, isAdmin, isStudent, user } = useAuth();
+
+  const mainNavItems = allNavItems.filter(item => {
+    if (item.adminOnly && isStudent) return false;
+    if ((item as any).studentOnly && !isStudent) return false;
+    return true;
+  });
 
   const handleSignOut = async () => {
     await signOut();
@@ -121,7 +127,7 @@ export function AppSidebar() {
               {user?.email}
             </p>
             <p className="text-xs capitalize text-sidebar-foreground/70">
-              {isAdmin ? 'Administrator' : 'Staff'}
+              {isAdmin ? 'Administrator' : isStudent ? 'Student' : 'Staff'}
             </p>
           </div>
           <Button

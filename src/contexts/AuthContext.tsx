@@ -3,7 +3,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-type AppRole = 'admin' | 'staff';
+type AppRole = 'admin' | 'staff' | 'student';
 
 interface AuthContextType {
   user: User | null;
@@ -11,6 +11,8 @@ interface AuthContextType {
   role: AppRole | null;
   isLoading: boolean;
   isAdmin: boolean;
+  isStudent: boolean;
+  tenantId: string | null;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -26,6 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
+  const [tenantId, setTenantId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [lastActivity, setLastActivity] = useState(Date.now());
   const { toast } = useToast();
@@ -34,22 +37,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // since the types file hasn't been regenerated yet
   const fetchUserRole = useCallback(async (userId: string): Promise<AppRole | null> => {
     try {
-      // Call the has_role function we created in the migration
-      // Type assertion needed because types.ts hasn't been regenerated
-      const { data, error } = await (supabase.rpc as Function)('has_role', { 
-        _user_id: userId, 
-        _role: 'admin' 
+      // Check admin first
+      const { data: isAdminData } = await (supabase.rpc as Function)('has_role', { 
+        _user_id: userId, _role: 'admin' 
       });
+      if (isAdminData === true) return 'admin';
 
-      if (error) {
-        console.error('Error checking admin role:', error);
-        return 'staff'; // Default to staff if error
-      }
-      
-      return data === true ? 'admin' : 'staff';
+      // Check student
+      const { data: isStudentData } = await (supabase.rpc as Function)('is_student', {
+        _user_id: userId
+      });
+      if (isStudentData === true) return 'student';
+
+      return 'staff';
     } catch (err) {
       console.error('Error in fetchUserRole:', err);
       return 'staff';
+    }
+  }, []);
+
+  const fetchTenantId = useCallback(async (userId: string): Promise<string | null> => {
+    try {
+      const { data } = await supabase
+        .from('tenants')
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
+      return data?.id ?? null;
+    } catch {
+      return null;
     }
   }, []);
 
@@ -62,13 +78,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(currentSession?.user ?? null);
 
         if (currentSession?.user) {
-          // Use setTimeout to prevent potential Supabase deadlock
           setTimeout(async () => {
             const userRole = await fetchUserRole(currentSession.user.id);
             setRole(userRole);
+            if (userRole === 'student') {
+              const tid = await fetchTenantId(currentSession.user.id);
+              setTenantId(tid);
+            } else {
+              setTenantId(null);
+            }
           }, 0);
         } else {
           setRole(null);
+          setTenantId(null);
         }
 
         setIsLoading(false);
@@ -81,7 +103,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(existingSession?.user ?? null);
 
       if (existingSession?.user) {
-        fetchUserRole(existingSession.user.id).then(setRole);
+        fetchUserRole(existingSession.user.id).then(async (r) => {
+          setRole(r);
+          if (r === 'student') {
+            const tid = await fetchTenantId(existingSession.user.id);
+            setTenantId(tid);
+          }
+        });
       }
 
       setIsLoading(false);
@@ -160,6 +188,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setSession(null);
     setRole(null);
+    setTenantId(null);
   };
 
   const value: AuthContextType = {
@@ -168,6 +197,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     role,
     isLoading,
     isAdmin: role === 'admin',
+    isStudent: role === 'student',
+    tenantId,
     signIn,
     signUp,
     signOut,
