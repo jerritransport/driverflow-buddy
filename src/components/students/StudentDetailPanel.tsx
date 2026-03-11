@@ -18,6 +18,7 @@ import { formatPhoneDisplay } from '@/lib/phoneUtils';
 import { format } from 'date-fns';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { TwilioConfigCard } from './TwilioConfigCard';
+import { CrlConfigCard } from './CrlConfigCard';
 
 interface StudentDetailPanelProps {
   tenantId: string | null;
