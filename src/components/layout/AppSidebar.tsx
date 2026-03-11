@@ -48,7 +48,9 @@ const adminNavItems = [
 export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut, isAdmin, user } = useAuth();
+  const { signOut, isAdmin, isStudent, user } = useAuth();
+
+  const mainNavItems = allNavItems.filter(item => !item.adminOnly || !isStudent);
 
   const handleSignOut = async () => {
     await signOut();
