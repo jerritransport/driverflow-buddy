@@ -33,6 +33,8 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/pending-approval" element={<PendingApproval />} />
             <Route
               path="/"
               element={
