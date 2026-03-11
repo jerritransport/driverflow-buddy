@@ -20,6 +20,7 @@ import {
   LogOut,
   Truck,
   Shield,
+  GraduationCap,
   BarChart3,
   Calendar,
   FileText,

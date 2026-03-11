@@ -110,6 +110,14 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/students"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <Students />
+                </ProtectedRoute>
+              }
+            />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
