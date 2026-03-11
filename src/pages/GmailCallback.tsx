@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -9,6 +10,7 @@ export default function GmailCallback() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isStudent } = useAuth();
 
   useEffect(() => {
     const success = searchParams.get('gmail_success');
@@ -18,6 +20,7 @@ export default function GmailCallback() {
     if (success === 'true') {
       toast({ title: 'Gmail Connected', description: 'Gmail OAuth has been successfully configured.' });
       queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      queryClient.invalidateQueries({ queryKey: ['tenant-setup-status'] });
       if (tenantId) {
         queryClient.invalidateQueries({ queryKey: ['tenant', tenantId] });
       }
@@ -25,9 +28,8 @@ export default function GmailCallback() {
       toast({ title: 'Gmail Connection Failed', description: decodeURIComponent(error), variant: 'destructive' });
     }
 
-    // Redirect back to setup wizard for students, or students page for admins
-    navigate('/setup', { replace: true });
-  }, [searchParams, navigate, toast, queryClient]);
+    navigate(isStudent ? '/setup' : '/students', { replace: true });
+  }, [searchParams, navigate, toast, queryClient, isStudent]);
 
   return (
     <div className="flex h-screen items-center justify-center bg-background">
