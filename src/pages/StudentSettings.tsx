@@ -1,16 +1,13 @@
-import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTenant } from '@/hooks/useTenants';
 import { TwilioConfigCard } from '@/components/students/TwilioConfigCard';
 import { CrlConfigCard } from '@/components/students/CrlConfigCard';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Mail, MessageSquare, Globe, CheckCircle2, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Mail } from 'lucide-react';
 
 export default function StudentSettings() {
   const { tenantId, user } = useAuth();
