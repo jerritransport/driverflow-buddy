@@ -10,10 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Mail } from 'lucide-react';
 
 export default function StudentSettings() {
-  const { tenantId, user } = useAuth();
+  const { tenantId } = useAuth();
   const { data: tenant, isLoading } = useTenant(tenantId);
-  const navigate = useNavigate();
-  const [showWizard, setShowWizard] = useState(false);
 
   // Show wizard if tenant has no credentials configured yet
   const isFirstTime = tenant && !tenant.gmail_refresh_token && !tenant.twilio_account_sid && !tenant.crl_login_email;
