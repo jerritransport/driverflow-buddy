@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { useTenants, Tenant } from '@/hooks/useTenants';
+import { useTenants, useUpdateTenant, Tenant } from '@/hooks/useTenants';
 import { StudentFormDialog } from '@/components/students/StudentFormDialog';
 import { StudentDetailPanel } from '@/components/students/StudentDetailPanel';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,9 +14,10 @@ import {
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, Plus, Building2, Users, CheckCircle2, MoreHorizontal, Eye, Pencil } from 'lucide-react';
+import { Search, Plus, Building2, Users, CheckCircle2, MoreHorizontal, Eye, Pencil, ShieldCheck, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { formatPhoneDisplay } from '@/lib/phoneUtils';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Students() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -25,6 +26,20 @@ export default function Students() {
   const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null);
 
   const { data: tenants, isLoading } = useTenants();
+  const updateTenant = useUpdateTenant();
+  const { toast } = useToast();
+
+  const pendingCount = tenants?.filter(t => !t.is_active).length ?? 0;
+
+  const handleApprove = async (tenantId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await updateTenant.mutateAsync({ tenantId, updates: { is_active: true } });
+      toast({ title: 'Student Approved', description: 'The student account has been activated.' });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err?.message || 'Failed to approve.', variant: 'destructive' });
+    }
+  };
 
   const filtered = tenants?.filter((t) => {
     if (!searchQuery) return true;
@@ -78,13 +93,9 @@ export default function Students() {
         {/* Summary Cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <SummaryCard icon={Building2} label="Total Students" value={totalTenants} subtext={`${activeTenants} active`} />
+          <SummaryCard icon={Clock} label="Pending Approval" value={pendingCount} />
           <SummaryCard icon={Users} label="Gmail Connected" value={gmailConfigured} />
           <SummaryCard icon={CheckCircle2} label="Twilio Configured" value={twilioConfigured} />
-          <SummaryCard
-            icon={CheckCircle2}
-            label="CRL Configured"
-            value={tenants?.filter(t => t.crl_login_email).length ?? 0}
-          />
         </div>
 
         {/* Search */}
@@ -166,6 +177,11 @@ export default function Students() {
                             <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEdit(t.id); }}>
                               <Pencil className="mr-2 h-4 w-4" /> Edit
                             </DropdownMenuItem>
+                            {!t.is_active && (
+                              <DropdownMenuItem onClick={(e) => handleApprove(t.id, e)}>
+                                <ShieldCheck className="mr-2 h-4 w-4" /> Approve
+                              </DropdownMenuItem>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>

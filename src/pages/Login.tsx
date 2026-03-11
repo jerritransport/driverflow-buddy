@@ -168,6 +168,10 @@ export default function Login() {
               </form>
             </TabsContent>
           </Tabs>
+          <p className="mt-4 text-center text-sm text-muted-foreground">
+            Are you a CTPA student?{' '}
+            <a href="/register" className="text-primary hover:underline">Register here</a>
+          </p>
         </CardContent>
       </Card>
     </div>
