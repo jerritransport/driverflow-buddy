@@ -37,22 +37,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // since the types file hasn't been regenerated yet
   const fetchUserRole = useCallback(async (userId: string): Promise<AppRole | null> => {
     try {
-      // Call the has_role function we created in the migration
-      // Type assertion needed because types.ts hasn't been regenerated
-      const { data, error } = await (supabase.rpc as Function)('has_role', { 
-        _user_id: userId, 
-        _role: 'admin' 
+      // Check admin first
+      const { data: isAdminData } = await (supabase.rpc as Function)('has_role', { 
+        _user_id: userId, _role: 'admin' 
       });
+      if (isAdminData === true) return 'admin';
 
-      if (error) {
-        console.error('Error checking admin role:', error);
-        return 'staff'; // Default to staff if error
-      }
-      
-      return data === true ? 'admin' : 'staff';
+      // Check student
+      const { data: isStudentData } = await (supabase.rpc as Function)('is_student', {
+        _user_id: userId
+      });
+      if (isStudentData === true) return 'student';
+
+      return 'staff';
     } catch (err) {
       console.error('Error in fetchUserRole:', err);
       return 'staff';
+    }
+  }, []);
+
+  const fetchTenantId = useCallback(async (userId: string): Promise<string | null> => {
+    try {
+      const { data } = await supabase
+        .from('tenants')
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
+      return data?.id ?? null;
+    } catch {
+      return null;
     }
   }, []);
 
