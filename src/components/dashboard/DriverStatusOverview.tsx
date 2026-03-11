@@ -30,6 +30,7 @@ export function DriverStatusOverview() {
       const followUp = drivers?.filter(d => {
         const s = d.status?.toUpperCase();
         return s === 'PAYMENT_HOLD' || 
+               s === 'FOLLOW_UP' || 
                d.follow_up_date != null;
       }).length || 0;
 

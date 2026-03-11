@@ -24,7 +24,7 @@ import {
   Calendar,
   FileText,
   FlaskConical,
-  GraduationCap,
+  
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -40,7 +40,6 @@ const mainNavItems = [
 ];
 
 const adminNavItems = [
-  { title: 'Students', icon: GraduationCap, path: '/students' },
   { title: 'Admin', icon: Shield, path: '/admin' },
   { title: 'Settings', icon: Settings, path: '/settings' },
 ];
