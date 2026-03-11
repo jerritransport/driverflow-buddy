@@ -20,6 +20,7 @@ import {
   LogOut,
   Truck,
   Shield,
+  GraduationCap,
   BarChart3,
   Calendar,
   FileText,
@@ -40,6 +41,7 @@ const mainNavItems = [
 ];
 
 const adminNavItems = [
+  { title: 'Students', icon: GraduationCap, path: '/students' },
   { title: 'Admin', icon: Shield, path: '/admin' },
   { title: 'Settings', icon: Settings, path: '/settings' },
 ];
