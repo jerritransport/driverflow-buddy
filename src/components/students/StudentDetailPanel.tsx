@@ -222,7 +222,7 @@ export function StudentDetailPanel({ tenantId, open, onOpenChange, onEdit }: Stu
                       <Mail className="h-4 w-4" /> Gmail
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-2">
+                  <CardContent className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Status</span>
                       {credentialStatus(tenant.gmail_refresh_token)}
@@ -233,6 +233,30 @@ export function StudentDetailPanel({ tenantId, open, onOpenChange, onEdit }: Stu
                         <span className="text-sm">{tenant.gmail_address}</span>
                       </div>
                     )}
+                    <div className="pt-1">
+                      {tenant.gmail_refresh_token ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full gap-2"
+                          onClick={handleDisconnectGmail}
+                          disabled={gmailLoading}
+                        >
+                          {gmailLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Unplug className="h-4 w-4" />}
+                          Disconnect Gmail
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          className="w-full gap-2"
+                          onClick={handleConnectGmail}
+                          disabled={gmailLoading}
+                        >
+                          {gmailLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+                          Connect Gmail
+                        </Button>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
 
