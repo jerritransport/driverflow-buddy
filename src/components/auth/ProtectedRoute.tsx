@@ -10,25 +10,27 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
-  const { user, isLoading, isAdmin, role } = useAuth();
+  const { user, isLoading, isAdmin, isStudent, tenantId, role } = useAuth();
   const location = useLocation();
 
-  // Check if user is an inactive tenant (student pending approval)
+  // Check tenant status for students (active + setup completion)
   const { data: tenantStatus, isLoading: tenantLoading } = useQuery({
-    queryKey: ['tenant-status', user?.id],
+    queryKey: ['tenant-setup-status', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
       const { data } = await supabase
         .from('tenants')
-        .select('is_active')
+        .select('is_active, crl_login_email, gmail_refresh_token, twilio_account_sid')
         .eq('user_id', user.id)
         .maybeSingle();
       return data;
     },
-    enabled: !!user?.id && role === 'staff',
+    enabled: !!user?.id && (role === 'student' || role === 'staff'),
   });
 
-  if (isLoading || (role === 'staff' && tenantLoading)) {
+  const isCheckingTenant = (role === 'student' || role === 'staff') && tenantLoading;
+
+  if (isLoading || isCheckingTenant) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -40,9 +42,20 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // If user is a tenant with inactive status, redirect to pending approval
+  // Inactive tenant → pending approval
   if (tenantStatus && !tenantStatus.is_active) {
     return <Navigate to="/pending-approval" replace />;
+  }
+
+  // Student with incomplete setup → wizard (unless already on wizard route)
+  if (isStudent && tenantStatus && location.pathname !== '/setup') {
+    const setupComplete =
+      !!tenantStatus.crl_login_email &&
+      !!tenantStatus.gmail_refresh_token &&
+      !!tenantStatus.twilio_account_sid;
+    if (!setupComplete) {
+      return <Navigate to="/setup" replace />;
+    }
   }
 
   if (requireAdmin && !isAdmin) {

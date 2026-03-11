@@ -25,7 +25,8 @@ export default function GmailCallback() {
       toast({ title: 'Gmail Connection Failed', description: decodeURIComponent(error), variant: 'destructive' });
     }
 
-    navigate('/students', { replace: true });
+    // Redirect back to setup wizard for students, or students page for admins
+    navigate('/setup', { replace: true });
   }, [searchParams, navigate, toast, queryClient]);
 
   return (
