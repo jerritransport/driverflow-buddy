@@ -122,7 +122,7 @@ export function AppSidebar() {
               {user?.email}
             </p>
             <p className="text-xs capitalize text-sidebar-foreground/70">
-              {isAdmin ? 'Administrator' : 'Staff'}
+              {isAdmin ? 'Administrator' : isStudent ? 'Student' : 'Staff'}
             </p>
           </div>
           <Button
