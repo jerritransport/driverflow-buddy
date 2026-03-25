@@ -192,7 +192,7 @@ export function DriverFormDialog({
       employer_contact_name: (driver as any)?.employer_contact_name ?? driver?.employer_contact ?? '',
       employer_job_title: (driver as any)?.employer_job_title ?? '',
       employer_phone: (driver as any)?.employer_phone ?? '',
-      amount_due: driver?.amount_due ?? 450,
+      amount_due: driver?.amount_due ?? 248,
       requires_alcohol_test: driver?.requires_alcohol_test ?? false,
       tenant_id: driver?.tenant_id ?? undefined,
       sap_requirement: driver?.sap_id ? 'needs_sap' : 'none',
