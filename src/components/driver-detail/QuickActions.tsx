@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Driver } from '@/hooks/useDrivers';
 import { useAdvanceDriverStep, useUpdateDriver } from '@/hooks/useDriverDetails';
 import { Button } from '@/components/ui/button';
-import { DRIVER_STEPS } from '@/lib/constants';
+import { DRIVER_STEPS, BASE_PRICE, ALCOHOL_TEST_FEE, STATUS_LABELS } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
 import { RecordPaymentDialog } from './RecordPaymentDialog';
 import { GenerateDonorPassDialog } from './GenerateDonorPassDialog';
@@ -18,7 +18,8 @@ import {
   Ban,
   CheckCircle2,
   Calendar,
-  Wine
+  Wine,
+  Trophy
 } from 'lucide-react';
 
 interface QuickActionsProps {
@@ -45,23 +46,22 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
   const hasBalance = (driver.amount_due ?? 0) > (driver.amount_paid ?? 0);
   const showAlcoholPaymentButton = driver.requires_alcohol_test && driver.current_step === 3;
 
+  // Pricing
+  const totalPrice = driver.requires_alcohol_test ? BASE_PRICE + ALCOHOL_TEST_FEE : BASE_PRICE;
+
   const handleAdvance = async () => {
     if (!nextStepInfo) return;
-
     const nextStatus = nextStepInfo.statuses[0];
-
     try {
       await advanceStep.mutateAsync({
         driverId: driver.id,
         newStep: nextStepInfo.step,
         newStatus: nextStatus,
       });
-
       toast({
         title: 'Step Advanced',
         description: `Driver moved to Step ${nextStepInfo.step}: ${nextStepInfo.label}`,
       });
-
       onSuccess?.();
     } catch (error) {
       toast({
@@ -78,14 +78,12 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
         driverId: driver.id,
         updates: { payment_hold: !driver.payment_hold },
       });
-
       toast({
         title: driver.payment_hold ? 'Payment Hold Removed' : 'Payment Hold Applied',
         description: driver.payment_hold 
           ? 'Driver can now proceed with the workflow'
           : 'Driver workflow is paused until hold is cleared',
       });
-
       onSuccess?.();
     } catch (error) {
       toast({
@@ -96,13 +94,46 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
     }
   };
 
+  const handleSetStatus = async (status: string) => {
+    try {
+      await advanceStep.mutateAsync({
+        driverId: driver.id,
+        newStep: driver.current_step,
+        newStatus: status,
+      });
+      toast({
+        title: 'Status Updated',
+        description: `Status changed to ${STATUS_LABELS[status] || status}`,
+      });
+      onSuccess?.();
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'Failed to update status',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  // Feature 8: Completion state
   if (isComplete) {
     return (
-      <div className="mt-4 flex items-center gap-2 rounded-lg bg-[hsl(var(--status-success))]/10 p-3">
-        <CheckCircle className="h-5 w-5 text-[hsl(var(--status-success))]" />
-        <div>
-          <p className="text-sm font-medium text-[hsl(var(--status-success))]">RTD Complete</p>
-          <p className="text-xs text-muted-foreground">This driver has completed the RTD process</p>
+      <div className="mt-4 space-y-3">
+        <div className="flex items-center gap-3 rounded-lg bg-[hsl(var(--status-success))]/10 p-4">
+          <Trophy className="h-6 w-6 text-[hsl(var(--status-success))]" />
+          <div>
+            <p className="text-sm font-semibold text-[hsl(var(--status-success))]">🎉 RTD Complete!</p>
+            <p className="text-xs text-muted-foreground">
+              Congratulations — {driver.first_name} {driver.last_name} has completed the Return-to-Duty process.
+            </p>
+          </div>
+        </div>
+        {/* Price display */}
+        <div className="rounded-lg border bg-muted/30 p-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">Total Price</span>
+            <span className="text-lg font-bold">${totalPrice}</span>
+          </div>
         </div>
       </div>
     );
@@ -110,6 +141,19 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
 
   return (
     <div className="mt-4 space-y-3">
+      {/* Price Display */}
+      <div className="rounded-lg border bg-muted/30 p-3">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">Total Price</span>
+          <span className="text-lg font-bold">${totalPrice}</span>
+        </div>
+        {driver.requires_alcohol_test && (
+          <p className="text-xs text-muted-foreground mt-1">
+            Base: ${BASE_PRICE} + Alcohol Test: ${ALCOHOL_TEST_FEE}
+          </p>
+        )}
+      </div>
+
       {/* Payment Hold Warning */}
       {driver.payment_hold && (
         <div className="flex items-center gap-2 rounded-lg bg-destructive/10 p-3">
@@ -157,6 +201,78 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
           >
             <DollarSign className="mr-1 h-4 w-4" />
             Send Payment Link
+          </Button>
+        </div>
+      )}
+
+      {/* Feature 7: SAP Paperwork Step Action Buttons */}
+      {driver.current_step === 3 && (
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 min-w-[120px] text-xs"
+            onClick={() => handleSetStatus('SAP_PAPERWORK_PENDING')}
+            disabled={driver.status === 'SAP_PAPERWORK_PENDING' || advanceStep.isPending}
+          >
+            Paperwork Pending
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 min-w-[120px] text-xs"
+            onClick={() => handleSetStatus('ALCOHOL_FEE_PENDING')}
+            disabled={driver.status === 'ALCOHOL_FEE_PENDING' || advanceStep.isPending}
+          >
+            Alcohol Fee Pending
+          </Button>
+          <Button
+            size="sm"
+            className="flex-1 min-w-[120px] text-xs bg-[hsl(var(--status-success))] hover:bg-[hsl(var(--status-success))]/90 text-white"
+            onClick={() => handleSetStatus('SAP_PAPERWORK_RECEIVED')}
+            disabled={driver.status === 'SAP_PAPERWORK_RECEIVED' || advanceStep.isPending}
+          >
+            <CheckCircle className="mr-1 h-3 w-3" />
+            Paperwork Received
+          </Button>
+        </div>
+      )}
+
+      {/* Feature 8: Donor Pass / Results Step Action Buttons */}
+      {driver.current_step === 6 && (
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 min-w-[120px] text-xs"
+            onClick={() => handleSetStatus('RESULTS_PENDING')}
+            disabled={driver.status === 'RESULTS_PENDING' || advanceStep.isPending}
+          >
+            Pending Results
+          </Button>
+          <Button
+            size="sm"
+            className="flex-1 min-w-[120px] text-xs bg-[hsl(var(--status-success))] hover:bg-[hsl(var(--status-success))]/90 text-white"
+            onClick={async () => {
+              try {
+                await advanceStep.mutateAsync({
+                  driverId: driver.id,
+                  newStep: 7,
+                  newStatus: 'RTD_COMPLETE',
+                });
+                toast({
+                  title: 'Results Received',
+                  description: 'Driver has been moved to completion!',
+                });
+                onSuccess?.();
+              } catch {
+                toast({ title: 'Error', description: 'Failed to update', variant: 'destructive' });
+              }
+            }}
+            disabled={advanceStep.isPending}
+          >
+            <CheckCircle className="mr-1 h-3 w-3" />
+            Results Received
           </Button>
         </div>
       )}
@@ -241,43 +357,6 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
             <ChevronRight className="h-4 w-4" />
           </span>
         </Button>
-      )}
-
-      {/* Quick Status Actions based on current step */}
-      {currentStepInfo && currentStepInfo.statuses.length > 1 && (
-        <div className="flex flex-wrap gap-2">
-          {currentStepInfo.statuses.slice(1).map((status) => (
-            <Button
-              key={status}
-              variant="outline"
-              size="sm"
-              className="flex-1 min-w-[100px] text-xs"
-              onClick={async () => {
-                try {
-                  await advanceStep.mutateAsync({
-                    driverId: driver.id,
-                    newStep: driver.current_step,
-                    newStatus: status,
-                  });
-                  toast({
-                    title: 'Status Updated',
-                    description: `Status changed to ${status.replace(/_/g, ' ')}`,
-                  });
-                  onSuccess?.();
-                } catch {
-                  toast({
-                    title: 'Error',
-                    description: 'Failed to update status',
-                    variant: 'destructive',
-                  });
-                }
-              }}
-              disabled={driver.status === status || advanceStep.isPending}
-            >
-              {status.replace(/_/g, ' ')}
-            </Button>
-          ))}
-        </div>
       )}
 
       {/* Dialogs */}

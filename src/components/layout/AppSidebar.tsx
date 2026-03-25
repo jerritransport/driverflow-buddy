@@ -25,7 +25,8 @@ import {
   Calendar,
   FileText,
   FlaskConical,
-  
+  CreditCard,
+  UserCog,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -36,11 +37,13 @@ const allNavItems = [
   { title: 'Intake Forms', icon: FileText, path: '/intake-forms', adminOnly: true },
   { title: 'SAPs', icon: Stethoscope, path: '/saps', adminOnly: true },
   { title: 'Test Results', icon: FlaskConical, path: '/test-results', adminOnly: true },
+  { title: 'Unmatched Payments', icon: CreditCard, path: '/unmatched-payments', adminOnly: true },
   { title: 'Reports', icon: BarChart3, path: '/reports', adminOnly: true },
   { title: 'My Settings', icon: Settings, path: '/my-settings', studentOnly: true },
 ];
 
 const adminNavItems = [
+  { title: 'Staff Management', icon: UserCog, path: '/staff' },
   { title: 'Students', icon: GraduationCap, path: '/students' },
   { title: 'Admin', icon: Shield, path: '/admin' },
   { title: 'Settings', icon: Settings, path: '/settings' },

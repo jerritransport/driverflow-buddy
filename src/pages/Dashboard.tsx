@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { SummaryCards } from '@/components/dashboard/SummaryCards';
 import { ViewToggle, ViewMode } from '@/components/dashboard/ViewToggle';
@@ -9,11 +10,13 @@ import { RevenueOutstandingPanel } from '@/components/dashboard/RevenueOutstandi
 import { DateRangePicker } from '@/components/dashboard/DateRangePicker';
 import { DriverDetailPanel } from '@/components/driver-detail';
 import { DateRange } from 'react-day-picker';
+import { ArrowRight } from 'lucide-react';
 
 export default function Dashboard() {
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const navigate = useNavigate();
 
   const handleDriverSelect = (driverId: string) => {
     setSelectedDriverId(driverId);
@@ -49,8 +52,17 @@ export default function Dashboard() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Driver Pipeline</h2>
-              <div className="sm:hidden">
-                <ViewToggle value={viewMode} onChange={setViewMode} />
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => navigate('/drivers')}
+                  className="text-sm text-primary hover:underline inline-flex items-center gap-1 transition-colors"
+                >
+                  View All
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+                <div className="sm:hidden">
+                  <ViewToggle value={viewMode} onChange={setViewMode} />
+                </div>
               </div>
             </div>
             {viewMode === 'table' ? (
