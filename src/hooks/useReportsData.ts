@@ -153,7 +153,7 @@ export function useStepDistribution() {
         'Intake',
         'Payment',
         'SAP',
-        'Clearinghouse',
+        'Designation',
         'Donor Pass',
         'Testing',
         'Complete',

@@ -40,7 +40,7 @@ export function AutomationSettings() {
                 Auto Donor Pass Generation
               </Label>
               <p className="text-sm text-muted-foreground">
-                Generate and send donor passes when clearinghouse clears
+                Generate and send donor passes when designation clears
               </p>
             </div>
           </div>
