@@ -743,19 +743,19 @@ export function DriverFormDialog({
               )}
             </div>
 
-            {/* Tenant Assignment */}
+            {/* Staff Assignment */}
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground">Tenant Assignment</h3>
+              <h3 className="text-sm font-medium text-muted-foreground">Staff Assignment</h3>
               <FormField
                 control={form.control}
                 name="tenant_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Assign to Tenant</FormLabel>
+                    <FormLabel>Select Staff</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select tenant" />
+                          <SelectValue placeholder="Select Staff" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -766,7 +766,7 @@ export function DriverFormDialog({
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormDescription>Assign this driver to a student's business</FormDescription>
+                    <FormDescription>Assign this driver to a staff member</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -254,17 +254,17 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
         </section>
       )}
 
-      {/* Tenant Assignment */}
+      {/* Staff Assignment */}
       <section>
         <div className="mb-3 flex items-center gap-2">
           <h4 className="flex items-center gap-2 text-sm font-semibold text-foreground">
             <Building2 className="h-4 w-4" />
-            Tenant Assignment
+            Staff Assignment
           </h4>
         </div>
         <div className="grid gap-3 rounded-lg border bg-muted/30 p-4">
           <div className="flex items-center justify-between gap-4">
-            <span className="text-xs text-muted-foreground">Assigned Tenant</span>
+            <span className="text-xs text-muted-foreground">Assigned Staff</span>
             <Select
               value={driver.tenant_id || ''}
               onValueChange={async (value) => {
@@ -273,9 +273,9 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
                     driverId: driver.id,
                     updates: { tenant_id: value || null },
                   });
-                  toast.success('Tenant updated');
+                  toast.success('Staff updated');
                 } catch (err: any) {
-                  toast.error(`Failed to update tenant: ${err.message}`);
+                  toast.error(`Failed to update staff: ${err.message}`);
                 }
               }}
             >
