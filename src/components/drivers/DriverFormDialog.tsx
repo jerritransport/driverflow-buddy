@@ -192,7 +192,7 @@ export function DriverFormDialog({
       employer_contact_name: (driver as any)?.employer_contact_name ?? driver?.employer_contact ?? '',
       employer_job_title: (driver as any)?.employer_job_title ?? '',
       employer_phone: (driver as any)?.employer_phone ?? '',
-      amount_due: driver?.amount_due ?? 450,
+      amount_due: driver?.amount_due ?? 248,
       requires_alcohol_test: driver?.requires_alcohol_test ?? false,
       tenant_id: driver?.tenant_id ?? undefined,
       sap_requirement: driver?.sap_id ? 'needs_sap' : 'none',
@@ -743,19 +743,19 @@ export function DriverFormDialog({
               )}
             </div>
 
-            {/* Tenant Assignment */}
+            {/* Staff Assignment */}
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground">Tenant Assignment</h3>
+              <h3 className="text-sm font-medium text-muted-foreground">Staff Assignment</h3>
               <FormField
                 control={form.control}
                 name="tenant_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Assign to Tenant</FormLabel>
+                    <FormLabel>Select Staff</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select tenant" />
+                          <SelectValue placeholder="Select Staff" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -766,7 +766,7 @@ export function DriverFormDialog({
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormDescription>Assign this driver to a student's business</FormDescription>
+                    <FormDescription>Assign this driver to a staff member</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -786,7 +786,9 @@ export function DriverFormDialog({
                       <FormControl>
                         <Input type="number" step="0.01" min="0" {...field} />
                       </FormControl>
-                      <FormDescription>Default is $450</FormDescription>
+                      <FormDescription>
+                        Total: ${form.watch('requires_alcohol_test') ? '363 (base $248 + alcohol $115)' : '248'}
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -799,13 +801,17 @@ export function DriverFormDialog({
                       <div className="space-y-0.5">
                         <FormLabel className="text-base">Requires Alcohol Test</FormLabel>
                         <FormDescription>
-                          Enable if driver needs alcohol testing
+                          {field.value ? 'Total: $363 ($248 + $115)' : 'Enable to add $115 alcohol test fee'}
                         </FormDescription>
                       </div>
                       <FormControl>
                         <Switch
                           checked={field.value}
-                          onCheckedChange={field.onChange}
+                          onCheckedChange={(checked) => {
+                            field.onChange(checked);
+                            // Auto-update amount_due based on toggle
+                            form.setValue('amount_due', checked ? 363 : 248);
+                          }}
                         />
                       </FormControl>
                     </FormItem>

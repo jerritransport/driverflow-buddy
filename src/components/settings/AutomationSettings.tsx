@@ -21,15 +21,15 @@ export function AutomationSettings() {
           <div className="flex items-center gap-3">
             <RefreshCw className="h-5 w-5 text-muted-foreground" />
             <div>
-              <Label htmlFor="auto-clearinghouse" className="font-medium">
-                Auto Clearinghouse Query
+              <Label htmlFor="auto-designation" className="font-medium">
+                Auto Designation Query
               </Label>
               <p className="text-sm text-muted-foreground">
-                Automatically run clearinghouse queries when drivers reach step 4
+                Automatically run designation queries when drivers reach step 4
               </p>
             </div>
           </div>
-          <Switch id="auto-clearinghouse" defaultChecked />
+          <Switch id="auto-designation" defaultChecked />
         </div>
 
         <div className="flex items-center justify-between">
@@ -40,7 +40,7 @@ export function AutomationSettings() {
                 Auto Donor Pass Generation
               </Label>
               <p className="text-sm text-muted-foreground">
-                Generate and send donor passes when clearinghouse clears
+                Generate and send donor passes when designation clears
               </p>
             </div>
           </div>

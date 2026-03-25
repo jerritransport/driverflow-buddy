@@ -198,7 +198,7 @@ export function DriversTable({
               )}
             </TableHead>
             <TableHead>Payment</TableHead>
-            <TableHead>Tenant</TableHead>
+            <TableHead>Staff</TableHead>
             <TableHead>Docs</TableHead>
             <TableHead>
               {isSortable ? (
@@ -301,7 +301,7 @@ function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit,
       </TableCell>
       <TableCell>
         <span className="text-sm text-muted-foreground">
-          {driver.tenant_name || '—'}
+          {(driver as any).staff_member_name || driver.tenant_name || '—'}
         </span>
       </TableCell>
       <TableCell>

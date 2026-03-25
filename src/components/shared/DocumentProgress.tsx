@@ -9,8 +9,8 @@ import {
 export const DOCUMENT_TYPES = [
   'Intake Form',
   'CDL Photo',
-  'Clearinghouse Query Acceptance',
-  'Clearinghouse Consent',
+  'Designation Query Acceptance',
+  'Designation Consent',
   'SAP Paperwork',
   'Test Result',
   'Chain of Custody',

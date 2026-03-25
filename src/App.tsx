@@ -21,6 +21,8 @@ import Settings from "./pages/Settings";
 import Students from "./pages/Students";
 import StudentSettings from "./pages/StudentSettings";
 import StudentSetupWizard from "./pages/StudentSetupWizard";
+import StaffManagement from "./pages/StaffManagement";
+import UnmatchedPayments from "./pages/UnmatchedPayments";
 import GmailCallback from "./pages/GmailCallback";
 import NotFound from "./pages/NotFound";
 
@@ -122,6 +124,22 @@ const App = () => (
               element={
                 <ProtectedRoute requireAdmin>
                   <Students />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/staff"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <StaffManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/unmatched-payments"
+              element={
+                <ProtectedRoute>
+                  <UnmatchedPayments />
                 </ProtectedRoute>
               }
             />
