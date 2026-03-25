@@ -198,7 +198,7 @@ export function DriversTable({
               )}
             </TableHead>
             <TableHead>Payment</TableHead>
-            <TableHead>Tenant</TableHead>
+            <TableHead>Staff</TableHead>
             <TableHead>Docs</TableHead>
             <TableHead>
               {isSortable ? (
