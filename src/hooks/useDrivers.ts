@@ -29,6 +29,7 @@ export interface Driver {
   amount_paid: number;
   requires_alcohol_test: boolean;
   sap_id: string | null;
+  staff_member_id: string | null;
   tenant_id: string | null;
   test_clinic_id: string | null;
   donor_pass_number: string | null;
