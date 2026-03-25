@@ -2,11 +2,11 @@
 export const DRIVER_STEPS = [
   { step: 1, label: 'Consent Form', statuses: ['INTAKE_PENDING'] },
   { step: 2, label: 'Payment', statuses: ['PAYMENT_HOLD', 'PAYMENT_COMPLETE'] },
-  { step: 3, label: 'SAP Paperwork', statuses: ['SAP_REQUEST_PENDING', 'SAP_PAPERWORK_PENDING', 'ALCOHOL_FEE_PENDING'] },
-  { step: 4, label: 'Designation', statuses: ['CLEARINGHOUSE_PENDING', 'CLEARINGHOUSE_AUTOMATING', 'CLEARINGHOUSE_COMPLETE'] },
+  { step: 3, label: 'SAP Paperwork', statuses: ['SAP_REQUEST_PENDING', 'SAP_PAPERWORK_PENDING', 'ALCOHOL_FEE_PENDING', 'SAP_PAPERWORK_RECEIVED'] },
+  { step: 4, label: 'Designation', statuses: ['DESIGNATION_PENDING', 'DESIGNATION_AUTOMATING', 'DESIGNATION_COMPLETE'] },
   { step: 5, label: 'Donor Pass', statuses: ['DONOR_PASS_PENDING', 'DONOR_PASS_SENT'] },
-  { step: 6, label: 'Results', statuses: ['TEST_IN_PROGRESS', 'RESULT_RECEIVED'] },
-  { step: 7, label: 'Step 5 Complete', statuses: ['RTD_COMPLETE'] },
+  { step: 6, label: 'Results', statuses: ['TEST_IN_PROGRESS', 'RESULTS_PENDING', 'RESULTS_RECEIVED', 'RESULT_RECEIVED'] },
+  { step: 7, label: 'Complete', statuses: ['RTD_COMPLETE'] },
 ] as const;
 
 // Workflow steps for UI (same as DRIVER_STEPS but simpler format)
@@ -20,31 +20,41 @@ export const DRIVER_STATUSES = [
   { value: 'SAP_REQUEST_PENDING', label: 'SAP Request Pending' },
   { value: 'SAP_PAPERWORK_PENDING', label: 'SAP Paperwork Pending' },
   { value: 'ALCOHOL_FEE_PENDING', label: 'Alcohol Fee Pending' },
-  { value: 'CLEARINGHOUSE_PENDING', label: 'Clearinghouse Pending' },
-  { value: 'CLEARINGHOUSE_AUTOMATING', label: 'Clearinghouse Automating' },
-  { value: 'CLEARINGHOUSE_COMPLETE', label: 'Clearinghouse Complete' },
+  { value: 'SAP_PAPERWORK_RECEIVED', label: 'SAP Paperwork Received' },
+  { value: 'DESIGNATION_PENDING', label: 'Designation Pending' },
+  { value: 'DESIGNATION_AUTOMATING', label: 'Designation Automating' },
+  { value: 'DESIGNATION_COMPLETE', label: 'Designation Complete' },
   { value: 'DONOR_PASS_PENDING', label: 'Donor Pass Pending' },
   { value: 'DONOR_PASS_SENT', label: 'Donor Pass Sent' },
   { value: 'TEST_IN_PROGRESS', label: 'Test In Progress' },
+  { value: 'RESULTS_PENDING', label: 'Results Pending' },
+  { value: 'RESULTS_RECEIVED', label: 'Results Received' },
   { value: 'RESULT_RECEIVED', label: 'Result Received' },
   { value: 'RTD_COMPLETE', label: 'RTD Complete' },
 ] as const;
 
 export const STATUS_LABELS: Record<string, string> = {
   INTAKE_PENDING: 'Consent Pending',
-  PAYMENT_HOLD: 'Follow-Up', // Renamed from "Payment Hold" per client request
+  PAYMENT_HOLD: 'Follow-Up',
   PAYMENT_COMPLETE: 'Payment Complete',
   SAP_REQUEST_PENDING: 'SAP Request Pending',
   SAP_PAPERWORK_PENDING: 'SAP Paperwork Pending',
   ALCOHOL_FEE_PENDING: 'Alcohol Fee Pending',
-  CLEARINGHOUSE_PENDING: 'Designation Pending',
-  CLEARINGHOUSE_AUTOMATING: 'Designation Automating',
-  CLEARINGHOUSE_COMPLETE: 'Designation Complete',
+  SAP_PAPERWORK_RECEIVED: 'SAP Paperwork Received',
+  DESIGNATION_PENDING: 'Designation Pending',
+  DESIGNATION_AUTOMATING: 'Designation Automating',
+  DESIGNATION_COMPLETE: 'Designation Complete',
   DONOR_PASS_PENDING: 'Donor Pass Pending',
   DONOR_PASS_SENT: 'Donor Pass Sent',
   TEST_IN_PROGRESS: 'Test In Progress',
+  RESULTS_PENDING: 'Results Pending',
+  RESULTS_RECEIVED: 'Results Received',
   RESULT_RECEIVED: 'Result Received',
   RTD_COMPLETE: 'RTD Complete',
+  // Legacy mappings for backward compat
+  CLEARINGHOUSE_PENDING: 'Designation Pending',
+  CLEARINGHOUSE_AUTOMATING: 'Designation Automating',
+  CLEARINGHOUSE_COMPLETE: 'Designation Complete',
 };
 
 export const PAYMENT_STATUS_LABELS: Record<string, string> = {
@@ -69,3 +79,7 @@ export const getStepForStatus = (status: string): number => {
 export const getStepLabel = (step: number): string => {
   return DRIVER_STEPS.find(s => s.step === step)?.label ?? 'Unknown';
 };
+
+// Pricing constants
+export const BASE_PRICE = 248;
+export const ALCOHOL_TEST_FEE = 115;

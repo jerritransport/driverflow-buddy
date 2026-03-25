@@ -458,6 +458,7 @@ export type Database = {
           sap_id: string | null
           sap_paperwork_received_at: string | null
           SSN: string | null
+          staff_member_id: string | null
           state: string | null
           status: string
           tenant_id: string | null
@@ -518,6 +519,7 @@ export type Database = {
           sap_id?: string | null
           sap_paperwork_received_at?: string | null
           SSN?: string | null
+          staff_member_id?: string | null
           state?: string | null
           status?: string
           tenant_id?: string | null
@@ -578,6 +580,7 @@ export type Database = {
           sap_id?: string | null
           sap_paperwork_received_at?: string | null
           SSN?: string | null
+          staff_member_id?: string | null
           state?: string | null
           status?: string
           tenant_id?: string | null
@@ -612,6 +615,13 @@ export type Database = {
             columns: ["sap_id"]
             isOneToOne: false
             referencedRelation: "saps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drivers_staff_member_id_fkey"
+            columns: ["staff_member_id"]
+            isOneToOne: false
+            referencedRelation: "staff_members"
             referencedColumns: ["id"]
           },
           {
@@ -859,6 +869,30 @@ export type Database = {
         }
         Relationships: []
       }
+      staff_members: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
       tenants: {
         Row: {
           company_name: string
@@ -918,6 +952,70 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      unmatched_payments: {
+        Row: {
+          amount: number | null
+          created_at: string
+          id: string
+          matched_at: string | null
+          matched_by: string | null
+          matched_driver_id: string | null
+          payer_email: string | null
+          payer_name: string | null
+          payment_date: string | null
+          status: string
+          stripe_payment_id: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          id?: string
+          matched_at?: string | null
+          matched_by?: string | null
+          matched_driver_id?: string | null
+          payer_email?: string | null
+          payer_name?: string | null
+          payment_date?: string | null
+          status?: string
+          stripe_payment_id?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          id?: string
+          matched_at?: string | null
+          matched_by?: string | null
+          matched_driver_id?: string | null
+          payer_email?: string | null
+          payer_name?: string | null
+          payment_date?: string | null
+          status?: string
+          stripe_payment_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unmatched_payments_matched_driver_id_fkey"
+            columns: ["matched_driver_id"]
+            isOneToOne: false
+            referencedRelation: "driver_full_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unmatched_payments_matched_driver_id_fkey"
+            columns: ["matched_driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unmatched_payments_matched_driver_id_fkey"
+            columns: ["matched_driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers_needing_attention"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -1205,6 +1303,7 @@ export type Database = {
           sap_id: string | null
           sap_paperwork_received_at: string | null
           SSN: string | null
+          staff_member_id: string | null
           state: string | null
           status: string
           tenant_id: string | null
