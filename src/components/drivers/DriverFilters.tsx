@@ -45,9 +45,9 @@ export function DriverFilters({ filters, onFiltersChange }: DriverFiltersProps) 
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-4">
         {/* Search */}
-        <div className="relative flex-1 min-w-[200px] max-w-md">
+        <div className="relative w-full sm:flex-1 sm:min-w-[200px] sm:max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search by name, CDL, email, phone..."
@@ -64,7 +64,7 @@ export function DriverFilters({ filters, onFiltersChange }: DriverFiltersProps) 
             updateFilter('step', value === 'all' ? undefined : parseInt(value))
           }
         >
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[140px]">
             <SelectValue placeholder="All Steps" />
           </SelectTrigger>
           <SelectContent>
@@ -84,7 +84,7 @@ export function DriverFilters({ filters, onFiltersChange }: DriverFiltersProps) 
             updateFilter('status', value === 'all' ? undefined : value)
           }
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[180px]">
             <SelectValue placeholder="All Statuses" />
           </SelectTrigger>
           <SelectContent>
@@ -104,7 +104,7 @@ export function DriverFilters({ filters, onFiltersChange }: DriverFiltersProps) 
             updateFilter('paymentStatus', value === 'all' ? undefined : value)
           }
         >
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[140px]">
             <SelectValue placeholder="All Payments" />
           </SelectTrigger>
           <SelectContent>
@@ -133,7 +133,7 @@ export function DriverFilters({ filters, onFiltersChange }: DriverFiltersProps) 
             )
           }
         >
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[140px]">
             <SelectValue placeholder="Hold Status" />
           </SelectTrigger>
           <SelectContent>
@@ -159,7 +159,7 @@ export function DriverFilters({ filters, onFiltersChange }: DriverFiltersProps) 
             )
           }
         >
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[140px]">
             <SelectValue placeholder="Alcohol Test" />
           </SelectTrigger>
           <SelectContent>
@@ -176,7 +176,7 @@ export function DriverFilters({ filters, onFiltersChange }: DriverFiltersProps) 
             updateFilter('dateField', value === 'none' ? undefined : value as 'created_at' | 'updated_at')
           }
         >
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[140px]">
             <SelectValue placeholder="Date Field" />
           </SelectTrigger>
           <SelectContent>

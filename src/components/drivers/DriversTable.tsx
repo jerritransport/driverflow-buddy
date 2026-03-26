@@ -142,8 +142,8 @@ export function DriversTable({
   }
 
   return (
-    <div className="rounded-lg border bg-card">
-      <Table>
+    <div className="rounded-lg border bg-card overflow-x-auto">
+      <Table className="min-w-[800px]">
         <TableHeader>
           <TableRow>
             {isSelectable && (
