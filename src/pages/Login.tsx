@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { APP_NAME } from '@/lib/constants';
+import goopLogo from '@/assets/goop-logo.png';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';

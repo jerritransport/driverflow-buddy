@@ -29,6 +29,7 @@ import {
   UserCog,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import goopLogo from '@/assets/goop-logo.png';
 
 const allNavItems = [
   { title: 'Dashboard', icon: LayoutDashboard, path: '/', adminOnly: false },
