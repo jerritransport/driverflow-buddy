@@ -31,6 +31,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <ThemeProvider attribute="class" defaultTheme="system" storageKey="goop-theme">
     <TooltipProvider>
       <Toaster />
       <Sonner />
