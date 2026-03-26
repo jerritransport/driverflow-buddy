@@ -18,7 +18,7 @@ import {
   Stethoscope, 
   Settings, 
   LogOut,
-  Truck,
+  
   Shield,
   GraduationCap,
   BarChart3,
