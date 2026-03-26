@@ -126,6 +126,9 @@ export function AppHeader() {
         </Button>
 
         <div className="flex items-center gap-2">
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
           {/* Keyboard Shortcuts Help */}
           <Button
             variant="ghost"
