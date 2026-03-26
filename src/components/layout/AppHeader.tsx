@@ -16,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { GlobalSearch } from '@/components/layout/GlobalSearch';
 import { NotificationsDropdown } from '@/components/layout/NotificationsDropdown';
 import { KeyboardShortcutsHelp } from '@/components/layout/KeyboardShortcutsHelp';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { Search, User, LogOut, Settings, Keyboard } from 'lucide-react';
 
 export function AppHeader() {
@@ -125,6 +126,9 @@ export function AppHeader() {
         </Button>
 
         <div className="flex items-center gap-2">
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
           {/* Keyboard Shortcuts Help */}
           <Button
             variant="ghost"
