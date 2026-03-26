@@ -104,7 +104,7 @@ export function DriverFilters({ filters, onFiltersChange }: DriverFiltersProps) 
             updateFilter('paymentStatus', value === 'all' ? undefined : value)
           }
         >
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[140px]">
             <SelectValue placeholder="All Payments" />
           </SelectTrigger>
           <SelectContent>
