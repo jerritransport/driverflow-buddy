@@ -84,7 +84,7 @@ export function DriverFilters({ filters, onFiltersChange }: DriverFiltersProps) 
             updateFilter('status', value === 'all' ? undefined : value)
           }
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[180px]">
             <SelectValue placeholder="All Statuses" />
           </SelectTrigger>
           <SelectContent>
