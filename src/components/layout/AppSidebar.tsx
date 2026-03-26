@@ -18,7 +18,7 @@ import {
   Stethoscope, 
   Settings, 
   LogOut,
-  Truck,
+  
   Shield,
   GraduationCap,
   BarChart3,
@@ -68,14 +68,9 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="border-b border-sidebar-border p-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sidebar-primary">
-            <Truck className="h-5 w-5 text-sidebar-primary-foreground" />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-sidebar-foreground">RTD Dashboard</h2>
-            <p className="text-xs text-sidebar-foreground/70">Driver Management</p>
-          </div>
+        <div>
+          <h2 className="text-base font-semibold text-sidebar-foreground">GOOP RTD Dashboard</h2>
+          <p className="text-xs text-sidebar-foreground/70">Driver Management</p>
         </div>
       </SidebarHeader>
 

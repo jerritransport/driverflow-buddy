@@ -80,6 +80,9 @@ export const getStepLabel = (step: number): string => {
   return DRIVER_STEPS.find(s => s.step === step)?.label ?? 'Unknown';
 };
 
+// Branding
+export const APP_NAME = 'GOOP RTD Dashboard';
+
 // Pricing constants
 export const BASE_PRICE = 248;
 export const ALCOHOL_TEST_FEE = 115;
