@@ -1,39 +1,34 @@
 
 
-## Problem
+## Login Page UI & Wording Fix
 
-The "Add New SAP" form fails with a **403 "permission denied for table saps"** error. The database returns error code `42501`.
+### Issues Identified
+1. Placeholder text "you@example.com" and "John Doe" are generic/demo text
+2. "Are you a CTPA student? Register here" is confusing and misaligned with the sub-account concept
+3. Card lacks shadow and polish (no elevated shadow, tight spacing)
+4. Subtitle "GetOut of Prohibited" needs proper spacing: "Get Out of Prohibited"
+5. Sign Up tab exposes a raw signup form that should not be on the main login — sub-accounts register via `/register`
 
-## Root Cause
+### Plan
 
-The RLS policies on the `saps` table are all **RESTRICTIVE** (`Permissive: No`). In PostgreSQL, RESTRICTIVE policies alone are not sufficient to grant access -- there must be at least one **PERMISSIVE** policy that passes. Since all three existing policies (SELECT, INSERT, UPDATE) are RESTRICTIVE, no authenticated user can actually insert into the table, even though the check expression is `true`.
+**File: `src/pages/Login.tsx`**
 
-The same issue likely affects SELECT and UPDATE, but SELECT works because there's probably a grant allowing it at a different level. INSERT is strictly blocked.
+1. **Remove the Tabs (Sign In / Sign Up)** — The login page should only show the Sign In form. Sub-account registration is handled at `/register`. Remove the `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`, and the entire Sign Up form. Keep only the sign-in form.
 
-## Fix
+2. **Fix branding text** — Change subtitle from `"GetOut of Prohibited"` to `"Get Out of Prohibited"` (with spaces). Bump title size slightly and add a decorative divider or extra spacing below the subtitle for visual hierarchy.
 
-Run a migration to drop the existing RESTRICTIVE INSERT policy and recreate it as a **PERMISSIVE** policy. To be safe and consistent, do the same for SELECT and UPDATE policies on the `saps` table.
+3. **Remove generic placeholders** — Change `"you@example.com"` to `"Enter your email"` and password placeholder to `"Enter your password"`.
 
-```sql
--- Drop restrictive policies
-DROP POLICY IF EXISTS "saps_insert_policy" ON public.saps;
-DROP POLICY IF EXISTS "saps_select_policy" ON public.saps;
-DROP POLICY IF EXISTS "saps_update_policy" ON public.saps;
+4. **Replace student messaging** — Change `"Are you a CTPA student? Register here"` to `"Want to manage your own RTD pipeline?"` with a link labeled `"Create a sub-account"` pointing to `/register`.
 
--- Recreate as PERMISSIVE
-CREATE POLICY "saps_select_policy" ON public.saps
-  FOR SELECT TO authenticated USING (true);
+5. **Visual polish** — Add `shadow-lg` to the Card. Add more vertical padding to CardHeader. Ensure the sign-in button has strong contrast. Add a subtle top accent border or brand-colored top strip to the card.
 
-CREATE POLICY "saps_insert_policy" ON public.saps
-  FOR INSERT TO authenticated WITH CHECK (true);
+6. **Mobile** — Already full-width via `max-w-md` + `p-4` on the wrapper. Inputs and button already `w-full`. No changes needed.
 
-CREATE POLICY "saps_update_policy" ON public.saps
-  FOR UPDATE TO authenticated USING (true);
-```
+7. **Remove unused imports** — Remove `Tabs` components, `fullName` state, `handleSignUp`, and `signUp` from `useAuth` destructure since the Sign Up tab is being removed.
 
-Additionally, improve the error toast in `SapFormDialog.tsx` to surface the actual backend error message instead of a generic "Failed to create SAP" message, making future debugging easier.
-
-## Files to Change
-1. **New migration** -- Fix RLS policies on the `saps` table
-2. **`src/components/sap/SapFormDialog.tsx`** -- Surface specific error messages in the toast
+### Technical Details
+- Single file edit: `src/pages/Login.tsx`
+- No database or auth logic changes
+- No new dependencies
 
