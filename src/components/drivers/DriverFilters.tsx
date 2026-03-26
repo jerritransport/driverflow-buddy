@@ -176,7 +176,7 @@ export function DriverFilters({ filters, onFiltersChange }: DriverFiltersProps) 
             updateFilter('dateField', value === 'none' ? undefined : value as 'created_at' | 'updated_at')
           }
         >
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[140px]">
             <SelectValue placeholder="Date Field" />
           </SelectTrigger>
           <SelectContent>

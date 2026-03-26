@@ -122,12 +122,12 @@ export default function Drivers() {
               Manage driver records, track their progress, and handle RTD workflow
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex w-full gap-2 sm:w-auto">
             <Button 
               variant="outline" 
               onClick={handleExportAll} 
               disabled={isExporting || isFetchingAll}
-              className="gap-2"
+              className="gap-2 flex-1 sm:flex-none"
             >
               {isExporting || isFetchingAll ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -136,7 +136,7 @@ export default function Drivers() {
               )}
               Export All
             </Button>
-            <Button onClick={handleAddNew} className="gap-2">
+            <Button onClick={handleAddNew} className="gap-2 flex-1 sm:flex-none">
               <Plus className="h-4 w-4" />
               Add Driver
             </Button>
