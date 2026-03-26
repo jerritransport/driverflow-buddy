@@ -16,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { GlobalSearch } from '@/components/layout/GlobalSearch';
 import { NotificationsDropdown } from '@/components/layout/NotificationsDropdown';
 import { KeyboardShortcutsHelp } from '@/components/layout/KeyboardShortcutsHelp';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { Search, User, LogOut, Settings, Keyboard } from 'lucide-react';
 
 export function AppHeader() {
