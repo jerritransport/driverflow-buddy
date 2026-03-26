@@ -238,6 +238,30 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
         </div>
       )}
 
+      {/* Step 5: Donor Pass Action Buttons */}
+      {driver.current_step === 5 && (
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 min-w-[120px] text-xs"
+            onClick={() => handleSetStatus('DONOR_PASS_PENDING')}
+            disabled={driver.status === 'DONOR_PASS_PENDING' || advanceStep.isPending}
+          >
+            Donor Pass Pending
+          </Button>
+          <Button
+            size="sm"
+            className="flex-1 min-w-[120px] text-xs bg-[hsl(var(--status-success))] hover:bg-[hsl(var(--status-success))]/90 text-white"
+            onClick={() => handleSetStatus('DONOR_PASS_SENT')}
+            disabled={driver.status === 'DONOR_PASS_SENT' || advanceStep.isPending}
+          >
+            <CheckCircle className="mr-1 h-3 w-3" />
+            Donor Pass Sent
+          </Button>
+        </div>
+      )}
+
       {/* Feature 8: Donor Pass / Results Step Action Buttons */}
       {driver.current_step === 6 && (
         <div className="flex flex-wrap gap-2">
