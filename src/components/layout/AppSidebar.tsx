@@ -29,6 +29,7 @@ import {
   UserCog,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import goopLogo from '@/assets/goop-logo.png';
 
 const allNavItems = [
   { title: 'Dashboard', icon: LayoutDashboard, path: '/', adminOnly: false },
@@ -68,9 +69,12 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="border-b border-sidebar-border p-4">
-        <div>
-          <h2 className="text-base font-semibold text-sidebar-foreground">GOOP RTD Dashboard</h2>
-          <p className="text-xs text-sidebar-foreground/70">Driver Management</p>
+        <div className="flex items-center gap-3">
+          <img src={goopLogo} alt="GOOP Logo" className="h-10 w-auto shrink-0" />
+          <div>
+            <h2 className="text-sm font-semibold text-sidebar-foreground leading-tight">GOOP RTD Dashboard</h2>
+            <p className="text-xs text-sidebar-foreground/70">Driver Management</p>
+          </div>
         </div>
       </SidebarHeader>
 

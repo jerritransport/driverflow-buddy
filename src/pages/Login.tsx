@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { APP_NAME } from '@/lib/constants';
+import goopLogo from '@/assets/goop-logo.png';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -40,6 +41,7 @@ export default function Login() {
       <Card className="w-full max-w-md shadow-lg overflow-hidden">
         <div className="h-1.5 bg-primary w-full" />
         <CardHeader className="text-center py-8 pb-4">
+          <img src={goopLogo} alt="GOOP Logo" className="mx-auto h-20 w-auto mb-2" />
           <CardTitle className="text-3xl font-bold tracking-tight text-primary">
             {APP_NAME}
           </CardTitle>
