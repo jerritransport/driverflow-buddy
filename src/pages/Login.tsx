@@ -42,9 +42,6 @@ export default function Login() {
           <CardTitle className="text-3xl font-bold tracking-tight text-primary">
             GOOP RTD Dashboard
           </CardTitle>
-          <CardDescription className="text-base text-muted-foreground mt-1">
-            Get Out of Prohibited
-          </CardDescription>
         </CardHeader>
         <CardContent className="px-6 pb-8">
           {error && (
