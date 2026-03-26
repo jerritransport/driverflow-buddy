@@ -133,7 +133,7 @@ export function DriverFilters({ filters, onFiltersChange }: DriverFiltersProps) 
             )
           }
         >
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[140px]">
             <SelectValue placeholder="Hold Status" />
           </SelectTrigger>
           <SelectContent>
