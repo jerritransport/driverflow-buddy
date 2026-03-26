@@ -1,17 +1,35 @@
 
 
-## Add Step 5 (Donor Pass) Action Buttons
+## Add Light/Dark Mode Support
 
-Step 5 has two statuses: `DONOR_PASS_PENDING` and `DONOR_PASS_SENT`. Currently, `QuickActions.tsx` has conditional button sections for Step 3 and Step 6 but nothing for Step 5.
+The project already has all the prerequisites in place: `next-themes` is installed, Tailwind is configured with `darkMode: ["class"]`, and dark-mode CSS variables are defined in `index.css`. The only missing pieces are the theme provider wrapper and a visible toggle.
 
-### Change
+### Changes
 
-**File: `src/components/driver-detail/QuickActions.tsx`**
+**1. Wrap app with ThemeProvider — `src/App.tsx`**
+- Import `ThemeProvider` from `next-themes`
+- Wrap the outermost content (inside `QueryClientProvider`) with `<ThemeProvider attribute="class" defaultTheme="system" storageKey="goop-theme">`
+- This enables class-based theme switching, system default detection, and localStorage persistence
 
-Add a new conditional block for `driver.current_step === 5`, placed between the existing Step 3 and Step 6 blocks (around line 183). Two buttons:
+**2. Create theme toggle component — `src/components/layout/ThemeToggle.tsx`**
+- New component using `useTheme()` from `next-themes`
+- Renders a `Button` (ghost, icon size) with `Sun` / `Moon` icons from lucide-react
+- Clicking cycles between light and dark (or uses a dropdown for light/dark/system)
+- Simple two-state toggle: light ↔ dark
 
-1. **"Donor Pass Pending"** — outline/secondary style, sets status to `DONOR_PASS_PENDING`
-2. **"Donor Pass Sent"** — primary green style (matches "Paperwork Received" pattern), sets status to `DONOR_PASS_SENT`
+**3. Add toggle to AppHeader — `src/components/layout/AppHeader.tsx`**
+- Import and render `<ThemeToggle />` in the header's right-side button group, next to the keyboard shortcuts button
 
-Both use the existing `handleSetStatus` function. Each button is disabled when the driver already has that status or when `advanceStep.isPending`.
+**4. Add toggle to Login page — `src/pages/Login.tsx`**
+- Place a small `<ThemeToggle />` in the top-right corner so unauthenticated users can also switch themes
+
+**5. Fix Sonner toaster — `src/components/ui/sonner.tsx`**
+- Already imports `useTheme` from `next-themes` — will work correctly once the provider is in place; no changes needed
+
+### Technical notes
+- `storageKey: "goop-theme"` persists preference in localStorage across sessions
+- `defaultTheme: "system"` respects OS preference when no saved choice exists
+- All shadcn/ui components already use CSS variables (`hsl(var(--...))`) so they automatically adapt
+- The existing `.dark` block in `index.css` already defines polished dark surfaces (not pure black)
+- No hardcoded colors need fixing — the design system is already CSS-variable-driven
 
