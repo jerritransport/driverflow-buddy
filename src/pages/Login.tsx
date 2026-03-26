@@ -40,7 +40,7 @@ export default function Login() {
         <div className="h-1.5 bg-primary w-full" />
         <CardHeader className="text-center py-8 pb-4">
           <CardTitle className="text-3xl font-bold tracking-tight text-primary">
-            GOOP RTD Dashboard
+            {APP_NAME}
           </CardTitle>
         </CardHeader>
         <CardContent className="px-6 pb-8">
