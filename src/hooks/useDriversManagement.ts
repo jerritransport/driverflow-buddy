@@ -165,6 +165,10 @@ export function useDriversPaginated(
         .from('drivers')
         .select('*')
         .range(from, to);
+
+      if (!filters.showHidden) {
+        dataQuery = dataQuery.eq('is_hidden', false);
+      }
       
       dataQuery = applySort(dataQuery, sort);
 
