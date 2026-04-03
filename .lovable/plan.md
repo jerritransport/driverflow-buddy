@@ -1,35 +1,66 @@
 
 
-## Add Light/Dark Mode Support
+## Soft-Delete "Hide Driver" System
 
-The project already has all the prerequisites in place: `next-themes` is installed, Tailwind is configured with `darkMode: ["class"]`, and dark-mode CSS variables are defined in `index.css`. The only missing pieces are the theme provider wrapper and a visible toggle.
+### Overview
+Add an `is_hidden` boolean column to the `drivers` table and replace the hard-delete flow with a soft-delete (hide/restore) system. Hidden drivers are excluded from all queries by default, with an optional toggle to reveal them.
 
-### Changes
+### 1. Database Migration
+Add column `is_hidden BOOLEAN DEFAULT false` to the `drivers` table.
 
-**1. Wrap app with ThemeProvider — `src/App.tsx`**
-- Import `ThemeProvider` from `next-themes`
-- Wrap the outermost content (inside `QueryClientProvider`) with `<ThemeProvider attribute="class" defaultTheme="system" storageKey="goop-theme">`
-- This enables class-based theme switching, system default detection, and localStorage persistence
+### 2. Query Changes — Filter out hidden drivers
 
-**2. Create theme toggle component — `src/components/layout/ThemeToggle.tsx`**
-- New component using `useTheme()` from `next-themes`
-- Renders a `Button` (ghost, icon size) with `Sun` / `Moon` icons from lucide-react
-- Clicking cycles between light and dark (or uses a dropdown for light/dark/system)
-- Simple two-state toggle: light ↔ dark
+**Files: `src/hooks/useDriversManagement.ts`, `src/hooks/useDrivers.ts`**
 
-**3. Add toggle to AppHeader — `src/components/layout/AppHeader.tsx`**
-- Import and render `<ThemeToggle />` in the header's right-side button group, next to the keyboard shortcuts button
+- Add `showHidden?: boolean` to `DriverFilters` interface
+- In `useDriversPaginated` and `useAllFilteredDrivers`: when `showHidden` is not true, add `.eq('is_hidden', false)` to both count and data queries
+- In `useDrivers` (used by dashboard/kanban): add `.eq('is_hidden', false)` to all queries
+- In `useDriversByStep`: add `.eq('is_hidden', false)`
+- Add `is_hidden` field to the `Driver` interface
 
-**4. Add toggle to Login page — `src/pages/Login.tsx`**
-- Place a small `<ThemeToggle />` in the top-right corner so unauthenticated users can also switch themes
+### 3. Replace hard-delete with soft-delete
 
-**5. Fix Sonner toaster — `src/components/ui/sonner.tsx`**
-- Already imports `useTheme` from `next-themes` — will work correctly once the provider is in place; no changes needed
+**File: `src/hooks/useDriversManagement.ts`**
+- Change `useDeleteDriver` to perform `UPDATE ... SET is_hidden = true` instead of `DELETE`
+- Add new `useRestoreDriver` hook that sets `is_hidden = false`
+
+### 4. Update DeleteDriverDialog → HideDriverDialog
+
+**File: `src/components/drivers/DeleteDriverDialog.tsx`**
+- Rename to conceptually be "Hide Driver"
+- Update title to "Hide Driver"
+- Update description to: "Are you sure you want to hide this driver? This will remove them from the active dashboard but will not permanently delete their data."
+- Button text: "Hide Driver"
+- Success toast: "Driver Hidden"
+
+### 5. Add "Show Hidden Drivers" toggle to Drivers page
+
+**File: `src/pages/Drivers.tsx`**
+- Add a checkbox/switch labeled "Show Hidden Drivers" near the filters area
+- When toggled on, set `filters.showHidden = true`
+- Hidden drivers render with `opacity-50` styling in the table
+- Show a "Hidden" badge on hidden driver rows
+
+### 6. Add "Restore Driver" button for hidden drivers
+
+**File: `src/components/drivers/DriversTable.tsx`**
+- When a driver has `is_hidden === true`, show a "Restore" option in the row actions dropdown (instead of or in addition to the existing actions)
+- Calls `useRestoreDriver` hook
+
+### 7. Add "Hide Driver" button to Driver Detail Panel
+
+**File: `src/components/driver-detail/QuickActions.tsx`**
+- Add a "Hide Driver" button (destructive outline style) at the bottom of quick actions
+- Opens the same confirmation dialog
+
+### 8. Styling for hidden drivers in table
+
+**File: `src/components/drivers/DriversTable.tsx`**
+- Add conditional `opacity-50` class on the table row when `driver.is_hidden`
+- Add a "Hidden" badge next to the driver name
 
 ### Technical notes
-- `storageKey: "goop-theme"` persists preference in localStorage across sessions
-- `defaultTheme: "system"` respects OS preference when no saved choice exists
-- All shadcn/ui components already use CSS variables (`hsl(var(--...))`) so they automatically adapt
-- The existing `.dark` block in `index.css` already defines polished dark surfaces (not pure black)
-- No hardcoded colors need fixing — the design system is already CSS-variable-driven
+- The audit trail trigger already captures UPDATE operations on the drivers table, so hiding/restoring will be automatically logged with changed fields and timestamps
+- No changes needed to reports — they already query through the same hooks that will filter `is_hidden`
+- Global search (`useGlobalSearch`) should also filter hidden drivers
 
