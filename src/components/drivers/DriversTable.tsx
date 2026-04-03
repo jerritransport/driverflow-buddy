@@ -19,11 +19,13 @@ import {
 import { PaymentBadge } from '@/components/shared/PaymentBadge';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { DocumentProgress } from '@/components/shared/DocumentProgress';
+import { Badge } from '@/components/ui/badge';
 import { getStepLabel } from '@/lib/constants';
 import { formatDistanceToNow } from 'date-fns';
 import { Driver } from '@/hooks/useDrivers';
-import { SortField, SortOptions } from '@/hooks/useDriversManagement';
-import { Eye, MoreHorizontal, Pencil, Trash2, AlertTriangle, Wine, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { SortField, SortOptions, useRestoreDriver } from '@/hooks/useDriversManagement';
+import { Eye, MoreHorizontal, Pencil, Trash2, AlertTriangle, Wine, ArrowUp, ArrowDown, ArrowUpDown, RotateCcw } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface DriversTableProps {
   drivers: Driver[];
