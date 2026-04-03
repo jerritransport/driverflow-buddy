@@ -163,6 +163,18 @@ export function BulkActionsBar({ selectedDrivers, onClearSelection }: BulkAction
           </DropdownMenuContent>
         </DropdownMenu>
 
+        {/* Hide Drivers */}
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={isPending}
+          className="gap-1 text-destructive hover:text-destructive"
+          onClick={() => setHideConfirmOpen(true)}
+        >
+          <EyeOff className="h-4 w-4" />
+          Hide
+        </Button>
+
         {/* Export */}
         <Button variant="outline" size="sm" onClick={handleExport} className="gap-1">
           <Download className="h-4 w-4" />
@@ -174,6 +186,28 @@ export function BulkActionsBar({ selectedDrivers, onClearSelection }: BulkAction
           <X className="h-4 w-4" />
         </Button>
       </div>
+
+      {/* Hide Confirmation Dialog */}
+      <AlertDialog open={hideConfirmOpen} onOpenChange={setHideConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hide {count} Driver{count !== 1 ? 's' : ''}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to hide {count} driver{count !== 1 ? 's' : ''}? They will be removed from the active dashboard but their records will be preserved.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleHideDrivers}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Hide Driver{count !== 1 ? 's' : ''}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
