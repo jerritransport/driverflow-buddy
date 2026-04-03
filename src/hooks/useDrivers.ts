@@ -50,6 +50,7 @@ export interface Driver {
   follow_up_date: string | null;
   follow_up_note: string | null;
   documents_uploaded: Record<string, boolean> | null;
+  is_hidden: boolean;
   created_at: string;
   updated_at: string;
   // Joined field
