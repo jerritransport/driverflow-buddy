@@ -41,6 +41,7 @@ interface BulkActionsBarProps {
 
 export function BulkActionsBar({ selectedDrivers, onClearSelection }: BulkActionsBarProps) {
   const { mutate: bulkUpdate, isPending } = useBulkUpdateDrivers();
+  const [hideConfirmOpen, setHideConfirmOpen] = useState(false);
   const selectedIds = selectedDrivers.map((d) => d.id);
   const count = selectedDrivers.length;
 
@@ -54,6 +55,13 @@ export function BulkActionsBar({ selectedDrivers, onClearSelection }: BulkAction
 
   const handlePaymentHoldToggle = (paymentHold: boolean) => {
     bulkUpdate({ driverIds: selectedIds, updateData: { payment_hold: paymentHold } });
+  };
+
+  const handleHideDrivers = () => {
+    bulkUpdate(
+      { driverIds: selectedIds, updateData: { is_hidden: true } as any },
+      { onSuccess: () => { setHideConfirmOpen(false); onClearSelection(); } }
+    );
   };
 
   const handleExport = () => {
