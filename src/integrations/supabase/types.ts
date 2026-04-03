@@ -445,6 +445,7 @@ export type Database = {
           follow_up_note: string | null
           gender: string | null
           id: string
+          is_hidden: boolean
           last_name: string
           middle_name: string | null
           payment_hold: boolean | null
@@ -506,6 +507,7 @@ export type Database = {
           follow_up_note?: string | null
           gender?: string | null
           id?: string
+          is_hidden?: boolean
           last_name: string
           middle_name?: string | null
           payment_hold?: boolean | null
@@ -567,6 +569,7 @@ export type Database = {
           follow_up_note?: string | null
           gender?: string | null
           id?: string
+          is_hidden?: boolean
           last_name?: string
           middle_name?: string | null
           payment_hold?: boolean | null
@@ -1290,6 +1293,7 @@ export type Database = {
           follow_up_note: string | null
           gender: string | null
           id: string
+          is_hidden: boolean
           last_name: string
           middle_name: string | null
           payment_hold: boolean | null
