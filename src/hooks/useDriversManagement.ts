@@ -122,6 +122,10 @@ export function useDriversPaginated(
         .from('drivers')
         .select('*', { count: 'exact', head: true });
 
+      if (!filters.showHidden) {
+        countQuery = countQuery.eq('is_hidden', false);
+      }
+
       // Apply filters to count query
       if (step !== undefined) {
         countQuery = countQuery.eq('current_step', step);
