@@ -77,6 +77,7 @@ export function useDrivers(options: UseDriversOptions = {}) {
       let query = supabase
         .from('drivers')
         .select('*, tenants:tenant_id(company_name)')
+        .eq('is_hidden', false)
         .order('updated_at', { ascending: false })
         .limit(limit);
 
