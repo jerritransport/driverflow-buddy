@@ -281,8 +281,9 @@ function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit,
       <TableCell>
         <div className="flex items-center gap-2">
           <div>
-            <p className="font-medium">
+            <p className="font-medium flex items-center gap-1.5">
               {driver.first_name} {driver.last_name}
+              {isHidden && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Hidden</Badge>}
             </p>
             <p className="text-xs text-muted-foreground">{driver.email}</p>
           </div>
