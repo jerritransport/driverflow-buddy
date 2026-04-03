@@ -251,9 +251,22 @@ function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit,
     ? formatDistanceToNow(new Date(driver.updated_at), { addSuffix: true })
     : 'Unknown';
 
+  const restoreDriver = useRestoreDriver();
+  const isHidden = driver.is_hidden;
+
+  const handleRestore = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await restoreDriver.mutateAsync(driver.id);
+      toast.success(`${driver.first_name} ${driver.last_name} has been restored.`);
+    } catch {
+      toast.error('Failed to restore driver.');
+    }
+  };
+
   return (
     <TableRow 
-      className={`cursor-pointer hover:bg-muted/50 ${isSelected ? 'bg-muted/30' : ''}`} 
+      className={`cursor-pointer hover:bg-muted/50 ${isSelected ? 'bg-muted/30' : ''} ${isHidden ? 'opacity-50' : ''}`} 
       onClick={onView}
     >
       {isSelectable && (
