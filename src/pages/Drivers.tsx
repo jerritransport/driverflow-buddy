@@ -14,6 +14,8 @@ import { DriverDetailPanel } from '@/components/driver-detail/DriverDetailPanel'
 import { useDriversPaginated, useAllFilteredDrivers, DriverFilters as FilterType, SortOptions } from '@/hooks/useDriversManagement';
 import { Driver } from '@/hooks/useDrivers';
 import { exportDriversToCSV } from '@/lib/exportUtils';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Plus, Users, AlertTriangle, Wine, CheckCircle, Download, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
