@@ -38,6 +38,7 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
   const [donorPassDialogOpen, setDonorPassDialogOpen] = useState(false);
   const [followUpDialogOpen, setFollowUpDialogOpen] = useState(false);
   const [alcoholPaymentDialogOpen, setAlcoholPaymentDialogOpen] = useState(false);
+  const [hideDialogOpen, setHideDialogOpen] = useState(false);
 
   const currentStepInfo = DRIVER_STEPS.find(s => s.step === driver.current_step);
   const nextStepInfo = DRIVER_STEPS.find(s => s.step === driver.current_step + 1);
