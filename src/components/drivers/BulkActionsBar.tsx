@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -5,11 +6,18 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Driver } from '@/hooks/useDrivers';
 import { useBulkUpdateDrivers } from '@/hooks/useBulkDriverActions';
 import { exportDriversToCSV } from '@/lib/exportUtils';
@@ -23,6 +31,7 @@ import {
   ArrowUpCircle,
   Ban,
   CheckCircle,
+  EyeOff,
 } from 'lucide-react';
 
 interface BulkActionsBarProps {
