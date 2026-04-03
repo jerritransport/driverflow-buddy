@@ -308,7 +308,28 @@ export function useDeleteDriver() {
     mutationFn: async (driverId: string) => {
       const { error } = await supabase
         .from('drivers')
-        .delete()
+        .update({ is_hidden: true } as any)
+        .eq('id', driverId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['drivers'] });
+      queryClient.invalidateQueries({ queryKey: ['drivers-paginated'] });
+      queryClient.invalidateQueries({ queryKey: ['drivers-by-step'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-summary'] });
+    },
+  });
+}
+
+export function useRestoreDriver() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (driverId: string) => {
+      const { error } = await supabase
+        .from('drivers')
+        .update({ is_hidden: false } as any)
         .eq('id', driverId);
 
       if (error) throw error;

@@ -138,7 +138,8 @@ export function useDriversByStep() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('drivers')
-        .select('id, first_name, last_name, cdl_number, status, current_step, payment_status, payment_hold, updated_at, requires_alcohol_test, follow_up_date, documents_uploaded')
+        .select('id, first_name, last_name, cdl_number, status, current_step, payment_status, payment_hold, updated_at, requires_alcohol_test, follow_up_date, documents_uploaded, is_hidden')
+        .eq('is_hidden', false)
         .order('updated_at', { ascending: false });
 
       if (error) throw error;

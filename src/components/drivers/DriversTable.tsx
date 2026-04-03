@@ -343,13 +343,20 @@ function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit,
               Edit Driver
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={(e) => { e.stopPropagation(); onDelete(); }}
-              className="text-destructive focus:text-destructive"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete Driver
-            </DropdownMenuItem>
+            {isHidden ? (
+              <DropdownMenuItem onClick={handleRestore} disabled={restoreDriver.isPending}>
+                <RotateCcw className="mr-2 h-4 w-4" />
+                Restore Driver
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Hide Driver
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>

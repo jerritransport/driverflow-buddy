@@ -43,6 +43,7 @@ async function searchDrivers(query: string): Promise<SearchResult[]> {
   const { data, error } = await supabase
     .from('drivers')
     .select('id, first_name, last_name, cdl_number, email, phone, current_step, status')
+    .eq('is_hidden', false)
     .or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%,cdl_number.ilike.%${query}%,email.ilike.%${query}%,phone.ilike.%${query}%`)
     .limit(5);
 

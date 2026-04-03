@@ -412,6 +412,24 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
         driver={driver}
         onSuccess={onSuccess}
       />
+
+      <DeleteDriverDialog
+        open={hideDialogOpen}
+        onOpenChange={setHideDialogOpen}
+        driver={driver}
+        onSuccess={onSuccess}
+      />
+
+      {/* Hide Driver */}
+      <Button
+        variant="outline"
+        size="sm"
+        className="w-full gap-1.5 text-destructive border-destructive/30 hover:bg-destructive/10"
+        onClick={() => setHideDialogOpen(true)}
+      >
+        <EyeOff className="h-4 w-4" />
+        Hide Driver
+      </Button>
     </div>
   );
 }
