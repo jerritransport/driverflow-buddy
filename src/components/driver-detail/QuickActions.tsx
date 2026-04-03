@@ -8,6 +8,7 @@ import { RecordPaymentDialog } from './RecordPaymentDialog';
 import { GenerateDonorPassDialog } from './GenerateDonorPassDialog';
 import { SetFollowUpDialog } from './SetFollowUpDialog';
 import { SendAlcoholPaymentDialog } from './SendAlcoholPaymentDialog';
+import { DeleteDriverDialog } from '@/components/drivers/DeleteDriverDialog';
 import { 
   ChevronRight, 
   Loader2, 
@@ -19,7 +20,8 @@ import {
   CheckCircle2,
   Calendar,
   Wine,
-  Trophy
+  Trophy,
+  EyeOff,
 } from 'lucide-react';
 
 interface QuickActionsProps {
