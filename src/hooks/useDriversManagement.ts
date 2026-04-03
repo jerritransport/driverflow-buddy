@@ -20,6 +20,7 @@ export interface DriverFilters {
   dateField?: 'created_at' | 'updated_at';
   dateFrom?: string;
   dateTo?: string;
+  showHidden?: boolean;
 }
 
 export interface PaginationOptions {
