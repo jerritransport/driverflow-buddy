@@ -14,6 +14,8 @@ import { DriverDetailPanel } from '@/components/driver-detail/DriverDetailPanel'
 import { useDriversPaginated, useAllFilteredDrivers, DriverFilters as FilterType, SortOptions } from '@/hooks/useDriversManagement';
 import { Driver } from '@/hooks/useDrivers';
 import { exportDriversToCSV } from '@/lib/exportUtils';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Plus, Users, AlertTriangle, Wine, CheckCircle, Download, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -175,6 +177,18 @@ export default function Drivers() {
         <Card>
           <CardContent className="pt-6">
             <DriverFilters filters={filters} onFiltersChange={handleFiltersChange} />
+            <div className="mt-4 flex items-center space-x-2">
+              <Switch
+                id="show-hidden"
+                checked={filters.showHidden ?? false}
+                onCheckedChange={(checked) =>
+                  handleFiltersChange({ ...filters, showHidden: checked })
+                }
+              />
+              <Label htmlFor="show-hidden" className="text-sm text-muted-foreground cursor-pointer">
+                Show Hidden Drivers
+              </Label>
+            </div>
           </CardContent>
         </Card>
 

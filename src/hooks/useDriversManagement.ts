@@ -20,6 +20,7 @@ export interface DriverFilters {
   dateField?: 'created_at' | 'updated_at';
   dateFrom?: string;
   dateTo?: string;
+  showHidden?: boolean;
 }
 
 export interface PaginationOptions {
@@ -62,6 +63,10 @@ export function useAllFilteredDrivers(
       let query = supabase
         .from('drivers')
         .select('*');
+      
+      if (!filters.showHidden) {
+        query = query.eq('is_hidden', false);
+      }
       
       query = applySort(query, sort);
 
@@ -117,6 +122,10 @@ export function useDriversPaginated(
         .from('drivers')
         .select('*', { count: 'exact', head: true });
 
+      if (!filters.showHidden) {
+        countQuery = countQuery.eq('is_hidden', false);
+      }
+
       // Apply filters to count query
       if (step !== undefined) {
         countQuery = countQuery.eq('current_step', step);
@@ -156,6 +165,10 @@ export function useDriversPaginated(
         .from('drivers')
         .select('*')
         .range(from, to);
+
+      if (!filters.showHidden) {
+        dataQuery = dataQuery.eq('is_hidden', false);
+      }
       
       dataQuery = applySort(dataQuery, sort);
 
@@ -295,7 +308,28 @@ export function useDeleteDriver() {
     mutationFn: async (driverId: string) => {
       const { error } = await supabase
         .from('drivers')
-        .delete()
+        .update({ is_hidden: true } as any)
+        .eq('id', driverId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['drivers'] });
+      queryClient.invalidateQueries({ queryKey: ['drivers-paginated'] });
+      queryClient.invalidateQueries({ queryKey: ['drivers-by-step'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-summary'] });
+    },
+  });
+}
+
+export function useRestoreDriver() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (driverId: string) => {
+      const { error } = await supabase
+        .from('drivers')
+        .update({ is_hidden: false } as any)
         .eq('id', driverId);
 
       if (error) throw error;

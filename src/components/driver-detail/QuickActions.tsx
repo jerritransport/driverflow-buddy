@@ -8,6 +8,7 @@ import { RecordPaymentDialog } from './RecordPaymentDialog';
 import { GenerateDonorPassDialog } from './GenerateDonorPassDialog';
 import { SetFollowUpDialog } from './SetFollowUpDialog';
 import { SendAlcoholPaymentDialog } from './SendAlcoholPaymentDialog';
+import { DeleteDriverDialog } from '@/components/drivers/DeleteDriverDialog';
 import { 
   ChevronRight, 
   Loader2, 
@@ -19,7 +20,8 @@ import {
   CheckCircle2,
   Calendar,
   Wine,
-  Trophy
+  Trophy,
+  EyeOff,
 } from 'lucide-react';
 
 interface QuickActionsProps {
@@ -36,6 +38,7 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
   const [donorPassDialogOpen, setDonorPassDialogOpen] = useState(false);
   const [followUpDialogOpen, setFollowUpDialogOpen] = useState(false);
   const [alcoholPaymentDialogOpen, setAlcoholPaymentDialogOpen] = useState(false);
+  const [hideDialogOpen, setHideDialogOpen] = useState(false);
 
   const currentStepInfo = DRIVER_STEPS.find(s => s.step === driver.current_step);
   const nextStepInfo = DRIVER_STEPS.find(s => s.step === driver.current_step + 1);
@@ -409,6 +412,24 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
         driver={driver}
         onSuccess={onSuccess}
       />
+
+      <DeleteDriverDialog
+        open={hideDialogOpen}
+        onOpenChange={setHideDialogOpen}
+        driver={driver}
+        onSuccess={onSuccess}
+      />
+
+      {/* Hide Driver */}
+      <Button
+        variant="outline"
+        size="sm"
+        className="w-full gap-1.5 text-destructive border-destructive/30 hover:bg-destructive/10"
+        onClick={() => setHideDialogOpen(true)}
+      >
+        <EyeOff className="h-4 w-4" />
+        Hide Driver
+      </Button>
     </div>
   );
 }

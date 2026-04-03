@@ -50,6 +50,7 @@ export interface Driver {
   follow_up_date: string | null;
   follow_up_note: string | null;
   documents_uploaded: Record<string, boolean> | null;
+  is_hidden: boolean;
   created_at: string;
   updated_at: string;
   // Joined field
@@ -76,6 +77,7 @@ export function useDrivers(options: UseDriversOptions = {}) {
       let query = supabase
         .from('drivers')
         .select('*, tenants:tenant_id(company_name)')
+        .eq('is_hidden', false)
         .order('updated_at', { ascending: false })
         .limit(limit);
 
@@ -136,7 +138,8 @@ export function useDriversByStep() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('drivers')
-        .select('id, first_name, last_name, cdl_number, status, current_step, payment_status, payment_hold, updated_at, requires_alcohol_test, follow_up_date, documents_uploaded')
+        .select('id, first_name, last_name, cdl_number, status, current_step, payment_status, payment_hold, updated_at, requires_alcohol_test, follow_up_date, documents_uploaded, is_hidden')
+        .eq('is_hidden', false)
         .order('updated_at', { ascending: false });
 
       if (error) throw error;

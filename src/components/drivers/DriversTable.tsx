@@ -19,11 +19,13 @@ import {
 import { PaymentBadge } from '@/components/shared/PaymentBadge';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { DocumentProgress } from '@/components/shared/DocumentProgress';
+import { Badge } from '@/components/ui/badge';
 import { getStepLabel } from '@/lib/constants';
 import { formatDistanceToNow } from 'date-fns';
 import { Driver } from '@/hooks/useDrivers';
-import { SortField, SortOptions } from '@/hooks/useDriversManagement';
-import { Eye, MoreHorizontal, Pencil, Trash2, AlertTriangle, Wine, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { SortField, SortOptions, useRestoreDriver } from '@/hooks/useDriversManagement';
+import { Eye, MoreHorizontal, Pencil, Trash2, AlertTriangle, Wine, ArrowUp, ArrowDown, ArrowUpDown, RotateCcw } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface DriversTableProps {
   drivers: Driver[];
@@ -249,9 +251,22 @@ function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit,
     ? formatDistanceToNow(new Date(driver.updated_at), { addSuffix: true })
     : 'Unknown';
 
+  const restoreDriver = useRestoreDriver();
+  const isHidden = driver.is_hidden;
+
+  const handleRestore = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await restoreDriver.mutateAsync(driver.id);
+      toast.success(`${driver.first_name} ${driver.last_name} has been restored.`);
+    } catch {
+      toast.error('Failed to restore driver.');
+    }
+  };
+
   return (
     <TableRow 
-      className={`cursor-pointer hover:bg-muted/50 ${isSelected ? 'bg-muted/30' : ''}`} 
+      className={`cursor-pointer hover:bg-muted/50 ${isSelected ? 'bg-muted/30' : ''} ${isHidden ? 'opacity-50' : ''}`} 
       onClick={onView}
     >
       {isSelectable && (
@@ -266,8 +281,9 @@ function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit,
       <TableCell>
         <div className="flex items-center gap-2">
           <div>
-            <p className="font-medium">
+            <p className="font-medium flex items-center gap-1.5">
               {driver.first_name} {driver.last_name}
+              {isHidden && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Hidden</Badge>}
             </p>
             <p className="text-xs text-muted-foreground">{driver.email}</p>
           </div>
@@ -327,13 +343,20 @@ function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit,
               Edit Driver
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={(e) => { e.stopPropagation(); onDelete(); }}
-              className="text-destructive focus:text-destructive"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete Driver
-            </DropdownMenuItem>
+            {isHidden ? (
+              <DropdownMenuItem onClick={handleRestore} disabled={restoreDriver.isPending}>
+                <RotateCcw className="mr-2 h-4 w-4" />
+                Restore Driver
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Hide Driver
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>
