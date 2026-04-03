@@ -64,6 +64,10 @@ export function useAllFilteredDrivers(
         .from('drivers')
         .select('*');
       
+      if (!filters.showHidden) {
+        query = query.eq('is_hidden', false);
+      }
+      
       query = applySort(query, sort);
 
       if (step !== undefined) {
