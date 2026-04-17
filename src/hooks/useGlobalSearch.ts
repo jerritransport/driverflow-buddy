@@ -14,6 +14,7 @@ export interface SearchResult {
 interface DriverSearchResult {
   id: string;
   first_name: string;
+  middle_name: string | null;
   last_name: string;
   cdl_number: string;
   email: string;
@@ -42,9 +43,9 @@ interface ClinicSearchResult {
 async function searchDrivers(query: string): Promise<SearchResult[]> {
   const { data, error } = await supabase
     .from('drivers')
-    .select('id, first_name, last_name, cdl_number, email, phone, current_step, status')
+    .select('id, first_name, middle_name, last_name, cdl_number, email, phone, current_step, status')
     .eq('is_hidden', false)
-    .or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%,cdl_number.ilike.%${query}%,email.ilike.%${query}%,phone.ilike.%${query}%`)
+    .or(`first_name.ilike.%${query}%,middle_name.ilike.%${query}%,last_name.ilike.%${query}%,cdl_number.ilike.%${query}%,email.ilike.%${query}%,phone.ilike.%${query}%`)
     .limit(5);
 
   if (error) throw error;
@@ -52,7 +53,7 @@ async function searchDrivers(query: string): Promise<SearchResult[]> {
   return (data as DriverSearchResult[]).map((driver) => ({
     id: driver.id,
     type: 'driver' as const,
-    title: `${driver.first_name} ${driver.last_name}`,
+    title: [driver.first_name, driver.middle_name, driver.last_name].filter(Boolean).join(' '),
     subtitle: `CDL: ${driver.cdl_number}`,
     metadata: `Step ${driver.current_step} • ${driver.status.replace(/_/g, ' ')}`,
   }));

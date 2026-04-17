@@ -6,6 +6,7 @@ export type FollowUpFilter = 'today' | 'upcoming' | 'overdue' | 'all';
 export interface FollowUpDriver {
   id: string;
   first_name: string;
+  middle_name: string | null;
   last_name: string;
   phone: string;
   email: string;
@@ -28,7 +29,8 @@ export function useFollowUps({ filter, search }: UseFollowUpsOptions) {
       
       let query = supabase
         .from('drivers')
-        .select('id, first_name, last_name, phone, email, current_step, status, follow_up_date, follow_up_note')
+        .select('id, first_name, middle_name, last_name, phone, email, current_step, status, follow_up_date, follow_up_note')
+        .eq('is_hidden', false)
         .or('follow_up_date.not.is.null,status.ilike.PAYMENT_HOLD,status.ilike.FOLLOW_UP')
         .order('follow_up_date', { ascending: true, nullsFirst: false });
 
@@ -44,7 +46,7 @@ export function useFollowUps({ filter, search }: UseFollowUpsOptions) {
 
       // Apply search
       if (search) {
-        query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%,phone.ilike.%${search}%`);
+        query = query.or(`first_name.ilike.%${search}%,middle_name.ilike.%${search}%,last_name.ilike.%${search}%,phone.ilike.%${search}%`);
       }
 
       const { data, error } = await query;
@@ -69,6 +71,7 @@ export function useFollowUpStats() {
       const { data, error } = await supabase
         .from('drivers')
         .select('follow_up_date, status')
+        .eq('is_hidden', false)
         .or('follow_up_date.not.is.null,status.ilike.PAYMENT_HOLD,status.ilike.FOLLOW_UP');
 
       if (error) throw error;

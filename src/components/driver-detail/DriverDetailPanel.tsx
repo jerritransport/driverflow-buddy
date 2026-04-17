@@ -25,6 +25,7 @@ import { Phone, Mail, AlertTriangle, Wine, Calendar } from 'lucide-react';
 import { format, isToday, isPast } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { DRIVER_STEPS } from '@/lib/constants';
+import { formatDriverName } from '@/lib/utils';
 
 interface DriverDetailPanelProps {
   driverId: string | null;
@@ -77,7 +78,7 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
                 <div className="flex items-start justify-between">
                   <div>
                     <SheetTitle className="text-xl">
-                      {driver.first_name} {driver.last_name}
+                      {formatDriverName(driver.first_name, driver.middle_name, driver.last_name)}
                     </SheetTitle>
                     <SheetDescription className="flex items-center gap-2 pt-1">
                       <code className="rounded bg-muted px-1.5 py-0.5 text-xs">

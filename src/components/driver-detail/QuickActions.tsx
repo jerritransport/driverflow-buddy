@@ -22,7 +22,10 @@ import {
   Wine,
   Trophy,
   EyeOff,
+  Eye,
 } from 'lucide-react';
+import { useRestoreDriver } from '@/hooks/useDriversManagement';
+import { toast as sonnerToast } from 'sonner';
 
 interface QuickActionsProps {
   driver: Driver;
@@ -34,11 +37,23 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
   const advanceStep = useAdvanceDriverStep();
   const updateDriver = useUpdateDriver();
   
+  const restoreDriver = useRestoreDriver();
+  
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [donorPassDialogOpen, setDonorPassDialogOpen] = useState(false);
   const [followUpDialogOpen, setFollowUpDialogOpen] = useState(false);
   const [alcoholPaymentDialogOpen, setAlcoholPaymentDialogOpen] = useState(false);
   const [hideDialogOpen, setHideDialogOpen] = useState(false);
+
+  const handleUnhide = async () => {
+    try {
+      await restoreDriver.mutateAsync(driver.id);
+      sonnerToast.success(`${driver.first_name} ${driver.last_name} restored.`);
+      onSuccess?.();
+    } catch {
+      sonnerToast.error('Failed to restore driver.');
+    }
+  };
 
   const currentStepInfo = DRIVER_STEPS.find(s => s.step === driver.current_step);
   const nextStepInfo = DRIVER_STEPS.find(s => s.step === driver.current_step + 1);
@@ -420,16 +435,29 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
         onSuccess={onSuccess}
       />
 
-      {/* Hide Driver */}
-      <Button
-        variant="outline"
-        size="sm"
-        className="w-full gap-1.5 text-destructive border-destructive/30 hover:bg-destructive/10"
-        onClick={() => setHideDialogOpen(true)}
-      >
-        <EyeOff className="h-4 w-4" />
-        Hide Driver
-      </Button>
+      {/* Hide / Unhide Driver */}
+      {driver.is_hidden ? (
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full gap-1.5 border-primary/30 text-primary hover:bg-primary/10"
+          onClick={handleUnhide}
+          disabled={restoreDriver.isPending}
+        >
+          {restoreDriver.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
+          Unhide Driver
+        </Button>
+      ) : (
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full gap-1.5 text-destructive border-destructive/30 hover:bg-destructive/10"
+          onClick={() => setHideDialogOpen(true)}
+        >
+          <EyeOff className="h-4 w-4" />
+          Hide Driver
+        </Button>
+      )}
     </div>
   );
 }

@@ -6,6 +6,7 @@ export type TestResultFilter = 'pending' | 'completed' | 'all';
 export interface DriverTestResult {
   id: string;
   first_name: string;
+  middle_name: string | null;
   last_name: string;
   sample_id: string | null;
   collection_date: string | null;
@@ -29,7 +30,8 @@ export function useTestResults({ filter, search }: UseTestResultsOptions) {
     queryFn: async () => {
       let query = supabase
         .from('drivers')
-        .select('id, first_name, last_name, sample_id, collection_date, test_status, test_type, requires_alcohol_test, urine_result_url, alcohol_result_url, ccf_url, test_result')
+        .select('id, first_name, middle_name, last_name, sample_id, collection_date, test_status, test_type, requires_alcohol_test, urine_result_url, alcohol_result_url, ccf_url, test_result')
+        .eq('is_hidden', false)
         .not('sample_id', 'is', null) // Only drivers with test samples
         .order('collection_date', { ascending: false, nullsFirst: false });
 
@@ -43,7 +45,7 @@ export function useTestResults({ filter, search }: UseTestResultsOptions) {
 
       // Apply search
       if (search) {
-        query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%,sample_id.ilike.%${search}%`);
+        query = query.or(`first_name.ilike.%${search}%,middle_name.ilike.%${search}%,last_name.ilike.%${search}%,sample_id.ilike.%${search}%`);
       }
 
       const { data, error } = await query;

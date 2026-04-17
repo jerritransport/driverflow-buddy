@@ -29,9 +29,13 @@ export interface Driver {
   amount_paid: number;
   requires_alcohol_test: boolean;
   sap_id: string | null;
+  sap_info: string | null;
   staff_member_id: string | null;
   tenant_id: string | null;
   test_clinic_id: string | null;
+  test_clinic_name: string | null;
+  test_clinic_address: string | null;
+  test_clinic_phone: string | null;
   donor_pass_number: string | null;
   donor_pass_generated_at: string | null;
   test_scheduled_date: string | null;
@@ -39,6 +43,12 @@ export interface Driver {
   test_result: string | null;
   test_result_date: string | null;
   test_type: string | null;
+  test_status: string | null;
+  sample_id: string | null;
+  collection_date: string | null;
+  urine_result_url: string | null;
+  alcohol_result_url: string | null;
+  ccf_url: string | null;
   clearinghouse_prohibited: boolean;
   clearinghouse_query_conducted_at: string | null;
   clearinghouse_query_result: string | null;
@@ -47,10 +57,12 @@ export interface Driver {
   rtd_completed: boolean;
   rtd_completed_at: string | null;
   rtd_reported_to_fmcsa_at: string | null;
+  rtd_report_failed_at: string | null;
   follow_up_date: string | null;
   follow_up_note: string | null;
   documents_uploaded: Record<string, boolean> | null;
   is_hidden: boolean;
+  stripe_customer_id: string | null;
   created_at: string;
   updated_at: string;
   // Joined field
@@ -95,7 +107,7 @@ export function useDrivers(options: UseDriversOptions = {}) {
 
       if (search) {
         query = query.or(
-          `first_name.ilike.%${search}%,last_name.ilike.%${search}%,cdl_number.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`
+          `first_name.ilike.%${search}%,middle_name.ilike.%${search}%,last_name.ilike.%${search}%,cdl_number.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`
         );
       }
 
@@ -138,7 +150,7 @@ export function useDriversByStep() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('drivers')
-        .select('id, first_name, last_name, cdl_number, status, current_step, payment_status, payment_hold, updated_at, requires_alcohol_test, follow_up_date, documents_uploaded, is_hidden')
+        .select('id, first_name, middle_name, last_name, cdl_number, status, current_step, payment_status, payment_hold, updated_at, requires_alcohol_test, follow_up_date, documents_uploaded, is_hidden')
         .eq('is_hidden', false)
         .order('updated_at', { ascending: false });
 

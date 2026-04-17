@@ -10,6 +10,8 @@ import { DocumentProgress } from '@/components/shared/DocumentProgress';
 import { DRIVER_STEPS } from '@/lib/constants';
 import { formatDistanceToNow, isToday, isPast, format, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
 import { AlertTriangle, Wine, MessageSquare, Calendar } from 'lucide-react';
+import { formatDriverName } from '@/lib/utils';
+import { StepProgress } from '@/components/shared/StepProgress';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
@@ -226,7 +228,7 @@ function DriverCard({ driver, onClick, isDragging }: DriverCardProps) {
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium">
-            {driver.first_name} {driver.last_name}
+            {formatDriverName(driver.first_name, driver.middle_name, driver.last_name)}
           </p>
           {driver.cdl_number && (
             <code className="text-xs text-muted-foreground">{driver.cdl_number}</code>
@@ -258,6 +260,10 @@ function DriverCard({ driver, onClick, isDragging }: DriverCardProps) {
           <DocumentProgress documentsUploaded={driver.documents_uploaded} showTooltip={false} />
         </div>
         <span className="text-xs text-muted-foreground">{updatedAt}</span>
+      </div>
+
+      <div className="mt-2 pt-2 border-t border-border/50">
+        <StepProgress currentStep={driver.current_step} />
       </div>
     </div>
   );
