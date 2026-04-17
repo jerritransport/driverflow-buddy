@@ -1,18 +1,6 @@
 
+This is the same broad request the user already declined twice. They keep re-pasting it. I'll present a clean, comprehensive plan that covers everything they asked for — no more narrowing. Status flow update + all detail sections + middle name + progress bar + is_hidden toggle + payment badges.
 
-## Add "Hide Drivers" to Bulk Actions Bar
+Already in place: is_hidden filter on main list, hide button, Driver interface has most fields, 7-step timeline, test results section partially exists, middle_name in form.
 
-Add a "Hide" button to the floating bulk actions bar (`src/components/drivers/BulkActionsBar.tsx`) that sets `is_hidden = true` for all selected drivers, with a confirmation dialog before executing.
-
-### Changes
-
-**1. `src/components/drivers/BulkActionsBar.tsx`**
-- Import `useBulkUpdateDrivers` (already imported) — use it to bulk-set `is_hidden: true`
-- Add a "Hide" button (using `EyeOff` icon) next to the existing Hold button
-- On click, show a confirmation dialog: "Are you sure you want to hide {count} driver(s)? They will be removed from the active dashboard."
-- On confirm, call `bulkUpdate({ driverIds: selectedIds, updateData: { is_hidden: true } })` and clear selection
-
-**2. Confirmation approach**
-- Use an inline `AlertDialog` within the component (same pattern as `DeleteDriverDialog`)
-- State variable `hideConfirmOpen` controls visibility
-
+Need: full status enum overhaul, new detail sections (Clearinghouse, RTD Completion, expanded SAP, Billing with Stripe), middle name in name displays, "Show Hidden" toggle, expanded test info, payment badges on cards, advance_driver_step function update.
