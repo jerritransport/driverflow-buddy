@@ -26,6 +26,8 @@ import { Driver } from '@/hooks/useDrivers';
 import { SortField, SortOptions, useRestoreDriver } from '@/hooks/useDriversManagement';
 import { Eye, MoreHorizontal, Pencil, Trash2, AlertTriangle, Wine, ArrowUp, ArrowDown, ArrowUpDown, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
+import { formatDriverName } from '@/lib/utils';
+import { StepProgress } from '@/components/shared/StepProgress';
 
 interface DriversTableProps {
   drivers: Driver[];
@@ -258,7 +260,7 @@ function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit,
     e.stopPropagation();
     try {
       await restoreDriver.mutateAsync(driver.id);
-      toast.success(`${driver.first_name} ${driver.last_name} has been restored.`);
+      toast.success(`${formatDriverName(driver.first_name, driver.middle_name, driver.last_name)} has been restored.`);
     } catch {
       toast.error('Failed to restore driver.');
     }
@@ -274,7 +276,7 @@ function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit,
           <Checkbox
             checked={isSelected}
             onCheckedChange={(checked) => onSelect(!!checked)}
-            aria-label={`Select ${driver.first_name} ${driver.last_name}`}
+            aria-label={`Select ${formatDriverName(driver.first_name, driver.middle_name, driver.last_name)}`}
           />
         </TableCell>
       )}
@@ -282,7 +284,7 @@ function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit,
         <div className="flex items-center gap-2">
           <div>
             <p className="font-medium flex items-center gap-1.5">
-              {driver.first_name} {driver.last_name}
+              {formatDriverName(driver.first_name, driver.middle_name, driver.last_name)}
               {isHidden && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Hidden</Badge>}
             </p>
             <p className="text-xs text-muted-foreground">{driver.email}</p>
@@ -302,12 +304,15 @@ function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit,
         <span className="ml-1 text-xs text-muted-foreground">{driver.cdl_state}</span>
       </TableCell>
       <TableCell>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
-            {driver.current_step}
+        <div className="flex flex-col gap-1">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
+              {driver.current_step}
+            </span>
+            <span className="text-sm">{getStepLabel(driver.current_step)}</span>
           </span>
-          <span className="text-sm">{getStepLabel(driver.current_step)}</span>
-        </span>
+          <StepProgress currentStep={driver.current_step} />
+        </div>
       </TableCell>
       <TableCell>
         <StatusBadge status={driver.status} />

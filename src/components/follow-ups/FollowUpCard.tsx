@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { FollowUpDriver } from '@/hooks/useFollowUps';
 import { Phone, Calendar, CheckCircle, RefreshCw, Eye } from 'lucide-react';
 import { format, isToday, isPast } from 'date-fns';
+import { formatDriverName } from '@/lib/utils';
 
 interface FollowUpCardProps {
   driver: FollowUpDriver;
@@ -23,7 +24,7 @@ export function FollowUpCard({ driver, onComplete, onReschedule, onView }: Follo
         <div className="flex items-start justify-between">
           <div>
             <h3 className="font-semibold text-foreground">
-              {driver.first_name} {driver.last_name}
+              {formatDriverName(driver.first_name, (driver as any).middle_name, driver.last_name)}
             </h3>
             <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
               <Phone className="h-3 w-3" />

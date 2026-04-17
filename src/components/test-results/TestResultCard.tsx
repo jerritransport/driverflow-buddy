@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { DriverTestResult, TEST_STATUS_LABELS, TEST_STATUS_COLORS } from '@/hooks/useTestResults';
 import { Download, FileText, FlaskConical, Wine, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { formatDriverName } from '@/lib/utils';
 
 interface TestResultCardProps {
   result: DriverTestResult;
@@ -27,7 +28,7 @@ export function TestResultCard({ result, onViewDriver }: TestResultCardProps) {
             onClick={() => onViewDriver?.(result.id)}
           >
             <h3 className="font-semibold text-foreground">
-              {result.first_name} {result.last_name}
+              {formatDriverName(result.first_name, result.middle_name, result.last_name)}
             </h3>
             <p className="text-sm text-muted-foreground">{testType}</p>
           </div>

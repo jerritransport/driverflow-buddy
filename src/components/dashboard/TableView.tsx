@@ -16,6 +16,8 @@ import { getStepLabel } from '@/lib/constants';
 import { formatDistanceToNow, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
 import { Eye, AlertTriangle, Wine } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
+import { formatDriverName } from '@/lib/utils';
+import { StepProgress } from '@/components/shared/StepProgress';
 
 interface TableViewProps {
   onDriverSelect?: (driverId: string) => void;
@@ -129,7 +131,7 @@ function DriverRow({ driver, onView }: DriverRowProps) {
         <div className="flex items-center gap-2">
           <div>
             <p className="font-medium">
-              {driver.first_name} {driver.last_name}
+              {formatDriverName(driver.first_name, driver.middle_name, driver.last_name)}
             </p>
             <p className="text-xs text-muted-foreground">{driver.email}</p>
           </div>
@@ -148,12 +150,15 @@ function DriverRow({ driver, onView }: DriverRowProps) {
         <span className="ml-1 text-xs text-muted-foreground">{driver.cdl_state}</span>
       </TableCell>
       <TableCell>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
-            {driver.current_step}
+        <div className="flex flex-col gap-1">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
+              {driver.current_step}
+            </span>
+            <span className="text-sm">{getStepLabel(driver.current_step)}</span>
           </span>
-          <span className="text-sm">{getStepLabel(driver.current_step)}</span>
-        </span>
+          <StepProgress currentStep={driver.current_step} />
+        </div>
       </TableCell>
       <TableCell>
         <StatusBadge status={driver.status} />
