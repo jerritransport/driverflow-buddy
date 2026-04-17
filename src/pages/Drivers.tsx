@@ -16,7 +16,7 @@ import { Driver } from '@/hooks/useDrivers';
 import { exportDriversToCSV } from '@/lib/exportUtils';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Plus, Users, AlertTriangle, Wine, CheckCircle, Download, Loader2 } from 'lucide-react';
+import { Plus, Users, AlertTriangle, Wine, CheckCircle, Download, Loader2, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Drivers() {
@@ -125,6 +125,14 @@ export default function Drivers() {
             </p>
           </div>
           <div className="flex w-full gap-2 sm:w-auto">
+            <Button
+              variant={filters.showHidden ? 'default' : 'outline'}
+              onClick={() => handleFiltersChange({ ...filters, showHidden: !filters.showHidden })}
+              className="gap-2 flex-1 sm:flex-none"
+            >
+              {filters.showHidden ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {filters.showHidden ? 'Hide Hidden' : 'Show Hidden'}
+            </Button>
             <Button 
               variant="outline" 
               onClick={handleExportAll} 
