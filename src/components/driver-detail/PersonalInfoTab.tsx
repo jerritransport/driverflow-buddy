@@ -3,13 +3,16 @@ import { Driver } from '@/hooks/useDrivers';
 import { useUpdateDriver } from '@/hooks/useDriverDetails';
 import { useTenants } from '@/hooks/useTenants';
 import { format } from 'date-fns';
-import { User, MapPin, Briefcase, FileText, Calendar, Phone, Mail, Pencil, Check, X, Building2 } from 'lucide-react';
+import { User, MapPin, Briefcase, FileText, Calendar, Phone, Mail, Pencil, Check, X, Building2, FlaskConical, ShieldCheck, Trophy, CreditCard, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { TestResultsSection } from './TestResultsSection';
+import { PaymentBadge } from '@/components/shared/PaymentBadge';
 import { formatPhoneDisplay, formatPhoneFinal, normalizeUSPhone, isValidUSPhone } from '@/lib/phoneUtils';
+import { formatDriverName } from '@/lib/utils';
 
 interface PersonalInfoTabProps {
   driver: Driver;
@@ -24,9 +27,14 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
   const { data: tenants } = useTenants();
   const activeTenants = tenants?.filter(t => t.is_active) || [];
 
-  const formatDate = (date: string | null) => {
+  const formatDate = (date: string | null | undefined) => {
     if (!date) return 'N/A';
     return format(new Date(date), 'MMM d, yyyy');
+  };
+
+  const formatDateTime = (date: string | null | undefined) => {
+    if (!date) return 'N/A';
+    return format(new Date(date), 'MMM d, yyyy h:mm a');
   };
 
   const startEditing = (section: EditableSection, initialData: Record<string, string>) => {
@@ -42,7 +50,6 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
   const saveSection = async () => {
     if (!editingSection) return;
     
-    // Validate phone if contact section
     if (editingSection === 'contact' && formData.phone) {
       if (!isValidUSPhone(formData.phone)) {
         toast.error('Enter a valid US phone number');
@@ -51,7 +58,6 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
       formData.phone = normalizeUSPhone(formData.phone);
     }
     
-    // Convert empty strings to null for optional fields
     const sanitized: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(formData)) {
       sanitized[key] = value === '' ? null : value;
@@ -104,7 +110,18 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
     </div>
   );
 
+  const ReadOnlySectionHeader = ({ icon: Icon, title }: { icon: React.ComponentType<{ className?: string }>; title: string }) => (
+    <div className="mb-3 flex items-center gap-2">
+      <h4 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+        <Icon className="h-4 w-4" />
+        {title}
+      </h4>
+    </div>
+  );
+
   const isEditing = (section: EditableSection) => editingSection === section;
+
+  const testTypeLabel = driver.requires_alcohol_test ? 'Urine + Alcohol' : 'Urine Only';
 
   return (
     <div className="space-y-6">
@@ -149,7 +166,7 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
             </>
           ) : (
             <>
-              <InfoRow label="Full Name" value={`${driver.first_name} ${driver.middle_name || ''} ${driver.last_name}`.trim()} />
+              <InfoRow label="Full Name" value={formatDriverName(driver.first_name, driver.middle_name, driver.last_name)} />
               <InfoRow label="Email" value={driver.email} icon={<Mail className="h-3 w-3" />} />
               <InfoRow label="Phone" value={formatPhoneDisplay(driver.phone)} icon={<Phone className="h-3 w-3" />} />
               <InfoRow label="Gender" value={driver.gender} />
@@ -254,6 +271,113 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
         </section>
       )}
 
+      {/* SAP Record */}
+      <section>
+        <ReadOnlySectionHeader icon={Briefcase} title="SAP" />
+        <div className="grid gap-3 rounded-lg border bg-muted/30 p-4">
+          <InfoRow label="SAP (Form Entry)" value={driver.sap_info} />
+          <InfoRow label="SAP Record ID" value={driver.sap_id} />
+          <InfoRow label="Paperwork Received" value={formatDateTime(driver.sap_paperwork_received_at)} />
+        </div>
+      </section>
+
+      {/* Test Info */}
+      <section>
+        <ReadOnlySectionHeader icon={FlaskConical} title="Test Info" />
+        <div className="grid gap-3 rounded-lg border bg-muted/30 p-4">
+          <div className="flex items-start justify-between gap-4">
+            <span className="text-xs text-muted-foreground">Test Type</span>
+            <span className="text-right text-sm font-medium">{testTypeLabel}</span>
+          </div>
+          <div className="flex items-start justify-between gap-4">
+            <span className="text-xs text-muted-foreground">Requires Alcohol Test</span>
+            <Badge variant={driver.requires_alcohol_test ? 'default' : 'secondary'}>
+              {driver.requires_alcohol_test ? 'Yes' : 'No'}
+            </Badge>
+          </div>
+          <InfoRow label="Donor Pass #" value={driver.donor_pass_number} />
+          <InfoRow label="Donor Pass Generated" value={formatDateTime(driver.donor_pass_generated_at)} />
+          <InfoRow label="Test Clinic" value={driver.test_clinic_name} />
+          <InfoRow label="Clinic Address" value={driver.test_clinic_address} />
+          <InfoRow label="Clinic Phone" value={driver.test_clinic_phone ? formatPhoneDisplay(driver.test_clinic_phone) : null} />
+        </div>
+      </section>
+
+      {/* Clearinghouse */}
+      <section>
+        <ReadOnlySectionHeader icon={ShieldCheck} title="Clearinghouse" />
+        <div className="grid gap-3 rounded-lg border bg-muted/30 p-4">
+          <div className="flex items-start justify-between gap-4">
+            <span className="text-xs text-muted-foreground">Designation Accepted</span>
+            <Badge variant={driver.clearinghouse_designation_accepted ? 'default' : 'secondary'}>
+              {driver.clearinghouse_designation_accepted ? 'Yes' : 'No'}
+            </Badge>
+          </div>
+          <InfoRow label="Query Conducted" value={formatDateTime(driver.clearinghouse_query_conducted_at)} />
+          <InfoRow label="Query Result" value={driver.clearinghouse_query_result} />
+          <div className="flex items-start justify-between gap-4">
+            <span className="text-xs text-muted-foreground">Prohibited</span>
+            {driver.clearinghouse_prohibited ? (
+              <Badge variant="destructive" className="gap-1">
+                <AlertTriangle className="h-3 w-3" /> Yes
+              </Badge>
+            ) : (
+              <Badge variant="secondary">No</Badge>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* RTD Completion */}
+      <section>
+        <ReadOnlySectionHeader icon={Trophy} title="RTD Completion" />
+        <div className="grid gap-3 rounded-lg border bg-muted/30 p-4">
+          <div className="flex items-start justify-between gap-4">
+            <span className="text-xs text-muted-foreground">RTD Completed</span>
+            <Badge variant={driver.rtd_completed ? 'default' : 'secondary'} className={driver.rtd_completed ? 'bg-[hsl(var(--status-success))]' : ''}>
+              {driver.rtd_completed ? 'Yes' : 'No'}
+            </Badge>
+          </div>
+          <InfoRow label="Completed At" value={formatDateTime(driver.rtd_completed_at)} />
+          <InfoRow label="Reported to FMCSA" value={formatDateTime(driver.rtd_reported_to_fmcsa_at)} />
+          {driver.rtd_report_failed_at && (
+            <div className="flex items-start justify-between gap-4 rounded-md bg-destructive/10 p-2">
+              <span className="text-xs font-medium text-destructive flex items-center gap-1">
+                <AlertTriangle className="h-3 w-3" /> Report Failed
+              </span>
+              <span className="text-right text-sm font-medium text-destructive">
+                {formatDateTime(driver.rtd_report_failed_at)}
+              </span>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Payment / Billing */}
+      <section>
+        <ReadOnlySectionHeader icon={CreditCard} title="Payment / Billing" />
+        <div className="grid gap-3 rounded-lg border bg-muted/30 p-4">
+          <div className="flex items-start justify-between gap-4">
+            <span className="text-xs text-muted-foreground">Payment Status</span>
+            <PaymentBadge status={driver.payment_status} />
+          </div>
+          <InfoRow label="Amount Due" value={driver.amount_due != null ? `$${Number(driver.amount_due).toFixed(2)}` : null} />
+          <InfoRow label="Amount Paid" value={driver.amount_paid != null ? `$${Number(driver.amount_paid).toFixed(2)}` : null} />
+          <div className="flex items-start justify-between gap-4">
+            <span className="text-xs text-muted-foreground">Payment Hold</span>
+            <Badge variant={driver.payment_hold ? 'destructive' : 'secondary'}>
+              {driver.payment_hold ? 'Yes' : 'No'}
+            </Badge>
+          </div>
+          {driver.stripe_customer_id && (
+            <div className="flex items-start justify-between gap-4">
+              <span className="text-xs text-muted-foreground">Stripe Customer ID</span>
+              <code className="rounded bg-muted px-1.5 py-0.5 text-[11px] font-mono">{driver.stripe_customer_id}</code>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Staff Assignment */}
       <section>
         <div className="mb-3 flex items-center gap-2">
@@ -300,7 +424,7 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
   );
 }
 
-function InfoRow({ label, value, icon }: { label: string; value: string | null; icon?: React.ReactNode }) {
+function InfoRow({ label, value, icon }: { label: string; value: string | null | undefined; icon?: React.ReactNode }) {
   return (
     <div className="flex items-start justify-between gap-4">
       <span className="text-xs text-muted-foreground">{label}</span>
