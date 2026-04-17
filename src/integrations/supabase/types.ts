@@ -228,6 +228,7 @@ export type Database = {
           email_provider_id: string | null
           error_message: string | null
           id: string
+          message: string | null
           recipient_email: string | null
           recipient_phone: string | null
           retry_count: number | null
@@ -246,6 +247,7 @@ export type Database = {
           email_provider_id?: string | null
           error_message?: string | null
           id?: string
+          message?: string | null
           recipient_email?: string | null
           recipient_phone?: string | null
           retry_count?: number | null
@@ -264,6 +266,7 @@ export type Database = {
           email_provider_id?: string | null
           error_message?: string | null
           id?: string
+          message?: string | null
           recipient_email?: string | null
           recipient_phone?: string | null
           retry_count?: number | null
@@ -445,25 +448,33 @@ export type Database = {
           follow_up_note: string | null
           gender: string | null
           id: string
+          intake_date: string | null
           is_hidden: boolean
           last_name: string
           middle_name: string | null
           payment_hold: boolean | null
           payment_status: string
           phone: string
+          referral_source: string | null
           requires_alcohol_test: boolean | null
           rtd_completed: boolean | null
           rtd_completed_at: string | null
+          rtd_report_failed_at: string | null
           rtd_reported_to_fmcsa_at: string | null
           sample_id: string | null
           sap_id: string | null
+          sap_info: string | null
           sap_paperwork_received_at: string | null
           SSN: string | null
           staff_member_id: string | null
           state: string | null
           status: string
+          stripe_customer_id: string | null
           tenant_id: string | null
+          test_clinic_address: string | null
           test_clinic_id: string | null
+          test_clinic_name: string | null
+          test_clinic_phone: string | null
           test_completed_at: string | null
           test_result: string | null
           test_result_date: string | null
@@ -507,25 +518,33 @@ export type Database = {
           follow_up_note?: string | null
           gender?: string | null
           id?: string
+          intake_date?: string | null
           is_hidden?: boolean
           last_name: string
           middle_name?: string | null
           payment_hold?: boolean | null
           payment_status?: string
           phone: string
+          referral_source?: string | null
           requires_alcohol_test?: boolean | null
           rtd_completed?: boolean | null
           rtd_completed_at?: string | null
+          rtd_report_failed_at?: string | null
           rtd_reported_to_fmcsa_at?: string | null
           sample_id?: string | null
           sap_id?: string | null
+          sap_info?: string | null
           sap_paperwork_received_at?: string | null
           SSN?: string | null
           staff_member_id?: string | null
           state?: string | null
           status?: string
+          stripe_customer_id?: string | null
           tenant_id?: string | null
+          test_clinic_address?: string | null
           test_clinic_id?: string | null
+          test_clinic_name?: string | null
+          test_clinic_phone?: string | null
           test_completed_at?: string | null
           test_result?: string | null
           test_result_date?: string | null
@@ -569,25 +588,33 @@ export type Database = {
           follow_up_note?: string | null
           gender?: string | null
           id?: string
+          intake_date?: string | null
           is_hidden?: boolean
           last_name?: string
           middle_name?: string | null
           payment_hold?: boolean | null
           payment_status?: string
           phone?: string
+          referral_source?: string | null
           requires_alcohol_test?: boolean | null
           rtd_completed?: boolean | null
           rtd_completed_at?: string | null
+          rtd_report_failed_at?: string | null
           rtd_reported_to_fmcsa_at?: string | null
           sample_id?: string | null
           sap_id?: string | null
+          sap_info?: string | null
           sap_paperwork_received_at?: string | null
           SSN?: string | null
           staff_member_id?: string | null
           state?: string | null
           status?: string
+          stripe_customer_id?: string | null
           tenant_id?: string | null
+          test_clinic_address?: string | null
           test_clinic_id?: string | null
+          test_clinic_name?: string | null
+          test_clinic_phone?: string | null
           test_completed_at?: string | null
           test_result?: string | null
           test_result_date?: string | null
@@ -825,6 +852,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           last_name: string
+          name: string | null
           organization: string | null
           phone: string | null
           state: string | null
@@ -844,6 +872,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           last_name: string
+          name?: string | null
           organization?: string | null
           phone?: string | null
           state?: string | null
@@ -863,6 +892,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           last_name?: string
+          name?: string | null
           organization?: string | null
           phone?: string | null
           state?: string | null
@@ -1293,25 +1323,33 @@ export type Database = {
           follow_up_note: string | null
           gender: string | null
           id: string
+          intake_date: string | null
           is_hidden: boolean
           last_name: string
           middle_name: string | null
           payment_hold: boolean | null
           payment_status: string
           phone: string
+          referral_source: string | null
           requires_alcohol_test: boolean | null
           rtd_completed: boolean | null
           rtd_completed_at: string | null
+          rtd_report_failed_at: string | null
           rtd_reported_to_fmcsa_at: string | null
           sample_id: string | null
           sap_id: string | null
+          sap_info: string | null
           sap_paperwork_received_at: string | null
           SSN: string | null
           staff_member_id: string | null
           state: string | null
           status: string
+          stripe_customer_id: string | null
           tenant_id: string | null
+          test_clinic_address: string | null
           test_clinic_id: string | null
+          test_clinic_name: string | null
+          test_clinic_phone: string | null
           test_completed_at: string | null
           test_result: string | null
           test_result_date: string | null
