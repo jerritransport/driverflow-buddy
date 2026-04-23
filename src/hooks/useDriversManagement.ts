@@ -282,7 +282,7 @@ export function useCreateDriver() {
           payment_status: 'UNPAID',
           payment_hold: false,
           amount_paid: 0,
-          amount_due: data.amount_due ?? 450,
+          amount_due: data.amount_due ?? 248,
           follow_up_date: data.follow_up_date || null,
           follow_up_note: data.follow_up_note || null,
         })

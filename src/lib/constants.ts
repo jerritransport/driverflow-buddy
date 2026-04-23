@@ -1,7 +1,7 @@
 // Driver status and step mappings — new RTD flow
 export const DRIVER_STEPS = [
   { step: 1, label: 'Intake', statuses: ['INTAKE_RECEIVED', 'INTAKE_PENDING'] },
-  { step: 2, label: 'Payment', statuses: ['UNPAID', 'PAYMENT_HOLD', 'PAYMENT_COMPLETE'] },
+  { step: 2, label: 'Payment', statuses: ['UNPAID', 'PAYMENT_COMPLETE'] },
   {
     step: 3,
     label: 'SAP Paperwork',
@@ -99,7 +99,7 @@ export const STATUS_LABELS: Record<string, string> = {
 export const PAYMENT_STATUS_LABELS: Record<string, string> = {
   UNPAID: 'Unpaid',
   DEPOSIT: 'Deposit',
-  PAYMENT_HOLD: 'Payment Hold',
+  PAYMENT_HOLD: 'Deposit Paid',
   PAID: 'Paid in Full',
   PAYMENT_COMPLETE: 'Paid in Full',
   REFUNDED: 'Refunded',

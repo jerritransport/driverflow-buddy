@@ -31,7 +31,7 @@ export function useFollowUps({ filter, search }: UseFollowUpsOptions) {
         .from('drivers')
         .select('id, first_name, middle_name, last_name, phone, email, current_step, status, follow_up_date, follow_up_note')
         .eq('is_hidden', false)
-        .or('follow_up_date.not.is.null,status.ilike.PAYMENT_HOLD,status.ilike.FOLLOW_UP')
+        .or('follow_up_date.not.is.null,payment_hold.eq.true,status.ilike.FOLLOW_UP')
         .order('follow_up_date', { ascending: true, nullsFirst: false });
 
       // Apply filter
@@ -70,9 +70,9 @@ export function useFollowUpStats() {
       // Get all follow-ups in one query
       const { data, error } = await supabase
         .from('drivers')
-        .select('follow_up_date, status')
+        .select('follow_up_date, status, payment_hold')
         .eq('is_hidden', false)
-        .or('follow_up_date.not.is.null,status.ilike.PAYMENT_HOLD,status.ilike.FOLLOW_UP');
+        .or('follow_up_date.not.is.null,payment_hold.eq.true,status.ilike.FOLLOW_UP');
 
       if (error) throw error;
 
@@ -80,9 +80,9 @@ export function useFollowUpStats() {
       const overdue = data.filter(d => d.follow_up_date && d.follow_up_date < today).length;
       const thisWeek = data.filter(d => {
         if (d.follow_up_date) return d.follow_up_date >= today && d.follow_up_date <= weekEnd;
-        // Drivers matched by status only (no date) count as "this week"
+        // Drivers matched by payment_hold or status only (no date) count as "this week"
         const s = d.status?.toUpperCase();
-        return s === 'PAYMENT_HOLD' || s === 'FOLLOW_UP';
+        return (d as any).payment_hold === true || s === 'FOLLOW_UP';
       }).length;
 
       return { dueToday, overdue, thisWeek };

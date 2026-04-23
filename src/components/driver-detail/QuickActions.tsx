@@ -58,7 +58,10 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
   const currentStepInfo = DRIVER_STEPS.find(s => s.step === driver.current_step);
   const nextStepInfo = DRIVER_STEPS.find(s => s.step === driver.current_step + 1);
 
-  const canAdvance = driver.current_step < 7 && !driver.payment_hold;
+  // Deposit payers (payment_hold=true) proceed through steps normally.
+  // Only block manual advance at step 6→7 if balance still owed (results withheld).
+  const canAdvance = driver.current_step < 7 &&
+    !(driver.payment_hold && driver.current_step >= 6);
   const isComplete = driver.current_step === 7 || driver.rtd_completed;
   const canGenerateDonorPass = driver.current_step >= 4 && !driver.donor_pass_number;
   const hasBalance = (driver.amount_due ?? 0) > (driver.amount_paid ?? 0);
@@ -98,9 +101,9 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
       });
       toast({
         title: driver.payment_hold ? 'Payment Hold Removed' : 'Payment Hold Applied',
-        description: driver.payment_hold 
-          ? 'Driver can now proceed with the workflow'
-          : 'Driver workflow is paused until hold is cleared',
+        description: driver.payment_hold
+          ? 'Balance cleared — test results will be released'
+          : 'Balance owed — test results will be withheld until paid',
       });
       onSuccess?.();
     } catch (error) {
@@ -174,12 +177,12 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
 
       {/* Payment Hold Warning */}
       {driver.payment_hold && (
-        <div className="flex items-center gap-2 rounded-lg bg-destructive/10 p-3">
-          <AlertTriangle className="h-5 w-5 text-destructive" />
+        <div className="flex items-center gap-2 rounded-lg bg-[hsl(var(--status-warning))]/10 p-3">
+          <AlertTriangle className="h-5 w-5 text-[hsl(var(--status-warning))]" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-destructive">Payment Hold</p>
+            <p className="text-sm font-medium text-[hsl(var(--status-warning))]">Balance Owed — $134</p>
             <p className="text-xs text-muted-foreground">
-              Clear payment hold before advancing to next step
+              Driver is proceeding through the process. Test results will be withheld until the remaining balance is paid.
             </p>
           </div>
           <Button
@@ -194,7 +197,7 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
             ) : (
               <>
                 <CheckCircle2 className="mr-1 h-4 w-4" />
-                Clear Hold
+                Mark Paid
               </>
             )}
           </Button>
