@@ -37,7 +37,7 @@ import { useCreateDriver, CreateDriverData } from '@/hooks/useDriversManagement'
 import { useUpdateDriver } from '@/hooks/useDriverDetails';
 import { Driver } from '@/hooks/useDrivers';
 import { useSaps, useCreateSap } from '@/hooks/useSaps';
-import { useTenants } from '@/hooks/useTenants';
+import { useStaffMembers } from '@/hooks/useStaffMembers';
 import { Loader2, Upload, X, Plus } from 'lucide-react';
 import { addDays, format } from 'date-fns';
 import { isValidUSPhone, normalizeUSPhone, formatPhoneFinal } from '@/lib/phoneUtils';
@@ -75,7 +75,7 @@ const driverFormSchema = z.object({
   employer_phone: z.string().optional(),
   amount_due: z.coerce.number().min(0).optional(),
   requires_alcohol_test: z.boolean().optional(),
-  tenant_id: z.string().optional(),
+  staff_member_id: z.string().optional(),
   sap_requirement: z.enum(['none', 'needs_sap']).optional(),
   sap_id: z.string().optional(),
 });
@@ -167,8 +167,8 @@ export function DriverFormDialog({
 
   const { data: saps } = useSaps();
   const activeSaps = saps?.filter(s => s.is_active) || [];
-  const { data: tenants } = useTenants();
-  const activeTenants = tenants?.filter(t => t.is_active) || [];
+  const { data: staffMembers } = useStaffMembers();
+  const activeStaff = staffMembers?.filter(s => s.is_active) || [];
 
   const form = useForm<DriverFormValues>({
     resolver: zodResolver(driverFormSchema),
@@ -194,7 +194,7 @@ export function DriverFormDialog({
       employer_phone: (driver as any)?.employer_phone ?? '',
       amount_due: driver?.amount_due ?? 248,
       requires_alcohol_test: driver?.requires_alcohol_test ?? false,
-      tenant_id: driver?.tenant_id ?? undefined,
+      staff_member_id: (driver as any)?.staff_member_id ?? undefined,
       sap_requirement: driver?.sap_id ? 'needs_sap' : 'none',
       sap_id: driver?.sap_id ?? undefined,
     },
@@ -223,7 +223,7 @@ export function DriverFormDialog({
         employer_job_title: values.employer_job_title || undefined,
         employer_phone: values.employer_phone ? normalizeUSPhone(values.employer_phone) : undefined,
         sap_id: values.sap_requirement === 'needs_sap' ? values.sap_id || undefined : undefined,
-        tenant_id: values.tenant_id || undefined,
+        staff_member_id: values.staff_member_id || undefined,
       };
 
       // Determine follow-up date based on SAP requirement
@@ -748,7 +748,7 @@ export function DriverFormDialog({
               <h3 className="text-sm font-medium text-muted-foreground">Staff Assignment</h3>
               <FormField
                 control={form.control}
-                name="tenant_id"
+                name="staff_member_id"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Select Staff</FormLabel>
@@ -759,9 +759,9 @@ export function DriverFormDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {activeTenants.map((tenant) => (
-                          <SelectItem key={tenant.id} value={tenant.id}>
-                            {tenant.company_name}
+                        {activeStaff.map((staff) => (
+                          <SelectItem key={staff.id} value={staff.id}>
+                            {staff.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
