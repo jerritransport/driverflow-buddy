@@ -38,7 +38,7 @@ const paymentSchema = z.object({
     (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
     'Amount must be a positive number'
   ),
-  payment_type: z.enum(['DEPOSIT', 'BALANCE', 'ALCOHOL_FEE', 'REFUND']),
+  payment_type: z.enum(['deposit', 'balance', 'alcohol_fee', 'refund']),
   payment_method_type: z.enum(['CARD', 'CASH', 'CHECK', 'ACH', 'OTHER']).optional().default('CARD'),
 });
 
@@ -51,10 +51,10 @@ interface RecordPaymentDialogProps {
 }
 
 const PAYMENT_TYPES = [
-  { value: 'DEPOSIT', label: 'Deposit' },
-  { value: 'BALANCE', label: 'Balance Payment' },
-  { value: 'ALCOHOL_FEE', label: 'Alcohol Test Fee' },
-  { value: 'REFUND', label: 'Refund' },
+  { value: 'deposit', label: 'Deposit' },
+  { value: 'balance', label: 'Balance Payment' },
+  { value: 'alcohol_fee', label: 'Alcohol Test Fee' },
+  { value: 'refund', label: 'Refund' },
 ];
 
 const PAYMENT_METHODS = [
@@ -75,7 +75,7 @@ export function RecordPaymentDialog({ open, onOpenChange, driver }: RecordPaymen
     resolver: zodResolver(paymentSchema),
     defaultValues: {
       amount: remainingBalance > 0 ? remainingBalance.toFixed(2) : '',
-      payment_type: 'BALANCE',
+      payment_type: 'balance',
       payment_method_type: 'CARD',
     },
   });
@@ -83,7 +83,7 @@ export function RecordPaymentDialog({ open, onOpenChange, driver }: RecordPaymen
   const recordPayment = useMutation({
     mutationFn: async (data: PaymentFormData) => {
       const amount = parseFloat(data.amount);
-      const isRefund = data.payment_type === 'REFUND';
+      const isRefund = data.payment_type === 'refund';
 
       // Create payment record
       const { error: paymentError } = await supabase.from('payments').insert({
