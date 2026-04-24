@@ -67,7 +67,12 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full overflow-hidden p-0 sm:max-w-xl">
+      <SheetContent
+        className={cn(
+          'w-full overflow-hidden p-0 transition-[max-width] duration-300',
+          expanded ? 'sm:max-w-[95vw]' : 'sm:max-w-xl'
+        )}
+      >
         {isLoading ? (
           <PanelSkeleton />
         ) : error ? (
