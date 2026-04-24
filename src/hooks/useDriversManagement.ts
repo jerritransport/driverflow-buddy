@@ -239,6 +239,7 @@ export interface CreateDriverData {
   amount_due?: number;
   requires_alcohol_test?: boolean;
   sap_id?: string;
+  staff_member_id?: string;
   follow_up_date?: string;
   follow_up_note?: string;
 }
@@ -271,6 +272,7 @@ export function useCreateDriver() {
         employer_phone: data.employer_phone || null,
         requires_alcohol_test: data.requires_alcohol_test ?? false,
         sap_id: data.sap_id || null,
+        staff_member_id: data.staff_member_id || null,
       };
 
       const { data: driver, error } = await supabase
