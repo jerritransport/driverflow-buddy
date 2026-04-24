@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Driver } from '@/hooks/useDrivers';
 import { useUpdateDriver } from '@/hooks/useDriverDetails';
-import { useTenants } from '@/hooks/useTenants';
+import { useStaffMembers } from '@/hooks/useStaffMembers';
 import { format } from 'date-fns';
 import { User, MapPin, Briefcase, FileText, Calendar, Phone, Mail, Pencil, Check, X, Building2, FlaskConical, ShieldCheck, Trophy, CreditCard, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -24,8 +24,8 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
   const [editingSection, setEditingSection] = useState<EditableSection>(null);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const updateDriver = useUpdateDriver();
-  const { data: tenants } = useTenants();
-  const activeTenants = tenants?.filter(t => t.is_active) || [];
+  const { data: staffMembers } = useStaffMembers();
+  const activeStaff = staffMembers?.filter(s => s.is_active) || [];
 
   const formatDate = (date: string | null | undefined) => {
     if (!date) return 'N/A';
@@ -390,12 +390,12 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
           <div className="flex items-center justify-between gap-4">
             <span className="text-xs text-muted-foreground">Assigned Staff</span>
             <Select
-              value={driver.tenant_id || ''}
+              value={(driver as any).staff_member_id || ''}
               onValueChange={async (value) => {
                 try {
                   await updateDriver.mutateAsync({
                     driverId: driver.id,
-                    updates: { tenant_id: value || null },
+                    updates: { staff_member_id: value || null } as any,
                   });
                   toast.success('Staff updated');
                 } catch (err: any) {
@@ -407,9 +407,9 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
                 <SelectValue placeholder="Unassigned" />
               </SelectTrigger>
               <SelectContent>
-                {activeTenants.map((t) => (
-                  <SelectItem key={t.id} value={t.id}>
-                    {t.company_name}
+                {activeStaff.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.name}
                   </SelectItem>
                 ))}
               </SelectContent>
