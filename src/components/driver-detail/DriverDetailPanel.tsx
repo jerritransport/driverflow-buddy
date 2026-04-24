@@ -21,7 +21,10 @@ import { NotesTab } from './NotesTab';
 import { CommunicationActions } from './CommunicationActions';
 import { PaymentBadge } from '@/components/shared/PaymentBadge';
 import { StatusBadge } from '@/components/shared/StatusBadge';
-import { Phone, Mail, AlertTriangle, Wine, Calendar } from 'lucide-react';
+import { Phone, Mail, AlertTriangle, Wine, Calendar, Maximize2, Minimize2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
 import { format, isToday, isPast } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { DRIVER_STEPS } from '@/lib/constants';
@@ -37,6 +40,7 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
   const { data: driver, isLoading, error } = useDriver(driverId ?? undefined);
   const advanceStep = useAdvanceDriverStep();
   const { toast } = useToast();
+  const [expanded, setExpanded] = useState(false);
 
   const handleStepRevert = async (step: number) => {
     if (!driver) return;
@@ -63,7 +67,12 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full overflow-hidden p-0 sm:max-w-xl">
+      <SheetContent
+        className={cn(
+          'w-full overflow-hidden p-0 transition-[max-width] duration-300',
+          expanded ? 'sm:max-w-[95vw]' : 'sm:max-w-xl'
+        )}
+      >
         {isLoading ? (
           <PanelSkeleton />
         ) : error ? (
@@ -87,7 +96,7 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
                       <span className="text-xs">{driver.cdl_state}</span>
                     </SheetDescription>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 mr-8">
                     {driver.payment_hold && (
                       <Badge variant="destructive" className="gap-1">
                         <AlertTriangle className="h-3 w-3" />
@@ -100,6 +109,17 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
                         Alcohol
                       </Badge>
                     )}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setExpanded((v) => !v)}
+                      aria-label={expanded ? 'Collapse panel' : 'Expand panel'}
+                      title={expanded ? 'Collapse' : 'Expand'}
+                    >
+                      {expanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                    </Button>
                   </div>
                 </div>
               </SheetHeader>
