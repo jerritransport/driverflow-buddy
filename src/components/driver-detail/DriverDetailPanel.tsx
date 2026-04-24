@@ -40,6 +40,7 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
   const { data: driver, isLoading, error } = useDriver(driverId ?? undefined);
   const advanceStep = useAdvanceDriverStep();
   const { toast } = useToast();
+  const [expanded, setExpanded] = useState(false);
 
   const handleStepRevert = async (step: number) => {
     if (!driver) return;
