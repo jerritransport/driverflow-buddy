@@ -96,7 +96,7 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
                       <span className="text-xs">{driver.cdl_state}</span>
                     </SheetDescription>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 mr-8">
                     {driver.payment_hold && (
                       <Badge variant="destructive" className="gap-1">
                         <AlertTriangle className="h-3 w-3" />
@@ -109,6 +109,17 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
                         Alcohol
                       </Badge>
                     )}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setExpanded((v) => !v)}
+                      aria-label={expanded ? 'Collapse panel' : 'Expand panel'}
+                      title={expanded ? 'Collapse' : 'Expand'}
+                    >
+                      {expanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                    </Button>
                   </div>
                 </div>
               </SheetHeader>
