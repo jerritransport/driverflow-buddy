@@ -181,24 +181,28 @@ export default function Drivers() {
             label="Total Drivers"
             value={totalDrivers.toLocaleString()}
             iconColor="text-primary"
+            onClick={() => handleFiltersChange({})}
           />
           <QuickStatCard
             icon={AlertTriangle}
             label="Pending Final Balance"
             value={drivers.filter((d) => d.payment_status === 'UNPAID' || d.payment_status === 'DEPOSIT').length.toString()}
             iconColor="text-[hsl(var(--status-warning))]"
+            onClick={() => handleFiltersChange({ ...filters, paymentStatus: 'UNPAID' })}
           />
           <QuickStatCard
             icon={Wine}
             label="Alcohol Test Required"
             value={drivers.filter((d) => d.requires_alcohol_test).length.toString()}
             iconColor="text-[hsl(var(--payment-hold))]"
+            onClick={() => handleFiltersChange({ ...filters, requiresAlcoholTest: true })}
           />
           <QuickStatCard
             icon={CheckCircle}
             label="RTD Complete"
             value={drivers.filter((d) => d.rtd_completed).length.toString()}
             iconColor="text-[hsl(var(--status-success))]"
+            onClick={() => handleFiltersChange({ ...filters, status: 'rtd_complete' })}
           />
         </div>
 
