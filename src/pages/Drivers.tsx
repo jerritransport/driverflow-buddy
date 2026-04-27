@@ -297,11 +297,24 @@ interface QuickStatCardProps {
   label: string;
   value: string;
   iconColor?: string;
+  onClick?: () => void;
 }
 
-function QuickStatCard({ icon: Icon, label, value, iconColor }: QuickStatCardProps) {
+function QuickStatCard({ icon: Icon, label, value, iconColor, onClick }: QuickStatCardProps) {
+  const isClickable = !!onClick;
   return (
-    <Card>
+    <Card
+      className={isClickable ? 'cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring' : undefined}
+      onClick={onClick}
+      role={isClickable ? 'button' : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      onKeyDown={isClickable ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick?.();
+        }
+      } : undefined}
+    >
       <CardContent className="flex items-center gap-4 p-4">
         <div className={`rounded-lg bg-muted p-2 ${iconColor}`}>
           <Icon className="h-5 w-5" />
