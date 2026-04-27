@@ -1,0 +1,26 @@
+CREATE OR REPLACE VIEW public.dashboard_summary AS
+SELECT count(*) AS total_drivers,
+    count(*) FILTER (WHERE status::text = 'INTAKE_PENDING'::text) AS intake_pending,
+    count(*) FILTER (WHERE status::text ~~ 'PAYMENT%'::text) AS payment_pending,
+    count(*) FILTER (WHERE status::text ~~ 'SAP%'::text) AS sap_pending,
+    count(*) FILTER (WHERE status::text ~~ 'CLEARINGHOUSE%'::text) AS clearinghouse_pending,
+    count(*) FILTER (WHERE status::text ~~ 'DONOR_PASS%'::text OR status::text = 'TEST_IN_PROGRESS'::text) AS test_pending,
+    count(*) FILTER (WHERE status::text = 'RTD_COMPLETE'::text) AS completed,
+    count(*) FILTER (WHERE current_step = 1) AS step_1_count,
+    count(*) FILTER (WHERE current_step = 2) AS step_2_count,
+    count(*) FILTER (WHERE current_step = 3) AS step_3_count,
+    count(*) FILTER (WHERE current_step = 4) AS step_4_count,
+    count(*) FILTER (WHERE current_step = 5) AS step_5_count,
+    count(*) FILTER (WHERE current_step = 6) AS step_6_count,
+    count(*) FILTER (WHERE current_step = 7) AS step_7_count,
+    count(*) FILTER (WHERE payment_hold = true) AS payment_hold_count,
+    count(*) FILTER (WHERE requires_alcohol_test = true) AS alcohol_test_required_count,
+    COALESCE(sum(amount_paid), 0::numeric) AS total_revenue,
+    COALESCE(sum(amount_due - amount_paid), 0::numeric) AS total_outstanding,
+    count(*) FILTER (WHERE rtd_completed = true AND rtd_completed_at >= (now() - '7 days'::interval)) AS completed_last_7_days,
+    count(*) FILTER (WHERE rtd_completed = true AND rtd_completed_at >= (now() - '30 days'::interval)) AS completed_last_30_days,
+    avg(EXTRACT(epoch FROM rtd_completed_at - created_at) / 86400::numeric) FILTER (WHERE rtd_completed = true) AS avg_completion_days,
+    count(*) FILTER (WHERE created_at >= (now() - '24:00:00'::interval)) AS new_drivers_today,
+    count(*) FILTER (WHERE updated_at >= (now() - '01:00:00'::interval)) AS active_last_hour
+   FROM drivers
+   WHERE is_hidden = false;
