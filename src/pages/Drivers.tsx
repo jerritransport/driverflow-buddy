@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -20,11 +21,31 @@ import { Plus, Users, AlertTriangle, Wine, CheckCircle, Download, Loader2, Eye, 
 import { toast } from 'sonner';
 
 export default function Drivers() {
+  const [searchParams, setSearchParams] = useSearchParams();
   // State management
   const [filters, setFilters] = useState<FilterType>({});
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState<SortOptions>({ field: 'updated_at', direction: 'desc' });
+
+  // Apply view filter from URL (e.g. ?view=completed | in_progress | alcohol | unpaid)
+  useEffect(() => {
+    const view = searchParams.get('view');
+    if (!view) return;
+    if (view === 'completed') {
+      setFilters((f) => ({ ...f, status: 'rtd_complete' }));
+    } else if (view === 'in_progress') {
+      setFilters((f) => ({ ...f, status: undefined }));
+    } else if (view === 'alcohol') {
+      setFilters((f) => ({ ...f, requiresAlcoholTest: true }));
+    } else if (view === 'unpaid') {
+      setFilters((f) => ({ ...f, paymentStatus: 'UNPAID' }));
+    }
+    // Clear the param so the user can later modify filters freely
+    searchParams.delete('view');
+    setSearchParams(searchParams, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   // Selection state for bulk actions
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -160,24 +181,28 @@ export default function Drivers() {
             label="Total Drivers"
             value={totalDrivers.toLocaleString()}
             iconColor="text-primary"
+            onClick={() => handleFiltersChange({})}
           />
           <QuickStatCard
             icon={AlertTriangle}
             label="Pending Final Balance"
             value={drivers.filter((d) => d.payment_status === 'UNPAID' || d.payment_status === 'DEPOSIT').length.toString()}
             iconColor="text-[hsl(var(--status-warning))]"
+            onClick={() => handleFiltersChange({ ...filters, paymentStatus: 'UNPAID' })}
           />
           <QuickStatCard
             icon={Wine}
             label="Alcohol Test Required"
             value={drivers.filter((d) => d.requires_alcohol_test).length.toString()}
             iconColor="text-[hsl(var(--payment-hold))]"
+            onClick={() => handleFiltersChange({ ...filters, requiresAlcoholTest: true })}
           />
           <QuickStatCard
             icon={CheckCircle}
             label="RTD Complete"
             value={drivers.filter((d) => d.rtd_completed).length.toString()}
             iconColor="text-[hsl(var(--status-success))]"
+            onClick={() => handleFiltersChange({ ...filters, status: 'rtd_complete' })}
           />
         </div>
 
@@ -272,11 +297,24 @@ interface QuickStatCardProps {
   label: string;
   value: string;
   iconColor?: string;
+  onClick?: () => void;
 }
 
-function QuickStatCard({ icon: Icon, label, value, iconColor }: QuickStatCardProps) {
+function QuickStatCard({ icon: Icon, label, value, iconColor, onClick }: QuickStatCardProps) {
+  const isClickable = !!onClick;
   return (
-    <Card>
+    <Card
+      className={isClickable ? 'cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring' : undefined}
+      onClick={onClick}
+      role={isClickable ? 'button' : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      onKeyDown={isClickable ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick?.();
+        }
+      } : undefined}
+    >
       <CardContent className="flex items-center gap-4 p-4">
         <div className={`rounded-lg bg-muted p-2 ${iconColor}`}>
           <Icon className="h-5 w-5" />
