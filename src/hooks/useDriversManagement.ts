@@ -14,6 +14,7 @@ export interface DriverFilters {
   search?: string;
   step?: number;
   status?: string;
+  notStatus?: string;
   paymentStatus?: string;
   paymentHold?: boolean;
   requiresAlcoholTest?: boolean;
@@ -55,7 +56,7 @@ export function useAllFilteredDrivers(
   sort: SortOptions = { field: 'updated_at', direction: 'desc' },
   enabled = false
 ) {
-  const { search, step, status, paymentStatus, paymentHold, requiresAlcoholTest, dateField, dateFrom, dateTo } = filters;
+  const { search, step, status, notStatus, paymentStatus, paymentHold, requiresAlcoholTest, dateField, dateFrom, dateTo } = filters;
 
   return useQuery({
     queryKey: ['drivers-all-filtered', filters, sort],
@@ -75,6 +76,9 @@ export function useAllFilteredDrivers(
       }
       if (status) {
         query = query.eq('status', status);
+      }
+      if (notStatus) {
+        query = query.neq('status', notStatus);
       }
       if (paymentStatus) {
         query = query.eq('payment_status', paymentStatus);
@@ -111,7 +115,7 @@ export function useDriversPaginated(
   pagination: PaginationOptions = { page: 1, pageSize: 20 },
   sort: SortOptions = { field: 'updated_at', direction: 'desc' }
 ) {
-  const { search, step, status, paymentStatus, paymentHold, requiresAlcoholTest, dateField, dateFrom, dateTo } = filters;
+  const { search, step, status, notStatus, paymentStatus, paymentHold, requiresAlcoholTest, dateField, dateFrom, dateTo } = filters;
   const { page, pageSize } = pagination;
 
   return useQuery({
@@ -132,6 +136,9 @@ export function useDriversPaginated(
       }
       if (status) {
         countQuery = countQuery.eq('status', status);
+      }
+      if (notStatus) {
+        countQuery = countQuery.neq('status', notStatus);
       }
       if (paymentStatus) {
         countQuery = countQuery.eq('payment_status', paymentStatus);
@@ -178,6 +185,9 @@ export function useDriversPaginated(
       }
       if (status) {
         dataQuery = dataQuery.eq('status', status);
+      }
+      if (notStatus) {
+        dataQuery = dataQuery.neq('status', notStatus);
       }
       if (paymentStatus) {
         dataQuery = dataQuery.eq('payment_status', paymentStatus);
