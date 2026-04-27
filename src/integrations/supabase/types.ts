@@ -858,6 +858,7 @@ export type Database = {
           state: string | null
           total_drivers_referred: number | null
           updated_at: string | null
+          website: string | null
           zip_code: string | null
         }
         Insert: {
@@ -878,6 +879,7 @@ export type Database = {
           state?: string | null
           total_drivers_referred?: number | null
           updated_at?: string | null
+          website?: string | null
           zip_code?: string | null
         }
         Update: {
@@ -898,6 +900,7 @@ export type Database = {
           state?: string | null
           total_drivers_referred?: number | null
           updated_at?: string | null
+          website?: string | null
           zip_code?: string | null
         }
         Relationships: []

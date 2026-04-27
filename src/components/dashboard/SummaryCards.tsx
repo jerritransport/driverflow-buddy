@@ -2,6 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useDashboardSummary } from '@/hooks/useDashboardSummary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DateRange } from 'react-day-picker';
+import { cn } from '@/lib/utils';
 import { 
   Users, 
   AlertTriangle, 
@@ -16,9 +17,10 @@ interface SummaryCardProps {
   icon: React.ReactNode;
   trend?: 'up' | 'down' | 'neutral';
   variant?: 'default' | 'success' | 'warning' | 'danger';
+  onClick?: () => void;
 }
 
-function SummaryCard({ title, value, subtitle, icon, variant = 'default' }: SummaryCardProps) {
+function SummaryCard({ title, value, subtitle, icon, variant = 'default', onClick }: SummaryCardProps) {
   const variantStyles = {
     default: 'border-border',
     success: 'border-l-4 border-l-[hsl(var(--status-success))]',
@@ -26,8 +28,24 @@ function SummaryCard({ title, value, subtitle, icon, variant = 'default' }: Summ
     danger: 'border-l-4 border-l-[hsl(var(--status-danger))]',
   };
 
+  const isClickable = !!onClick;
+
   return (
-    <Card className={`${variantStyles[variant]}`}>
+    <Card
+      className={cn(
+        variantStyles[variant],
+        isClickable && 'cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+      )}
+      onClick={onClick}
+      role={isClickable ? 'button' : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      onKeyDown={isClickable ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick?.();
+        }
+      } : undefined}
+    >
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
