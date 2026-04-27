@@ -55,57 +55,34 @@ export default function FollowUps() {
 
         {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-3">
-          <Card className={filter === 'today' ? 'ring-2 ring-primary' : ''}>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-[hsl(var(--status-warning))]/10 p-2">
-                  <Clock className="h-5 w-5 text-[hsl(var(--status-warning))]" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Due Today</p>
-                  {statsLoading ? (
-                    <Skeleton className="h-7 w-8" />
-                  ) : (
-                    <p className="text-2xl font-bold">{stats?.dueToday ?? 0}</p>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className={filter === 'overdue' ? 'ring-2 ring-primary' : ''}>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-destructive/10 p-2">
-                  <AlertTriangle className="h-5 w-5 text-destructive" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Overdue</p>
-                  {statsLoading ? (
-                    <Skeleton className="h-7 w-8" />
-                  ) : (
-                    <p className="text-2xl font-bold text-destructive">{stats?.overdue ?? 0}</p>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className={filter === 'upcoming' ? 'ring-2 ring-primary' : ''}>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-primary/10 p-2">
-                  <CalendarCheck className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">This Week</p>
-                  {statsLoading ? (
-                    <Skeleton className="h-7 w-8" />
-                  ) : (
-                    <p className="text-2xl font-bold">{stats?.thisWeek ?? 0}</p>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <StatCard
+            active={filter === 'today'}
+            onClick={() => setFilter('today')}
+            iconBg="bg-[hsl(var(--status-warning))]/10"
+            icon={<Clock className="h-5 w-5 text-[hsl(var(--status-warning))]" />}
+            label="Due Today"
+            value={stats?.dueToday ?? 0}
+            loading={statsLoading}
+          />
+          <StatCard
+            active={filter === 'overdue'}
+            onClick={() => setFilter('overdue')}
+            iconBg="bg-destructive/10"
+            icon={<AlertTriangle className="h-5 w-5 text-destructive" />}
+            label="Overdue"
+            value={stats?.overdue ?? 0}
+            loading={statsLoading}
+            valueClassName="text-destructive"
+          />
+          <StatCard
+            active={filter === 'upcoming'}
+            onClick={() => setFilter('upcoming')}
+            iconBg="bg-primary/10"
+            icon={<CalendarCheck className="h-5 w-5 text-primary" />}
+            label="This Week"
+            value={stats?.thisWeek ?? 0}
+            loading={statsLoading}
+          />
         </div>
 
         {/* Filters */}
@@ -189,5 +166,47 @@ export default function FollowUps() {
         }}
       />
     </AppLayout>
+  );
+}
+
+interface StatCardProps {
+  active?: boolean;
+  onClick?: () => void;
+  iconBg: string;
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+  loading?: boolean;
+  valueClassName?: string;
+}
+
+function StatCard({ active, onClick, iconBg, icon, label, value, loading, valueClassName }: StatCardProps) {
+  return (
+    <Card
+      className={`cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${active ? 'ring-2 ring-primary' : ''}`}
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
+    >
+      <CardContent className="p-4">
+        <div className="flex items-center gap-3">
+          <div className={`rounded-lg ${iconBg} p-2`}>{icon}</div>
+          <div>
+            <p className="text-sm text-muted-foreground">{label}</p>
+            {loading ? (
+              <Skeleton className="h-7 w-8" />
+            ) : (
+              <p className={`text-2xl font-bold ${valueClassName ?? ''}`}>{value}</p>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
