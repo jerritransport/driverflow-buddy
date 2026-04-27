@@ -33,9 +33,9 @@ export default function Drivers() {
     const view = searchParams.get('view');
     if (!view) return;
     if (view === 'completed') {
-      setFilters((f) => ({ ...f, status: 'rtd_complete' }));
+      setFilters((f) => ({ ...f, status: 'RTD_COMPLETE', notStatus: undefined }));
     } else if (view === 'in_progress') {
-      setFilters((f) => ({ ...f, status: undefined }));
+      setFilters((f) => ({ ...f, status: undefined, notStatus: 'RTD_COMPLETE' }));
     } else if (view === 'alcohol') {
       setFilters((f) => ({ ...f, requiresAlcoholTest: true }));
     } else if (view === 'unpaid') {
