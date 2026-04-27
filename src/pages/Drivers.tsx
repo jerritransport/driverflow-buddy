@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -20,11 +21,31 @@ import { Plus, Users, AlertTriangle, Wine, CheckCircle, Download, Loader2, Eye, 
 import { toast } from 'sonner';
 
 export default function Drivers() {
+  const [searchParams, setSearchParams] = useSearchParams();
   // State management
   const [filters, setFilters] = useState<FilterType>({});
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState<SortOptions>({ field: 'updated_at', direction: 'desc' });
+
+  // Apply view filter from URL (e.g. ?view=completed | in_progress | alcohol | unpaid)
+  useEffect(() => {
+    const view = searchParams.get('view');
+    if (!view) return;
+    if (view === 'completed') {
+      setFilters((f) => ({ ...f, status: 'rtd_complete' }));
+    } else if (view === 'in_progress') {
+      setFilters((f) => ({ ...f, status: undefined }));
+    } else if (view === 'alcohol') {
+      setFilters((f) => ({ ...f, requiresAlcoholTest: true }));
+    } else if (view === 'unpaid') {
+      setFilters((f) => ({ ...f, paymentStatus: 'UNPAID' }));
+    }
+    // Clear the param so the user can later modify filters freely
+    searchParams.delete('view');
+    setSearchParams(searchParams, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   // Selection state for bulk actions
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
