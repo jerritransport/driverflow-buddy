@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { useDashboardSummary } from '@/hooks/useDashboardSummary';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -87,6 +88,7 @@ interface SummaryCardsProps {
 
 export function SummaryCards({ dateRange }: SummaryCardsProps) {
   const { data: summary, isLoading, error } = useDashboardSummary();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return (
@@ -115,6 +117,7 @@ export function SummaryCards({ dateRange }: SummaryCardsProps) {
         value={summary.total_drivers || 0}
         subtitle={`${summary.new_drivers_today || 0} new today`}
         icon={<Users className="h-5 w-5 text-muted-foreground" />}
+        onClick={() => navigate('/drivers')}
       />
       <SummaryCard
         title="Needs Follow-Up"
@@ -122,6 +125,7 @@ export function SummaryCards({ dateRange }: SummaryCardsProps) {
         subtitle="Action required"
         icon={<AlertTriangle className="h-5 w-5 text-[hsl(var(--status-danger))]" />}
         variant="danger"
+        onClick={() => navigate('/follow-ups')}
       />
       <SummaryCard
         title="In Progress"
@@ -129,6 +133,7 @@ export function SummaryCards({ dateRange }: SummaryCardsProps) {
         subtitle="Active pipeline"
         icon={<Clock className="h-5 w-5 text-[hsl(var(--status-warning))]" />}
         variant="warning"
+        onClick={() => navigate('/drivers?view=in_progress')}
       />
       <SummaryCard
         title="Completed"
@@ -136,6 +141,7 @@ export function SummaryCards({ dateRange }: SummaryCardsProps) {
         subtitle={`${summary.completed_last_7_days || 0} this week`}
         icon={<CheckCircle className="h-5 w-5 text-[hsl(var(--status-success))]" />}
         variant="success"
+        onClick={() => navigate('/drivers?view=completed')}
       />
     </div>
   );
