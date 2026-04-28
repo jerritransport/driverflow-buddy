@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Driver } from '@/hooks/useDrivers';
 import { useAdvanceDriverStep, useUpdateDriver } from '@/hooks/useDriverDetails';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import { RecordPaymentDialog } from './RecordPaymentDialog';
 import { GenerateDonorPassDialog } from './GenerateDonorPassDialog';
 import { SetFollowUpDialog } from './SetFollowUpDialog';
 import { SendAlcoholPaymentDialog } from './SendAlcoholPaymentDialog';
+import { UploadSapPaperworkDialog } from './UploadSapPaperworkDialog';
 import { DeleteDriverDialog } from '@/components/drivers/DeleteDriverDialog';
 import { 
   ChevronRight, 
