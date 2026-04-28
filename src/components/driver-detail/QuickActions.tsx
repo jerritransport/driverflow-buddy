@@ -333,65 +333,27 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
           <Button
             size="sm"
             className="flex-1 min-w-[120px] text-xs bg-[hsl(var(--status-success))] hover:bg-[hsl(var(--status-success))]/90 text-white"
-            onClick={async () => {
-              try {
-                // 1. Find the most recently uploaded SAP_PAPERWORK document for this driver
-                const { data: latestDoc, error: docError } = await supabase
-                  .from('documents')
-                  .select('storage_bucket, storage_path')
-                  .eq('driver_id', driver.id)
-                  .eq('document_type', 'SAP_PAPERWORK')
-                  .order('uploaded_at', { ascending: false })
-                  .limit(1)
-                  .maybeSingle();
-                if (docError) throw docError;
-                if (!latestDoc) {
-                  toast({
-                    title: 'No SAP paperwork found',
-                    description: 'Upload the SAP paperwork document before marking it received.',
-                    variant: 'destructive',
-                  });
-                  return;
-                }
-
-                // 2. Generate a signed URL n8n can fetch (24h)
-                const { data: signed, error: signErr } = await supabase.storage
-                  .from(latestDoc.storage_bucket || 'rtd-documents')
-                  .createSignedUrl(latestDoc.storage_path, 60 * 60 * 24);
-                if (signErr || !signed?.signedUrl) throw signErr ?? new Error('Could not sign document URL');
-
-                // 3. Advance status (no longer triggers FMCSA webhook from DB)
-                await advanceStep.mutateAsync({
-                  driverId: driver.id,
-                  newStep: driver.current_step,
-                  newStatus: 'SAP_PAPERWORK_RECEIVED',
-                });
-
-                // 4. Fire the sap-paperwork-received webhook with document_url
-                await fetch(SAP_PAPERWORK_RECEIVED_WEBHOOK, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    driver_id: driver.id,
-                    document_url: signed.signedUrl,
-                  }),
-                });
-
-                toast({
-                  title: 'Paperwork Received',
-                  description: 'SAP paperwork sent to automation.',
-                });
-                onSuccess?.();
-              } catch (err) {
-                const message = err instanceof Error ? err.message : 'Failed to send paperwork';
-                toast({ title: 'Error', description: message, variant: 'destructive' });
-              }
-            }}
-            disabled={driver.status === 'SAP_PAPERWORK_RECEIVED' || advanceStep.isPending}
+            onClick={() => paperworkInputRef.current?.click()}
+            disabled={
+              uploadingPaperwork ||
+              driver.status === 'SAP_PAPERWORK_RECEIVED' ||
+              advanceStep.isPending
+            }
           >
-            <CheckCircle className="mr-1 h-3 w-3" />
-            Paperwork Received
+            {uploadingPaperwork ? (
+              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+            ) : (
+              <CheckCircle className="mr-1 h-3 w-3" />
+            )}
+            {uploadingPaperwork ? 'Uploading…' : 'Paperwork Received'}
           </Button>
+          <input
+            ref={paperworkInputRef}
+            type="file"
+            accept="application/pdf"
+            className="hidden"
+            onChange={handlePaperworkFileSelected}
+          />
         </div>
       )}
 
