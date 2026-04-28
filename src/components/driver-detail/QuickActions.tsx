@@ -29,9 +29,6 @@ import { useRestoreDriver } from '@/hooks/useDriversManagement';
 import { toast as sonnerToast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
-const SAP_PAPERWORK_RECEIVED_WEBHOOK =
-  'https://n8n.srv1186934.hstgr.cloud/webhook/sap-paperwork-received';
-
 interface QuickActionsProps {
   driver: Driver;
   onSuccess?: () => void;
