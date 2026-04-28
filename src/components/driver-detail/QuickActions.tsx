@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { useRestoreDriver } from '@/hooks/useDriversManagement';
 import { toast as sonnerToast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+
 
 interface QuickActionsProps {
   driver: Driver;
