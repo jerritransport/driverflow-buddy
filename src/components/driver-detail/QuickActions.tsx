@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Driver } from '@/hooks/useDrivers';
 import { useAdvanceDriverStep, useUpdateDriver } from '@/hooks/useDriverDetails';
 import { Button } from '@/components/ui/button';
