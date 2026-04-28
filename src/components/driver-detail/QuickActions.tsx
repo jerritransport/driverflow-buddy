@@ -253,27 +253,15 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
           <Button
             size="sm"
             className="flex-1 min-w-[120px] text-xs bg-[hsl(var(--status-success))] hover:bg-[hsl(var(--status-success))]/90 text-white"
-            onClick={() => paperworkInputRef.current?.click()}
+            onClick={() => setSapPaperworkDialogOpen(true)}
             disabled={
-              uploadingPaperwork ||
               driver.status === 'SAP_PAPERWORK_RECEIVED' ||
               advanceStep.isPending
             }
           >
-            {uploadingPaperwork ? (
-              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-            ) : (
-              <CheckCircle className="mr-1 h-3 w-3" />
-            )}
-            {uploadingPaperwork ? 'Uploading…' : 'Paperwork Received'}
+            <CheckCircle className="mr-1 h-3 w-3" />
+            Paperwork Received
           </Button>
-          <input
-            ref={paperworkInputRef}
-            type="file"
-            accept="application/pdf"
-            className="hidden"
-            onChange={handlePaperworkFileSelected}
-          />
         </div>
       )}
 
