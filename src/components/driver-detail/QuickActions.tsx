@@ -437,6 +437,13 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
         onSuccess={onSuccess}
       />
 
+      <UploadSapPaperworkDialog
+        open={sapPaperworkDialogOpen}
+        onOpenChange={setSapPaperworkDialogOpen}
+        driver={driver}
+        onSuccess={onSuccess}
+      />
+
       <DeleteDriverDialog
         open={hideDialogOpen}
         onOpenChange={setHideDialogOpen}
