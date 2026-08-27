@@ -44,7 +44,12 @@ const DOCUMENT_TYPES = [
   { value: 'SAP_PAPERWORK', label: 'SAP Paperwork' },
   { value: 'TEST_RESULT', label: 'Test Result' },
   { value: 'CDL_COPY', label: 'CDL Copy' },
+  { value: 'CDL_FRONT', label: 'CDL Front' },
   { value: 'DONOR_PASS', label: 'Donor Pass' },
+  { value: 'RTD_CONSENT_FORM', label: 'RTD Consent Form' },
+  { value: 'PAYMENT_SCREENSHOT', label: 'Payment Screenshot' },
+  { value: 'CLEARINGHOUSE_QUERY_RESULT', label: 'Clearinghouse Query Result' },
+  { value: 'CCF', label: 'CCF (Chain of Custody Form)' },
   { value: 'OTHER', label: 'Other' },
 ];
 
@@ -300,7 +305,12 @@ function DocumentTypeBadge({ type }: { type: string }) {
     SAP_PAPERWORK: 'SAP Paperwork',
     TEST_RESULT: 'Test Result',
     CDL_COPY: 'CDL Copy',
+    CDL_FRONT: 'CDL Front',
     DONOR_PASS: 'Donor Pass',
+    RTD_CONSENT_FORM: 'RTD Consent Form',
+    PAYMENT_SCREENSHOT: 'Payment Screenshot',
+    CLEARINGHOUSE_QUERY_RESULT: 'Clearinghouse Query Result',
+    CCF: 'CCF',
     OTHER: 'Other',
   };
 

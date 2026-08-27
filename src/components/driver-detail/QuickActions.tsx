@@ -8,6 +8,8 @@ import { RecordPaymentDialog } from './RecordPaymentDialog';
 import { SetFollowUpDialog } from './SetFollowUpDialog';
 import { SendAlcoholPaymentDialog } from './SendAlcoholPaymentDialog';
 import { UploadSapPaperworkDialog } from './UploadSapPaperworkDialog';
+import { AdvanceStepUploadDialog } from './AdvanceStepUploadDialog';
+import { STEP_UPLOAD_REQUIREMENTS } from '@/lib/stepUploadRequirements';
 import { 
   ChevronRight, 
   Loader2, 
@@ -43,6 +45,7 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
   const [followUpDialogOpen, setFollowUpDialogOpen] = useState(false);
   const [alcoholPaymentDialogOpen, setAlcoholPaymentDialogOpen] = useState(false);
   const [sapPaperworkDialogOpen, setSapPaperworkDialogOpen] = useState(false);
+  const [advanceUploadDialogOpen, setAdvanceUploadDialogOpen] = useState(false);
 
   const handleUnhide = async () => {
     try {
@@ -88,6 +91,7 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
         description: 'Failed to advance driver step',
         variant: 'destructive',
       });
+      throw error;
     }
   };
 
@@ -387,7 +391,14 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
       {/* Advance to Next Step */}
       {canAdvance && nextStepInfo && (
         <Button
-          onClick={handleAdvance}
+          onClick={() => {
+            const requirements = STEP_UPLOAD_REQUIREMENTS[nextStepInfo.step];
+            if (requirements?.length) {
+              setAdvanceUploadDialogOpen(true);
+            } else {
+              handleAdvance();
+            }
+          }}
           disabled={advanceStep.isPending}
           className="w-full justify-between"
           size="lg"
@@ -430,6 +441,18 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
         driver={driver}
         onSuccess={onSuccess}
       />
+
+      {nextStepInfo && STEP_UPLOAD_REQUIREMENTS[nextStepInfo.step] && (
+        <AdvanceStepUploadDialog
+          open={advanceUploadDialogOpen}
+          onOpenChange={setAdvanceUploadDialogOpen}
+          driver={driver}
+          targetStep={nextStepInfo.step}
+          stepLabel={nextStepInfo.label}
+          requirements={STEP_UPLOAD_REQUIREMENTS[nextStepInfo.step]}
+          onAdvance={handleAdvance}
+        />
+      )}
 
       {/* Unhide Driver (Hide/Expand now live in the panel header) */}
       {driver.is_hidden && (
