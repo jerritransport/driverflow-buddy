@@ -23,7 +23,7 @@ export default function TestResults() {
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
             <FlaskConical className="h-6 w-6" />
-            Test Results
+            Pending Test Results
           </h1>
           <p className="text-muted-foreground">
             View and download driver test results and documents

@@ -24,9 +24,11 @@ import {
   Trophy,
   EyeOff,
   Eye,
+  ExternalLink,
 } from 'lucide-react';
 import { useRestoreDriver } from '@/hooks/useDriversManagement';
 import { toast as sonnerToast } from 'sonner';
+import { openEscreenPopup } from '@/lib/escreenPopup';
 
 
 interface QuickActionsProps {
@@ -359,6 +361,18 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
           {driver.donor_pass_number && (
             <CheckCircle className="ml-1 h-3 w-3 text-[hsl(var(--status-success))]" />
           )}
+        </Button>
+
+        {/* Create a Donor Pass (eScreen) */}
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex-1 gap-1.5"
+          onClick={openEscreenPopup}
+          disabled={driver.current_step < 5}
+        >
+          <ExternalLink className="h-4 w-4" />
+          Create a Donor Pass
         </Button>
 
         {/* Toggle Payment Hold (if not already on hold) */}
