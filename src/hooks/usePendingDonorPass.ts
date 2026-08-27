@@ -6,6 +6,8 @@ export interface PendingDonorPassDriver {
   first_name: string;
   middle_name: string | null;
   last_name: string;
+  email: string;
+  phone: string;
   cdl_number: string | null;
   cdl_state: string | null;
   status: string;
@@ -28,7 +30,7 @@ export function usePendingDonorPass({ search }: UsePendingDonorPassOptions = {})
     queryFn: async () => {
       let query = supabase
         .from('drivers')
-        .select('id, first_name, middle_name, last_name, cdl_number, cdl_state, status, donor_pass_number, donor_pass_generated_at, requires_alcohol_test, updated_at')
+        .select('id, first_name, middle_name, last_name, email, phone, cdl_number, cdl_state, status, donor_pass_number, donor_pass_generated_at, requires_alcohol_test, updated_at')
         .eq('is_hidden', false)
         .eq('current_step', DONOR_PASS_STEP)
         .order('updated_at', { ascending: true });

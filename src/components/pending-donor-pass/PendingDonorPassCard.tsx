@@ -3,9 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PendingDonorPassDriver } from '@/hooks/usePendingDonorPass';
 import { openEscreenPopup } from '@/lib/escreenPopup';
-import { ExternalLink, CheckCircle, Wine } from 'lucide-react';
+import { ExternalLink, CheckCircle, Wine, Mail, Phone } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { formatDriverName } from '@/lib/utils';
+import { formatPhoneDisplay } from '@/lib/phoneUtils';
 
 interface PendingDonorPassCardProps {
   driver: PendingDonorPassDriver;
@@ -36,6 +37,34 @@ export function PendingDonorPassCard({ driver, onViewDriver }: PendingDonorPassC
               <Wine className="h-3 w-3" />
               Drug + Alcohol
             </Badge>
+          )}
+        </div>
+
+        {/* Contact Info */}
+        <div className="space-y-1.5 text-sm">
+          {driver.email && (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Mail className="h-3.5 w-3.5 shrink-0" />
+              <a
+                href={`mailto:${driver.email}`}
+                className="truncate hover:text-primary transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {driver.email}
+              </a>
+            </div>
+          )}
+          {driver.phone && (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Phone className="h-3.5 w-3.5 shrink-0" />
+              <a
+                href={`tel:${driver.phone}`}
+                className="hover:text-primary transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {formatPhoneDisplay(driver.phone)}
+              </a>
+            </div>
           )}
         </div>
 
