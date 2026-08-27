@@ -14,6 +14,16 @@ export interface StepUploadRequirement {
   requiresDrugAlcoholTag?: boolean;
 }
 
+// Documents required when marking SAP Paperwork as "Received" (Step 3),
+// which also auto-advances the driver to Step 4 on submit. The generic
+// "Advance to Step 4" button requires the exact same set.
+export const STEP_4_UPLOAD_REQUIREMENTS: StepUploadRequirement[] = [
+  { type: 'RTD_CONSENT_FORM', label: 'RTD Consent Form', min: 1, max: 1 },
+  { type: 'CDL_FRONT', label: 'CDL Front', min: 1, max: 1 },
+  { type: 'PAYMENT_SCREENSHOT', label: 'Payment Screenshot', min: 1, max: 5 },
+  { type: 'SAP_PAPERWORK', label: 'SAP Paperwork', min: 1, max: 5 },
+];
+
 export const STEP_UPLOAD_REQUIREMENTS: Record<number, StepUploadRequirement[]> = {
   // Advancing into Step 3 — SAP Paperwork
   3: [
@@ -22,9 +32,7 @@ export const STEP_UPLOAD_REQUIREMENTS: Record<number, StepUploadRequirement[]> =
     { type: 'PAYMENT_SCREENSHOT', label: 'Payment Screenshot', min: 1, max: 5 },
   ],
   // Advancing into Step 4 — Clearinghouse
-  4: [
-    { type: 'SAP_PAPERWORK', label: 'SAP Paperwork', min: 1, max: 5 },
-  ],
+  4: STEP_4_UPLOAD_REQUIREMENTS,
   // Advancing into Step 5 — Donor Pass
   5: [
     { type: 'CLEARINGHOUSE_QUERY_RESULT', label: 'Clearinghouse Query Result', min: 1, max: 1 },
@@ -40,11 +48,5 @@ export const STEP_UPLOAD_REQUIREMENTS: Record<number, StepUploadRequirement[]> =
   ],
 };
 
-// Documents required when marking SAP Paperwork as "Received" (Step 3),
-// which also auto-advances the driver to Step 4 on submit.
-export const PAPERWORK_RECEIVED_UPLOAD_REQUIREMENTS: StepUploadRequirement[] = [
-  { type: 'RTD_CONSENT_FORM', label: 'RTD Consent Form', min: 1, max: 1 },
-  { type: 'CDL_FRONT', label: 'CDL Front', min: 1, max: 1 },
-  { type: 'PAYMENT_SCREENSHOT', label: 'Payment Screenshot', min: 1, max: 5 },
-  { type: 'SAP_PAPERWORK', label: 'SAP Paperwork', min: 1, max: 5 },
-];
+// Alias kept for the "Paperwork Received" dialog, which uses the same set.
+export const PAPERWORK_RECEIVED_UPLOAD_REQUIREMENTS = STEP_4_UPLOAD_REQUIREMENTS;
