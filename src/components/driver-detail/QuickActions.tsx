@@ -8,7 +8,6 @@ import { RecordPaymentDialog } from './RecordPaymentDialog';
 import { SetFollowUpDialog } from './SetFollowUpDialog';
 import { SendAlcoholPaymentDialog } from './SendAlcoholPaymentDialog';
 import { UploadSapPaperworkDialog } from './UploadSapPaperworkDialog';
-import { DeleteDriverDialog } from '@/components/drivers/DeleteDriverDialog';
 import { 
   ChevronRight, 
   Loader2, 
@@ -20,9 +19,9 @@ import {
   Calendar,
   Wine,
   Trophy,
-  EyeOff,
   Eye,
   ExternalLink,
+  Maximize2,
 } from 'lucide-react';
 import { useRestoreDriver } from '@/hooks/useDriversManagement';
 import { toast as sonnerToast } from 'sonner';
@@ -32,9 +31,10 @@ import { openEscreenPopup } from '@/lib/escreenPopup';
 interface QuickActionsProps {
   driver: Driver;
   onSuccess?: () => void;
+  onExpand?: () => void;
 }
 
-export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
+export function QuickActions({ driver, onSuccess, onExpand }: QuickActionsProps) {
   const { toast } = useToast();
   const advanceStep = useAdvanceDriverStep();
   const updateDriver = useUpdateDriver();
@@ -44,7 +44,6 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [followUpDialogOpen, setFollowUpDialogOpen] = useState(false);
   const [alcoholPaymentDialogOpen, setAlcoholPaymentDialogOpen] = useState(false);
-  const [hideDialogOpen, setHideDialogOpen] = useState(false);
   const [sapPaperworkDialogOpen, setSapPaperworkDialogOpen] = useState(false);
 
   const handleUnhide = async () => {
@@ -434,14 +433,7 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
         onSuccess={onSuccess}
       />
 
-      <DeleteDriverDialog
-        open={hideDialogOpen}
-        onOpenChange={setHideDialogOpen}
-        driver={driver}
-        onSuccess={onSuccess}
-      />
-
-      {/* Hide / Unhide Driver */}
+      {/* View Full Profile / Unhide Driver */}
       {driver.is_hidden ? (
         <Button
           variant="outline"
@@ -457,11 +449,11 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
         <Button
           variant="outline"
           size="sm"
-          className="w-full gap-1.5 text-destructive border-destructive/30 hover:bg-destructive/10"
-          onClick={() => setHideDialogOpen(true)}
+          className="w-full gap-1.5"
+          onClick={onExpand}
         >
-          <EyeOff className="h-4 w-4" />
-          Hide Driver
+          <Maximize2 className="h-4 w-4" />
+          View Full Profile
         </Button>
       )}
     </div>

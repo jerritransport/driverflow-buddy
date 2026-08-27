@@ -166,7 +166,7 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
               <StepTimeline currentStep={driver.current_step} status={driver.status} onStepClick={handleStepRevert} />
 
               {/* Quick Actions */}
-              <QuickActions driver={driver} />
+              <QuickActions driver={driver} onExpand={() => setExpanded(true)} />
 
               {/* Communication Actions */}
               <div className="mt-4 pt-4 border-t">
