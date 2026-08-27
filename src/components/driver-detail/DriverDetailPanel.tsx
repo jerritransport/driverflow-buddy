@@ -21,7 +21,8 @@ import { NotesTab } from './NotesTab';
 import { CommunicationActions } from './CommunicationActions';
 import { PaymentBadge } from '@/components/shared/PaymentBadge';
 import { StatusBadge } from '@/components/shared/StatusBadge';
-import { Phone, Mail, AlertTriangle, Wine, Calendar, Maximize2, Minimize2 } from 'lucide-react';
+import { Phone, Mail, AlertTriangle, Wine, Calendar, Maximize2, Minimize2, EyeOff } from 'lucide-react';
+import { DeleteDriverDialog } from '@/components/drivers/DeleteDriverDialog';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -41,6 +42,7 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
   const advanceStep = useAdvanceDriverStep();
   const { toast } = useToast();
   const [expanded, setExpanded] = useState(false);
+  const [hideDialogOpen, setHideDialogOpen] = useState(false);
 
   const handleStepRevert = async (step: number) => {
     if (!driver) return;
@@ -109,6 +111,19 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
                         Alcohol
                       </Badge>
                     )}
+                    {!driver.is_hidden && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => setHideDialogOpen(true)}
+                        aria-label="Hide driver"
+                        title="Hide driver"
+                      >
+                        <EyeOff className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button
                       type="button"
                       variant="ghost"
@@ -166,7 +181,7 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
               <StepTimeline currentStep={driver.current_step} status={driver.status} onStepClick={handleStepRevert} />
 
               {/* Quick Actions */}
-              <QuickActions driver={driver} onExpand={() => setExpanded(true)} />
+              <QuickActions driver={driver} />
 
               {/* Communication Actions */}
               <div className="mt-4 pt-4 border-t">
@@ -209,6 +224,12 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
           </div>
         ) : null}
       </SheetContent>
+
+      <DeleteDriverDialog
+        open={hideDialogOpen}
+        onOpenChange={setHideDialogOpen}
+        driver={driver ?? null}
+      />
     </Sheet>
   );
 }

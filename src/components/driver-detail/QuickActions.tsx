@@ -21,7 +21,6 @@ import {
   Trophy,
   Eye,
   ExternalLink,
-  Maximize2,
 } from 'lucide-react';
 import { useRestoreDriver } from '@/hooks/useDriversManagement';
 import { toast as sonnerToast } from 'sonner';
@@ -31,10 +30,9 @@ import { openEscreenPopup } from '@/lib/escreenPopup';
 interface QuickActionsProps {
   driver: Driver;
   onSuccess?: () => void;
-  onExpand?: () => void;
 }
 
-export function QuickActions({ driver, onSuccess, onExpand }: QuickActionsProps) {
+export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
   const { toast } = useToast();
   const advanceStep = useAdvanceDriverStep();
   const updateDriver = useUpdateDriver();
@@ -433,8 +431,8 @@ export function QuickActions({ driver, onSuccess, onExpand }: QuickActionsProps)
         onSuccess={onSuccess}
       />
 
-      {/* View Full Profile / Unhide Driver */}
-      {driver.is_hidden ? (
+      {/* Unhide Driver (Hide/Expand now live in the panel header) */}
+      {driver.is_hidden && (
         <Button
           variant="outline"
           size="sm"
@@ -444,16 +442,6 @@ export function QuickActions({ driver, onSuccess, onExpand }: QuickActionsProps)
         >
           {restoreDriver.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
           Unhide Driver
-        </Button>
-      ) : (
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full gap-1.5"
-          onClick={onExpand}
-        >
-          <Maximize2 className="h-4 w-4" />
-          View Full Profile
         </Button>
       )}
     </div>
