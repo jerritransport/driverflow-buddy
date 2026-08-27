@@ -39,7 +39,7 @@ export const DRIVER_STEPS = [
       'RTD_REPORT_FAILED',
     ],
   },
-  { step: 7, label: 'RTD Complete', statuses: ['COMPLETED', 'RTD_COMPLETE'] },
+  { step: 7, label: 'RTD Complete', statuses: ['RTD_COMPLETE', 'COMPLETED'] },
 ] as const;
 
 // Workflow steps for UI (same as DRIVER_STEPS but simpler format)

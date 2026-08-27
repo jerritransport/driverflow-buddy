@@ -39,3 +39,12 @@ export const STEP_UPLOAD_REQUIREMENTS: Record<number, StepUploadRequirement[]> =
     { type: 'CCF', label: 'CCF (Chain of Custody Form)', min: 1, max: 4, requiresDrugAlcoholTag: true },
   ],
 };
+
+// Documents required when marking SAP Paperwork as "Received" (Step 3),
+// which also auto-advances the driver to Step 4 on submit.
+export const PAPERWORK_RECEIVED_UPLOAD_REQUIREMENTS: StepUploadRequirement[] = [
+  { type: 'RTD_CONSENT_FORM', label: 'RTD Consent Form', min: 1, max: 1 },
+  { type: 'CDL_FRONT', label: 'CDL Front', min: 1, max: 1 },
+  { type: 'PAYMENT_SCREENSHOT', label: 'Payment Screenshot', min: 1, max: 5 },
+  { type: 'SAP_PAPERWORK', label: 'SAP Paperwork', min: 1, max: 5 },
+];

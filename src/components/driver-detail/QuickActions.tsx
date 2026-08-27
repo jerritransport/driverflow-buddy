@@ -7,9 +7,8 @@ import { useToast } from '@/hooks/use-toast';
 import { RecordPaymentDialog } from './RecordPaymentDialog';
 import { SetFollowUpDialog } from './SetFollowUpDialog';
 import { SendAlcoholPaymentDialog } from './SendAlcoholPaymentDialog';
-import { UploadSapPaperworkDialog } from './UploadSapPaperworkDialog';
 import { AdvanceStepUploadDialog } from './AdvanceStepUploadDialog';
-import { STEP_UPLOAD_REQUIREMENTS } from '@/lib/stepUploadRequirements';
+import { STEP_UPLOAD_REQUIREMENTS, PAPERWORK_RECEIVED_UPLOAD_REQUIREMENTS } from '@/lib/stepUploadRequirements';
 import { 
   ChevronRight, 
   Loader2, 
@@ -44,8 +43,8 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [followUpDialogOpen, setFollowUpDialogOpen] = useState(false);
   const [alcoholPaymentDialogOpen, setAlcoholPaymentDialogOpen] = useState(false);
-  const [sapPaperworkDialogOpen, setSapPaperworkDialogOpen] = useState(false);
   const [advanceUploadDialogOpen, setAdvanceUploadDialogOpen] = useState(false);
+  const [paperworkReceivedDialogOpen, setPaperworkReceivedDialogOpen] = useState(false);
 
   const handleUnhide = async () => {
     try {
@@ -252,7 +251,7 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
           <Button
             size="sm"
             className="flex-1 min-w-[120px] text-xs bg-[hsl(var(--status-success))] hover:bg-[hsl(var(--status-success))]/90 text-white"
-            onClick={() => setSapPaperworkDialogOpen(true)}
+            onClick={() => setPaperworkReceivedDialogOpen(true)}
             disabled={
               driver.status === 'SAP_PAPERWORK_RECEIVED' ||
               advanceStep.isPending
@@ -303,22 +302,7 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
           <Button
             size="sm"
             className="flex-1 min-w-[120px] text-xs bg-[hsl(var(--status-success))] hover:bg-[hsl(var(--status-success))]/90 text-white"
-            onClick={async () => {
-              try {
-                await advanceStep.mutateAsync({
-                  driverId: driver.id,
-                  newStep: 7,
-                  newStatus: 'RTD_COMPLETE',
-                });
-                toast({
-                  title: 'Results Received',
-                  description: 'Driver has been moved to completion!',
-                });
-                onSuccess?.();
-              } catch {
-                toast({ title: 'Error', description: 'Failed to update', variant: 'destructive' });
-              }
-            }}
+            onClick={() => setAdvanceUploadDialogOpen(true)}
             disabled={advanceStep.isPending}
           >
             <CheckCircle className="mr-1 h-3 w-3" />
@@ -435,13 +419,6 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
         onSuccess={onSuccess}
       />
 
-      <UploadSapPaperworkDialog
-        open={sapPaperworkDialogOpen}
-        onOpenChange={setSapPaperworkDialogOpen}
-        driver={driver}
-        onSuccess={onSuccess}
-      />
-
       {nextStepInfo && STEP_UPLOAD_REQUIREMENTS[nextStepInfo.step] && (
         <AdvanceStepUploadDialog
           open={advanceUploadDialogOpen}
@@ -450,6 +427,18 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
           targetStep={nextStepInfo.step}
           stepLabel={nextStepInfo.label}
           requirements={STEP_UPLOAD_REQUIREMENTS[nextStepInfo.step]}
+          onAdvance={handleAdvance}
+        />
+      )}
+
+      {driver.current_step === 3 && nextStepInfo && (
+        <AdvanceStepUploadDialog
+          open={paperworkReceivedDialogOpen}
+          onOpenChange={setPaperworkReceivedDialogOpen}
+          driver={driver}
+          targetStep={nextStepInfo.step}
+          stepLabel={nextStepInfo.label}
+          requirements={PAPERWORK_RECEIVED_UPLOAD_REQUIREMENTS}
           onAdvance={handleAdvance}
         />
       )}
