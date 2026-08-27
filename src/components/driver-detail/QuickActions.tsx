@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { DRIVER_STEPS, BASE_PRICE, ALCOHOL_TEST_FEE, STATUS_LABELS } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
 import { RecordPaymentDialog } from './RecordPaymentDialog';
-import { GenerateDonorPassDialog } from './GenerateDonorPassDialog';
 import { SetFollowUpDialog } from './SetFollowUpDialog';
 import { SendAlcoholPaymentDialog } from './SendAlcoholPaymentDialog';
 import { UploadSapPaperworkDialog } from './UploadSapPaperworkDialog';
@@ -16,7 +15,6 @@ import {
   AlertTriangle, 
   CheckCircle, 
   DollarSign, 
-  FileText,
   Ban,
   CheckCircle2,
   Calendar,
@@ -44,7 +42,6 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
   const restoreDriver = useRestoreDriver();
   
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
-  const [donorPassDialogOpen, setDonorPassDialogOpen] = useState(false);
   const [followUpDialogOpen, setFollowUpDialogOpen] = useState(false);
   const [alcoholPaymentDialogOpen, setAlcoholPaymentDialogOpen] = useState(false);
   const [hideDialogOpen, setHideDialogOpen] = useState(false);
@@ -68,7 +65,6 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
   const canAdvance = driver.current_step < 7 &&
     !(driver.payment_hold && driver.current_step >= 6);
   const isComplete = driver.current_step === 7 || driver.rtd_completed;
-  const canGenerateDonorPass = driver.current_step >= 4 && !driver.donor_pass_number;
   const hasBalance = (driver.amount_due ?? 0) > (driver.amount_paid ?? 0);
   const showAlcoholPaymentButton = driver.requires_alcohol_test && driver.current_step === 3;
 
@@ -348,21 +344,6 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
           )}
         </Button>
 
-        {/* Generate/View Donor Pass */}
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex-1 gap-1.5"
-          onClick={() => setDonorPassDialogOpen(true)}
-          disabled={driver.current_step < 4}
-        >
-          <FileText className="h-4 w-4" />
-          {driver.donor_pass_number ? 'View' : 'Generate'} Pass
-          {driver.donor_pass_number && (
-            <CheckCircle className="ml-1 h-3 w-3 text-[hsl(var(--status-success))]" />
-          )}
-        </Button>
-
         {/* Create a Donor Pass (eScreen) */}
         <Button
           variant="outline"
@@ -374,6 +355,7 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
           <ExternalLink className="h-4 w-4" />
           Create a Donor Pass
         </Button>
+
 
         {/* Toggle Payment Hold (if not already on hold) */}
         {!driver.payment_hold && (
@@ -428,12 +410,6 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
       <RecordPaymentDialog
         open={paymentDialogOpen}
         onOpenChange={setPaymentDialogOpen}
-        driver={driver}
-      />
-
-      <GenerateDonorPassDialog
-        open={donorPassDialogOpen}
-        onOpenChange={setDonorPassDialogOpen}
         driver={driver}
       />
 
