@@ -281,7 +281,8 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
         </div>
       </section>
 
-      {/* Test Info */}
+      {/* Test Info — only once Donor Pass step is checked off */}
+      {driver.current_step > 5 && (
       <section>
         <ReadOnlySectionHeader icon={FlaskConical} title="Test Info" />
         <div className="grid gap-3 rounded-lg border bg-muted/30 p-4">
@@ -302,8 +303,10 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
           <InfoRow label="Clinic Phone" value={driver.test_clinic_phone ? formatPhoneDisplay(driver.test_clinic_phone) : null} />
         </div>
       </section>
+      )}
 
-      {/* Clearinghouse */}
+      {/* Clearinghouse — only once the Clearinghouse step is checked off */}
+      {driver.current_step > 4 && (
       <section>
         <ReadOnlySectionHeader icon={ShieldCheck} title="Clearinghouse" />
         <div className="grid gap-3 rounded-lg border bg-muted/30 p-4">
@@ -327,8 +330,10 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
           </div>
         </div>
       </section>
+      )}
 
-      {/* RTD Completion */}
+      {/* RTD Completion — only once the driver has reached the final step */}
+      {driver.current_step >= 7 && (
       <section>
         <ReadOnlySectionHeader icon={Trophy} title="RTD Completion" />
         <div className="grid gap-3 rounded-lg border bg-muted/30 p-4">
@@ -352,6 +357,7 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
           )}
         </div>
       </section>
+      )}
 
       {/* Payment / Billing */}
       <section>

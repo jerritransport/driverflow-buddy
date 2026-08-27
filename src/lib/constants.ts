@@ -6,9 +6,9 @@ export const DRIVER_STEPS = [
     step: 3,
     label: 'SAP Paperwork',
     statuses: [
+      'SAP_PAPERWORK_PENDING',
       'SAP_REQUEST_PENDING',
       'SAP_REQUESTED',
-      'SAP_PAPERWORK_PENDING',
       'ALCOHOL_FEE_PENDING',
       'SAP_PAPERWORK_RECEIVED',
     ],
