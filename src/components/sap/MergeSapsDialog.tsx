@@ -82,7 +82,12 @@ export function MergeSapsDialog({ open, onOpenChange, saps, onMerged }: MergeSap
       onMerged();
       onOpenChange(false);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to merge SAPs';
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === 'object' && err !== null && 'message' in err
+          ? String((err as { message: unknown }).message)
+          : 'Failed to merge SAPs';
       toast({ title: 'Merge failed', description: message, variant: 'destructive' });
     }
   };
