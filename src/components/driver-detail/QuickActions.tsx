@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Driver } from '@/hooks/useDrivers';
+import { cn } from '@/lib/utils';
 import { useAdvanceDriverStep, useUpdateDriver } from '@/hooks/useDriverDetails';
 import { Button } from '@/components/ui/button';
 import { DRIVER_STEPS, BASE_PRICE, ALCOHOL_TEST_FEE, STATUS_LABELS } from '@/lib/constants';
@@ -233,31 +234,46 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 min-w-[120px] text-xs"
+            className={cn(
+              'flex-1 min-w-[120px] text-xs',
+              driver.status === 'SAP_PAPERWORK_PENDING' &&
+                'bg-[hsl(var(--status-warning-bg))] text-[hsl(var(--status-warning-text))] border-[hsl(var(--status-warning-text))]/30 hover:bg-[hsl(var(--status-warning-bg))]',
+            )}
             onClick={() => handleSetStatus('SAP_PAPERWORK_PENDING')}
             disabled={driver.status === 'SAP_PAPERWORK_PENDING' || advanceStep.isPending}
           >
+            {driver.status === 'SAP_PAPERWORK_PENDING' && <CheckCircle className="mr-1 h-3 w-3" />}
             Paperwork Pending
           </Button>
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 min-w-[120px] text-xs"
+            className={cn(
+              'flex-1 min-w-[120px] text-xs',
+              driver.status === 'ALCOHOL_FEE_PENDING' &&
+                'bg-[hsl(var(--status-warning-bg))] text-[hsl(var(--status-warning-text))] border-[hsl(var(--status-warning-text))]/30 hover:bg-[hsl(var(--status-warning-bg))]',
+            )}
             onClick={() => handleSetStatus('ALCOHOL_FEE_PENDING')}
             disabled={driver.status === 'ALCOHOL_FEE_PENDING' || advanceStep.isPending}
           >
+            {driver.status === 'ALCOHOL_FEE_PENDING' && <CheckCircle className="mr-1 h-3 w-3" />}
             Alcohol Fee Pending
           </Button>
           <Button
+            variant="outline"
             size="sm"
-            className="flex-1 min-w-[120px] text-xs bg-[hsl(var(--status-success))] hover:bg-[hsl(var(--status-success))]/90 text-white"
+            className={cn(
+              'flex-1 min-w-[120px] text-xs',
+              driver.status === 'SAP_PAPERWORK_RECEIVED' &&
+                'bg-[hsl(var(--status-success-bg))] text-[hsl(var(--status-success-text))] border-[hsl(var(--status-success-text))]/30 hover:bg-[hsl(var(--status-success-bg))]',
+            )}
             onClick={() => setPaperworkReceivedDialogOpen(true)}
             disabled={
               driver.status === 'SAP_PAPERWORK_RECEIVED' ||
               advanceStep.isPending
             }
           >
-            <CheckCircle className="mr-1 h-3 w-3" />
+            {driver.status === 'SAP_PAPERWORK_RECEIVED' && <CheckCircle className="mr-1 h-3 w-3" />}
             Paperwork Received
           </Button>
         </div>
@@ -269,19 +285,29 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 min-w-[120px] text-xs"
+            className={cn(
+              'flex-1 min-w-[120px] text-xs',
+              driver.status === 'DONOR_PASS_PENDING' &&
+                'bg-[hsl(var(--status-warning-bg))] text-[hsl(var(--status-warning-text))] border-[hsl(var(--status-warning-text))]/30 hover:bg-[hsl(var(--status-warning-bg))]',
+            )}
             onClick={() => handleSetStatus('DONOR_PASS_PENDING')}
             disabled={driver.status === 'DONOR_PASS_PENDING' || advanceStep.isPending}
           >
+            {driver.status === 'DONOR_PASS_PENDING' && <CheckCircle className="mr-1 h-3 w-3" />}
             Donor Pass Pending
           </Button>
           <Button
+            variant="outline"
             size="sm"
-            className="flex-1 min-w-[120px] text-xs bg-[hsl(var(--status-success))] hover:bg-[hsl(var(--status-success))]/90 text-white"
+            className={cn(
+              'flex-1 min-w-[120px] text-xs',
+              driver.status === 'DONOR_PASS_SENT' &&
+                'bg-[hsl(var(--status-success-bg))] text-[hsl(var(--status-success-text))] border-[hsl(var(--status-success-text))]/30 hover:bg-[hsl(var(--status-success-bg))]',
+            )}
             onClick={() => handleSetStatus('DONOR_PASS_SENT')}
             disabled={driver.status === 'DONOR_PASS_SENT' || advanceStep.isPending}
           >
-            <CheckCircle className="mr-1 h-3 w-3" />
+            {driver.status === 'DONOR_PASS_SENT' && <CheckCircle className="mr-1 h-3 w-3" />}
             Donor Pass Sent
           </Button>
         </div>
@@ -293,19 +319,29 @@ export function QuickActions({ driver, onSuccess }: QuickActionsProps) {
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 min-w-[120px] text-xs"
+            className={cn(
+              'flex-1 min-w-[120px] text-xs',
+              driver.status === 'RESULTS_PENDING' &&
+                'bg-[hsl(var(--status-warning-bg))] text-[hsl(var(--status-warning-text))] border-[hsl(var(--status-warning-text))]/30 hover:bg-[hsl(var(--status-warning-bg))]',
+            )}
             onClick={() => handleSetStatus('RESULTS_PENDING')}
             disabled={driver.status === 'RESULTS_PENDING' || advanceStep.isPending}
           >
+            {driver.status === 'RESULTS_PENDING' && <CheckCircle className="mr-1 h-3 w-3" />}
             Pending Results
           </Button>
           <Button
+            variant="outline"
             size="sm"
-            className="flex-1 min-w-[120px] text-xs bg-[hsl(var(--status-success))] hover:bg-[hsl(var(--status-success))]/90 text-white"
+            className={cn(
+              'flex-1 min-w-[120px] text-xs',
+              driver.status === 'RESULTS_RECEIVED' &&
+                'bg-[hsl(var(--status-success-bg))] text-[hsl(var(--status-success-text))] border-[hsl(var(--status-success-text))]/30 hover:bg-[hsl(var(--status-success-bg))]',
+            )}
             onClick={() => setAdvanceUploadDialogOpen(true)}
             disabled={advanceStep.isPending}
           >
-            <CheckCircle className="mr-1 h-3 w-3" />
+            {driver.status === 'RESULTS_RECEIVED' && <CheckCircle className="mr-1 h-3 w-3" />}
             Results Received
           </Button>
         </div>
