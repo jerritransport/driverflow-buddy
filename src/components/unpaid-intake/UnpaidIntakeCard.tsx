@@ -1,9 +1,11 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { UnpaidIntakeDriver } from '@/hooks/useUnpaidIntake';
+import { useStaffMembers } from '@/hooks/useStaffMembers';
 import { formatDriverName, formatState, formatCdlNumber } from '@/lib/utils';
 import { formatPhoneDisplay } from '@/lib/phoneUtils';
-import { Mail, Phone, DollarSign } from 'lucide-react';
+import { Mail, Phone, DollarSign, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface UnpaidIntakeCardProps {
@@ -12,6 +14,9 @@ interface UnpaidIntakeCardProps {
 }
 
 export function UnpaidIntakeCard({ driver, onViewDriver }: UnpaidIntakeCardProps) {
+  const { data: staffMembers } = useStaffMembers();
+  const salesAgent = staffMembers?.find((s) => s.id === driver.staff_member_id);
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-4 space-y-4">
@@ -20,9 +25,18 @@ export function UnpaidIntakeCard({ driver, onViewDriver }: UnpaidIntakeCardProps
           className="cursor-pointer hover:text-primary transition-colors"
           onClick={() => onViewDriver?.(driver.id)}
         >
-          <h3 className="font-semibold text-foreground">
-            {formatDriverName(driver.first_name, driver.middle_name, driver.last_name)}
-          </h3>
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-semibold text-foreground">
+              {formatDriverName(driver.first_name, driver.middle_name, driver.last_name)}
+            </h3>
+            <Badge
+              variant={salesAgent ? 'secondary' : 'outline'}
+              className="shrink-0 gap-1 whitespace-nowrap text-xs font-normal"
+            >
+              <User className="h-3 w-3" />
+              {salesAgent ? salesAgent.name : 'Unassigned'}
+            </Badge>
+          </div>
           <p className="text-sm text-muted-foreground">
             {driver.cdl_number
               ? `CDL: ${formatCdlNumber(driver.cdl_number)}${driver.cdl_state ? ` (${formatState(driver.cdl_state)})` : ''}`

@@ -12,6 +12,7 @@ export interface UnpaidIntakeDriver {
   cdl_state: string | null;
   status: string;
   payment_status: string;
+  staff_member_id: string | null;
   updated_at: string;
 }
 
@@ -28,7 +29,7 @@ export function useUnpaidIntake({ search }: UseUnpaidIntakeOptions = {}) {
     queryFn: async () => {
       let query = supabase
         .from('drivers')
-        .select('id, first_name, middle_name, last_name, email, phone, cdl_number, cdl_state, status, payment_status, updated_at')
+        .select('id, first_name, middle_name, last_name, email, phone, cdl_number, cdl_state, status, payment_status, staff_member_id, updated_at')
         .eq('is_hidden', false)
         .eq('current_step', INTAKE_STEP)
         .eq('payment_status', 'UNPAID')
