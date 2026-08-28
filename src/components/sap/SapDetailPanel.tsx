@@ -7,6 +7,7 @@ import { SapInfoTab } from './SapInfoTab';
 import { SapDriversTab } from './SapDriversTab';
 import { SapMetricsCard } from './SapMetricsCard';
 import { Stethoscope, User, Users, BarChart3 } from 'lucide-react';
+import { toProperCase } from '@/lib/utils';
 
 interface SapDetailPanelProps {
   sapId: string | null;
@@ -38,10 +39,10 @@ export function SapDetailPanel({ sapId, open, onOpenChange }: SapDetailPanelProp
                 </div>
                 <div className="flex-1">
                   <SheetTitle className="text-xl">
-                    {sap.first_name} {sap.last_name}
+                    {toProperCase(sap.first_name)} {toProperCase(sap.last_name)}
                   </SheetTitle>
                   <p className="text-sm text-muted-foreground">
-                    {sap.organization || 'Independent SAP'}
+                    {sap.organization ? toProperCase(sap.organization) : 'Independent SAP'}
                   </p>
                 </div>
                 <Badge variant={sap.is_active ? 'default' : 'secondary'}>

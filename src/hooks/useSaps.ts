@@ -167,3 +167,49 @@ export function useUpdateSap() {
     },
   });
 }
+
+/**
+ * Merges duplicate SAP records into one "keeper" record: reassigns every
+ * driver pointing at the duplicate SAPs over to the keeper, then removes
+ * the duplicate SAP rows (falling back to deactivating them if a hard
+ * delete is blocked for any reason).
+ */
+export function useMergeSaps() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ keeperId, duplicateIds }: { keeperId: string; duplicateIds: string[] }) => {
+      const idsToMerge = duplicateIds.filter((id) => id !== keeperId);
+      if (idsToMerge.length === 0) return;
+
+      const { error: reassignError } = await supabase
+        .from('drivers')
+        .update({ sap_id: keeperId })
+        .in('sap_id', idsToMerge);
+      if (reassignError) throw reassignError;
+
+      const { error: deleteError } = await supabase
+        .from('saps')
+        .delete()
+        .in('id', idsToMerge);
+
+      if (deleteError) {
+        // Fall back to deactivating if a hard delete is blocked (e.g. other references).
+        const { error: deactivateError } = await supabase
+          .from('saps')
+          .update({ is_active: false })
+          .in('id', idsToMerge);
+        if (deactivateError) throw deactivateError;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['saps'] });
+      queryClient.invalidateQueries({ queryKey: ['sap-performance'] });
+      queryClient.invalidateQueries({ queryKey: ['sap-drivers'] });
+      queryClient.invalidateQueries({ queryKey: ['drivers'] });
+      queryClient.invalidateQueries({ queryKey: ['drivers-by-step'] });
+      queryClient.invalidateQueries({ queryKey: ['drivers-all-filtered'] });
+      queryClient.invalidateQueries({ queryKey: ['drivers-paginated'] });
+    },
+  });
+}

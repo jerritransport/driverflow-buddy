@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,14 +17,18 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Eye, MoreHorizontal, Pencil, TrendingUp, Users, CheckCircle2, Clock } from 'lucide-react';
+import { toProperCase, formatEmailDisplay } from '@/lib/utils';
 
 interface SapListViewProps {
   saps: SapPerformance[];
   onSelectSap: (sapId: string) => void;
   onEditSap?: (sapId: string) => void;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (sapId: string) => void;
+  onToggleSelectAll?: () => void;
 }
 
-export function SapListView({ saps, onSelectSap, onEditSap }: SapListViewProps) {
+export function SapListView({ saps, onSelectSap, onEditSap, selectedIds, onToggleSelect, onToggleSelectAll }: SapListViewProps) {
   const getCompletionRate = (sap: SapPerformance) => {
     if (!sap.total_drivers_assigned || sap.total_drivers_assigned === 0) return 0;
     return Math.round((sap.rtd_completed_count / sap.total_drivers_assigned) * 100);
@@ -34,11 +39,23 @@ export function SapListView({ saps, onSelectSap, onEditSap }: SapListViewProps) 
     return Math.round((sap.paperwork_received_count / sap.total_drivers_assigned) * 100);
   };
 
+  const selectionEnabled = !!onToggleSelect;
+  const allSelected = selectionEnabled && saps.length > 0 && saps.every((s) => selectedIds?.has(s.id));
+
   return (
     <div className="rounded-lg border bg-card">
       <Table>
         <TableHeader>
           <TableRow>
+            {selectionEnabled && (
+              <TableHead className="w-[40px]">
+                <Checkbox
+                  checked={allSelected}
+                  onCheckedChange={() => onToggleSelectAll?.()}
+                  aria-label="Select all SAPs"
+                />
+              </TableHead>
+            )}
             <TableHead>Name</TableHead>
             <TableHead>Organization</TableHead>
             <TableHead className="text-center">Status</TableHead>
@@ -72,26 +89,38 @@ export function SapListView({ saps, onSelectSap, onEditSap }: SapListViewProps) 
         <TableBody>
           {saps.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
+              <TableCell colSpan={selectionEnabled ? 9 : 8} className="py-8 text-center text-muted-foreground">
                 No SAPs found
               </TableCell>
             </TableRow>
           ) : (
-            saps.map((sap) => (
+            saps.map((sap) => {
+              const email = formatEmailDisplay(sap.email);
+              return (
               <TableRow
                 key={sap.id}
                 className="cursor-pointer"
                 onClick={() => onSelectSap(sap.id)}
+                data-state={selectedIds?.has(sap.id) ? 'selected' : undefined}
               >
+                {selectionEnabled && (
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <Checkbox
+                      checked={selectedIds?.has(sap.id) ?? false}
+                      onCheckedChange={() => onToggleSelect?.(sap.id)}
+                      aria-label={`Select ${sap.first_name} ${sap.last_name}`}
+                    />
+                  </TableCell>
+                )}
                 <TableCell>
                   <div>
-                    <p className="font-medium">{sap.first_name} {sap.last_name}</p>
-                    <p className="text-xs text-muted-foreground">{sap.email}</p>
+                    <p className="font-medium">{toProperCase(sap.first_name)} {toProperCase(sap.last_name)}</p>
+                    <p className="text-xs text-muted-foreground">{email || '—'}</p>
                   </div>
                 </TableCell>
                 <TableCell>
                   <span className="text-sm text-muted-foreground">
-                    {sap.organization || '—'}
+                    {sap.organization ? toProperCase(sap.organization) : '—'}
                   </span>
                 </TableCell>
                 <TableCell className="text-center">
@@ -147,7 +176,8 @@ export function SapListView({ saps, onSelectSap, onEditSap }: SapListViewProps) 
                   </DropdownMenu>
                 </TableCell>
               </TableRow>
-            ))
+              );
+            })
           )}
         </TableBody>
       </Table>

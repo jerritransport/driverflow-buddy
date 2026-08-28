@@ -3,6 +3,7 @@ import { Sap, useUpdateSap } from '@/hooks/useSaps';
 import { format } from 'date-fns';
 import { Mail, Phone, MapPin, Award, Calendar, Building2, Pencil, Check, X } from 'lucide-react';
 import { formatPhoneDisplay, formatPhoneFinal, normalizeUSPhone, isValidUSPhone } from '@/lib/phoneUtils';
+import { toProperCase, formatEmailDisplay } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
@@ -123,8 +124,8 @@ export function SapInfoTab({ sap }: SapInfoTabProps) {
             </>
           ) : (
             <>
-              <InfoRow label="Name" value={`${sap.first_name} ${sap.last_name}`} />
-              <InfoRow label="Email" value={sap.email} />
+              <InfoRow label="Name" value={`${toProperCase(sap.first_name)} ${toProperCase(sap.last_name)}`} />
+              <InfoRow label="Email" value={formatEmailDisplay(sap.email) || sap.email} />
               <InfoRow label="Phone" value={formatPhoneDisplay(sap.phone)} icon={<Phone className="h-3 w-3" />} />
             </>
           )}
@@ -143,7 +144,7 @@ export function SapInfoTab({ sap }: SapInfoTabProps) {
           {isEditing('organization') ? (
             <EditRow label="Organization" value={formData.organization} onChange={v => updateField('organization', v)} />
           ) : (
-            <InfoRow label="Organization" value={sap.organization} />
+            <InfoRow label="Organization" value={sap.organization ? toProperCase(sap.organization) : sap.organization} />
           )}
         </div>
       </section>

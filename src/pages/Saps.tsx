@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { SapListView, SapDetailPanel, SapFormDialog } from '@/components/sap';
+import { MergeSapsDialog } from '@/components/sap/MergeSapsDialog';
 import { useSapPerformance, useSap, Sap, useSaps } from '@/hooks/useSaps';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, Users, TrendingUp, CheckCircle2, Download, Loader2 } from 'lucide-react';
+import { Search, Plus, Users, TrendingUp, CheckCircle2, Download, Loader2, Merge, X } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { exportSapsToCSV } from '@/lib/exportUtils';
 import { toast } from 'sonner';
@@ -16,6 +17,8 @@ export default function Saps() {
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [editingSap, setEditingSap] = useState<Sap | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [mergeDialogOpen, setMergeDialogOpen] = useState(false);
   
   const { data: saps, isLoading } = useSapPerformance();
   const { data: allSaps, isFetching: isFetchingAll } = useSaps();
@@ -64,6 +67,25 @@ export default function Saps() {
       setIsExporting(false);
     }
   };
+
+  const handleToggleSelect = (sapId: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(sapId)) next.delete(sapId);
+      else next.add(sapId);
+      return next;
+    });
+  };
+
+  const handleToggleSelectAll = () => {
+    const visible = filteredSaps ?? [];
+    setSelectedIds((prev) => {
+      const allVisibleSelected = visible.length > 0 && visible.every((s) => prev.has(s.id));
+      return allVisibleSelected ? new Set() : new Set(visible.map((s) => s.id));
+    });
+  };
+
+  const selectedSaps = (filteredSaps ?? []).filter((s) => selectedIds.has(s.id));
 
   return (
     <AppLayout>
@@ -125,6 +147,23 @@ export default function Saps() {
           />
         </div>
 
+        {/* Merge Toolbar — shown when 2+ SAPs are selected */}
+        {selectedIds.size > 1 && (
+          <div className="flex items-center justify-between rounded-lg border bg-primary/5 px-4 py-2.5">
+            <span className="text-sm font-medium">{selectedIds.size} SAPs selected</span>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => setSelectedIds(new Set())}>
+                <X className="h-3.5 w-3.5" />
+                Clear
+              </Button>
+              <Button size="sm" className="gap-1.5" onClick={() => setMergeDialogOpen(true)}>
+                <Merge className="h-3.5 w-3.5" />
+                Merge Selected
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Search */}
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -148,6 +187,9 @@ export default function Saps() {
             saps={filteredSaps ?? []}
             onSelectSap={setSelectedSapId}
             onEditSap={handleEdit}
+            selectedIds={selectedIds}
+            onToggleSelect={handleToggleSelect}
+            onToggleSelectAll={handleToggleSelectAll}
           />
         )}
 
@@ -163,6 +205,14 @@ export default function Saps() {
           open={formDialogOpen}
           onOpenChange={setFormDialogOpen}
           sap={selectedSapData}
+        />
+
+        {/* Merge SAPs Dialog */}
+        <MergeSapsDialog
+          open={mergeDialogOpen}
+          onOpenChange={setMergeDialogOpen}
+          saps={selectedSaps}
+          onMerged={() => setSelectedIds(new Set())}
         />
       </div>
     </AppLayout>

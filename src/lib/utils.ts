@@ -40,6 +40,22 @@ export function formatCdlNumber(value?: string | null): string {
   return (value ?? '').trim().toUpperCase();
 }
 
+/**
+ * Cleans up a stored email for display — strips a stray "mailto:" prefix
+ * and hides obviously invalid placeholder values ("x", "n/a", "na", etc.)
+ * so the UI shows an em dash instead of junk data.
+ */
+export function formatEmailDisplay(value?: string | null): string {
+  let cleaned = (value ?? '').trim();
+  cleaned = cleaned.replace(/^mailto:/i, '').trim();
+
+  const junkValues = new Set(['x', 'n/a', 'na', 'none', 'unknown', '-', '—', '.']);
+  if (!cleaned || junkValues.has(cleaned.toLowerCase()) || !cleaned.includes('@')) {
+    return '';
+  }
+  return cleaned.toLowerCase();
+}
+
 const US_STATE_ABBREVIATIONS: Record<string, string> = {
   alabama: 'AL', alaska: 'AK', arizona: 'AZ', arkansas: 'AR', california: 'CA',
   colorado: 'CO', connecticut: 'CT', delaware: 'DE', florida: 'FL', georgia: 'GA',
