@@ -178,28 +178,45 @@ export function useMergeSaps() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ keeperId, duplicateIds }: { keeperId: string; duplicateIds: string[] }) => {
+    mutationFn: async ({
+      keeperId,
+      duplicateIds,
+      keeperUpdates,
+    }: {
+      keeperId: string;
+      duplicateIds: string[];
+      keeperUpdates?: Partial<Pick<Sap, 'first_name' | 'last_name' | 'email' | 'organization'>>;
+    }) => {
       const idsToMerge = duplicateIds.filter((id) => id !== keeperId);
-      if (idsToMerge.length === 0) return;
 
-      const { error: reassignError } = await supabase
-        .from('drivers')
-        .update({ sap_id: keeperId })
-        .in('sap_id', idsToMerge);
-      if (reassignError) throw reassignError;
+      if (idsToMerge.length > 0) {
+        const { error: reassignError } = await supabase
+          .from('drivers')
+          .update({ sap_id: keeperId })
+          .in('sap_id', idsToMerge);
+        if (reassignError) throw reassignError;
 
-      const { error: deleteError } = await supabase
-        .from('saps')
-        .delete()
-        .in('id', idsToMerge);
-
-      if (deleteError) {
-        // Fall back to deactivating if a hard delete is blocked (e.g. other references).
-        const { error: deactivateError } = await supabase
+        const { error: deleteError } = await supabase
           .from('saps')
-          .update({ is_active: false })
+          .delete()
           .in('id', idsToMerge);
-        if (deactivateError) throw deactivateError;
+
+        if (deleteError) {
+          // Fall back to deactivating if a hard delete is blocked (e.g. other references).
+          const { error: deactivateError } = await supabase
+            .from('saps')
+            .update({ is_active: false })
+            .in('id', idsToMerge);
+          if (deactivateError) throw deactivateError;
+        }
+      }
+
+      if (keeperUpdates && Object.keys(keeperUpdates).length > 0) {
+        const { error: updateError } = await supabase
+          .from('saps')
+          .update(keeperUpdates)
+          .eq('id', keeperId);
+        if (updateError) throw updateError;
       }
     },
     onSuccess: () => {
