@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { FollowUpCard } from '@/components/follow-ups/FollowUpCard';
+import { LeadCard } from '@/components/follow-ups/LeadCard';
+import { AddLeadDialog } from '@/components/follow-ups/AddLeadDialog';
 import { SetFollowUpDialog } from '@/components/driver-detail/SetFollowUpDialog';
 import { DriverDetailPanel } from '@/components/driver-detail';
 import { useFollowUps, useFollowUpStats, useClearFollowUp, FollowUpFilter } from '@/hooks/useFollowUps';
+import { useOpenLeads, useDeleteLead } from '@/hooks/useLeads';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Calendar, Search, AlertTriangle, Clock, CalendarCheck } from 'lucide-react';
+import { Calendar, Search, AlertTriangle, Clock, CalendarCheck, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function FollowUps() {
@@ -17,10 +20,22 @@ export default function FollowUps() {
   const [search, setSearch] = useState('');
   const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null);
   const [rescheduleDriverId, setRescheduleDriverId] = useState<string | null>(null);
+  const [addLeadOpen, setAddLeadOpen] = useState(false);
 
   const { data: followUps, isLoading } = useFollowUps({ filter, search });
   const { data: stats, isLoading: statsLoading } = useFollowUpStats();
+  const { data: leads, isLoading: leadsLoading } = useOpenLeads(search);
   const clearFollowUp = useClearFollowUp();
+  const deleteLead = useDeleteLead();
+
+  const handleDeleteLead = async (leadId: string) => {
+    try {
+      await deleteLead.mutateAsync(leadId);
+      toast.success('Lead removed');
+    } catch {
+      toast.error('Failed to remove lead');
+    }
+  };
 
   const handleComplete = async (driverId: string) => {
     try {
@@ -43,14 +58,20 @@ export default function FollowUps() {
     <AppLayout>
       <div className="space-y-6">
         {/* Page Header */}
-        <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-            <Calendar className="h-6 w-6" />
-            Follow-Ups
-          </h1>
-          <p className="text-muted-foreground">
-            Manage driver follow-up reminders and tasks
-          </p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+              <Calendar className="h-6 w-6" />
+              Follow-Ups
+            </h1>
+            <p className="text-muted-foreground">
+              Manage driver follow-up reminders and tasks
+            </p>
+          </div>
+          <Button onClick={() => setAddLeadOpen(true)} className="gap-2">
+            <UserPlus className="h-4 w-4" />
+            Add Lead
+          </Button>
         </div>
 
         {/* Stats Cards */}
@@ -84,6 +105,24 @@ export default function FollowUps() {
             loading={statsLoading}
           />
         </div>
+
+        {/* Leads — prospective drivers, not yet in the pipeline */}
+        {leadsLoading ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2].map((i) => <Skeleton key={i} className="h-40 w-full" />)}
+          </div>
+        ) : leads && leads.length > 0 ? (
+          <div className="space-y-3">
+            <h2 className="text-sm font-semibold text-muted-foreground">
+              Leads ({leads.length})
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {leads.map((lead) => (
+                <LeadCard key={lead.id} lead={lead} onDelete={handleDeleteLead} />
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4">
@@ -165,6 +204,9 @@ export default function FollowUps() {
           if (!open) setRescheduleDriverId(null);
         }}
       />
+
+      {/* Add Lead Dialog */}
+      <AddLeadDialog open={addLeadOpen} onOpenChange={setAddLeadOpen} />
     </AppLayout>
   );
 }
