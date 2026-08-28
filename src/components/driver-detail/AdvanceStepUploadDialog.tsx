@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Dialog,
   DialogContent,
@@ -52,6 +53,7 @@ export function AdvanceStepUploadDialog({
   onAdvance,
 }: AdvanceStepUploadDialogProps) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const [filesByType, setFilesByType] = useState<Record<string, PendingFile[]>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -158,6 +160,7 @@ export function AdvanceStepUploadDialog({
         }
       }
 
+      await queryClient.invalidateQueries({ queryKey: ['driver-documents', driver.id] });
       await onAdvance();
 
       reset();
