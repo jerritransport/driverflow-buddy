@@ -106,11 +106,11 @@ export const PAYMENT_STATUS_LABELS: Record<string, string> = {
 };
 
 export const PAYMENT_STATUS_COLORS: Record<string, string> = {
-  UNPAID: 'bg-[hsl(var(--payment-unpaid))] text-white',
-  DEPOSIT: 'bg-[hsl(var(--payment-deposit))] text-white',
-  PAYMENT_HOLD: 'bg-[hsl(var(--payment-hold))] text-white',
-  PAID: 'bg-[hsl(var(--payment-paid))] text-white',
-  PAYMENT_COMPLETE: 'bg-[hsl(var(--payment-paid))] text-white',
+  UNPAID: 'bg-[hsl(var(--status-danger-bg))] text-[hsl(var(--status-danger-text))]',
+  DEPOSIT: 'bg-[hsl(var(--status-warning-bg))] text-[hsl(var(--status-warning-text))]',
+  PAYMENT_HOLD: 'bg-[hsl(var(--status-hold-bg))] text-[hsl(var(--status-hold-text))]',
+  PAID: 'bg-[hsl(var(--status-success-bg))] text-[hsl(var(--status-success-text))]',
+  PAYMENT_COMPLETE: 'bg-[hsl(var(--status-success-bg))] text-[hsl(var(--status-success-text))]',
   REFUNDED: 'bg-muted text-muted-foreground',
 };
 

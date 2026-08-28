@@ -51,6 +51,18 @@
     --status-neutral: 220 9% 46%;
     --status-neutral-foreground: 0 0% 100%;
 
+    /* Soft-tint badge variants (light bg + dark saturated text) — easier on the eyes than solid fills */
+    --status-success-bg: 142 55% 94%;
+    --status-success-text: 142 70% 24%;
+    --status-warning-bg: 38 90% 93%;
+    --status-warning-text: 32 85% 28%;
+    --status-danger-bg: 0 85% 96%;
+    --status-danger-text: 0 70% 40%;
+    --status-info-bg: 221 85% 95%;
+    --status-info-text: 221 70% 38%;
+    --status-hold-bg: 280 55% 95%;
+    --status-hold-text: 280 55% 32%;
+
     /* Payment status colors */
     --payment-paid: 142 76% 36%;
     --payment-deposit: 38 92% 50%;
