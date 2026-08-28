@@ -16,7 +16,7 @@ import { getStepLabel } from '@/lib/constants';
 import { formatDistanceToNow, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
 import { Eye, AlertTriangle, Wine } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
-import { formatDriverName } from '@/lib/utils';
+import { formatDriverName, formatState, formatCdlNumber } from '@/lib/utils';
 import { StepProgress } from '@/components/shared/StepProgress';
 
 interface TableViewProps {
@@ -145,9 +145,9 @@ function DriverRow({ driver, onView }: DriverRowProps) {
       </TableCell>
       <TableCell>
         <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
-          {driver.cdl_number}
+          {formatCdlNumber(driver.cdl_number)}
         </code>
-        <span className="ml-1 text-xs text-muted-foreground">{driver.cdl_state}</span>
+        <span className="ml-1 text-xs text-muted-foreground">{formatState(driver.cdl_state)}</span>
       </TableCell>
       <TableCell>
         <div className="flex flex-col gap-1">

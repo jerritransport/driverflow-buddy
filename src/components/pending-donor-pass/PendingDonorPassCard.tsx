@@ -5,7 +5,7 @@ import { PendingDonorPassDriver } from '@/hooks/usePendingDonorPass';
 import { openEscreenPopup } from '@/lib/escreenPopup';
 import { ExternalLink, CheckCircle, Wine, Mail, Phone } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { formatDriverName } from '@/lib/utils';
+import { formatDriverName, formatState, formatCdlNumber } from '@/lib/utils';
 import { formatPhoneDisplay } from '@/lib/phoneUtils';
 
 interface PendingDonorPassCardProps {
@@ -29,7 +29,7 @@ export function PendingDonorPassCard({ driver, onViewDriver }: PendingDonorPassC
               {formatDriverName(driver.first_name, driver.middle_name, driver.last_name)}
             </h3>
             <p className="text-sm text-muted-foreground">
-              {driver.cdl_number ? `CDL: ${driver.cdl_number}${driver.cdl_state ? ` (${driver.cdl_state})` : ''}` : 'No CDL on file'}
+              {driver.cdl_number ? `CDL: ${formatCdlNumber(driver.cdl_number)}${driver.cdl_state ? ` (${formatState(driver.cdl_state)})` : ''}` : 'No CDL on file'}
             </p>
           </div>
           {driver.requires_alcohol_test && (

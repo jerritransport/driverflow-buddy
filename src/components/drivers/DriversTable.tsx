@@ -26,7 +26,7 @@ import { Driver } from '@/hooks/useDrivers';
 import { SortField, SortOptions, useRestoreDriver } from '@/hooks/useDriversManagement';
 import { Eye, MoreHorizontal, Pencil, Trash2, AlertTriangle, Wine, ArrowUp, ArrowDown, ArrowUpDown, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
-import { formatDriverName } from '@/lib/utils';
+import { formatDriverName, formatState, formatCdlNumber } from '@/lib/utils';
 import { StepProgress } from '@/components/shared/StepProgress';
 
 interface DriversTableProps {
@@ -299,9 +299,9 @@ function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit,
       </TableCell>
       <TableCell>
         <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
-          {driver.cdl_number}
+          {formatCdlNumber(driver.cdl_number)}
         </code>
-        <span className="ml-1 text-xs text-muted-foreground">{driver.cdl_state}</span>
+        <span className="ml-1 text-xs text-muted-foreground">{formatState(driver.cdl_state)}</span>
       </TableCell>
       <TableCell>
         <div className="flex flex-col gap-1">

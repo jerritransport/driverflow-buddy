@@ -29,7 +29,7 @@ import { cn } from '@/lib/utils';
 import { format, isToday, isPast } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { DRIVER_STEPS } from '@/lib/constants';
-import { formatDriverName } from '@/lib/utils';
+import { formatDriverName, formatState, formatCdlNumber } from '@/lib/utils';
 
 interface DriverDetailPanelProps {
   driverId: string | null;
@@ -93,9 +93,9 @@ export function DriverDetailPanel({ driverId, open, onOpenChange }: DriverDetail
                     </SheetTitle>
                     <SheetDescription className="flex items-center gap-2 pt-1">
                       <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
-                        {driver.cdl_number}
+                        {formatCdlNumber(driver.cdl_number)}
                       </code>
-                      <span className="text-xs">{driver.cdl_state}</span>
+                      <span className="text-xs">{formatState(driver.cdl_state)}</span>
                     </SheetDescription>
                   </div>
                   <div className="flex items-center gap-1 mr-8">

@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import { TestResultsSection } from './TestResultsSection';
 import { PaymentBadge } from '@/components/shared/PaymentBadge';
 import { formatPhoneDisplay, formatPhoneFinal, normalizeUSPhone, isValidUSPhone } from '@/lib/phoneUtils';
-import { formatDriverName } from '@/lib/utils';
+import { formatDriverName, formatState, formatCdlNumber } from '@/lib/utils';
 
 interface PersonalInfoTabProps {
   driver: Driver;
@@ -232,8 +232,8 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
             </>
           ) : (
             <>
-              <InfoRow label="CDL Number" value={driver.cdl_number} />
-              <InfoRow label="State" value={driver.cdl_state} />
+              <InfoRow label="CDL Number" value={formatCdlNumber(driver.cdl_number)} />
+              <InfoRow label="State" value={formatState(driver.cdl_state)} />
               <InfoRow label="Expiration" value={formatDate(driver.cdl_expiration)} />
             </>
           )}
