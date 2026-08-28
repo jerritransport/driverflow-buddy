@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -32,10 +32,15 @@ export function MergeSapsDialog({ open, onOpenChange, saps, onMerged }: MergeSap
   const [email, setEmail] = useState('');
   const [organization, setOrganization] = useState('');
 
+  const hasInitialized = useRef(false);
+
   // Default the keeper to whichever selected SAP has the most drivers assigned,
   // and pre-fill the editable fields from that record (cleaned up for display).
+  // Only runs once per time the dialog opens — a background refetch of `saps`
+  // (e.g. the 30s poll) must NOT re-trigger this and wipe out what's typed.
   useEffect(() => {
-    if (open && saps.length > 0) {
+    if (open && saps.length > 0 && !hasInitialized.current) {
+      hasInitialized.current = true;
       const best = [...saps].sort(
         (a, b) => (b.total_drivers_assigned || 0) - (a.total_drivers_assigned || 0)
       )[0];
@@ -44,6 +49,9 @@ export function MergeSapsDialog({ open, onOpenChange, saps, onMerged }: MergeSap
       setLastName(toProperCase(best.last_name || ''));
       setEmail(formatEmailDisplay(best.email));
       setOrganization(best.organization ? toProperCase(best.organization) : '');
+    }
+    if (!open) {
+      hasInitialized.current = false;
     }
   }, [open, saps]);
 
