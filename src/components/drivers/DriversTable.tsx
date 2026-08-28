@@ -28,6 +28,15 @@ import { Eye, MoreHorizontal, Pencil, Trash2, AlertTriangle, Wine, ArrowUp, Arro
 import { toast } from 'sonner';
 import { formatDriverName, formatState, formatCdlNumber } from '@/lib/utils';
 import { StepProgress } from '@/components/shared/StepProgress';
+import { useStaffMembers } from '@/hooks/useStaffMembers';
+import { useUpdateDriver } from '@/hooks/useDriverDetails';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface DriversTableProps {
   drivers: Driver[];
@@ -202,7 +211,7 @@ export function DriversTable({
               )}
             </TableHead>
             <TableHead>Payment</TableHead>
-            <TableHead>Staff</TableHead>
+            <TableHead>Sales Agent</TableHead>
             <TableHead>Docs</TableHead>
             <TableHead>
               {isSortable ? (
@@ -255,6 +264,20 @@ function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit,
 
   const restoreDriver = useRestoreDriver();
   const isHidden = driver.is_hidden;
+  const { data: staffMembers } = useStaffMembers();
+  const updateDriver = useUpdateDriver();
+
+  const handleAssignStaff = async (staffMemberId: string) => {
+    try {
+      await updateDriver.mutateAsync({
+        driverId: driver.id,
+        updates: { staff_member_id: staffMemberId === 'unassigned' ? null : staffMemberId },
+      });
+      toast.success('Sales agent updated.');
+    } catch {
+      toast.error('Failed to update sales agent.');
+    }
+  };
 
   const handleRestore = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -320,10 +343,24 @@ function DriverRow({ driver, isSelected, isSelectable, onSelect, onView, onEdit,
       <TableCell>
         <PaymentBadge status={driver.payment_status} />
       </TableCell>
-      <TableCell>
-        <span className="text-sm text-muted-foreground">
-          {(driver as any).staff_member_name || driver.tenant_name || '—'}
-        </span>
+      <TableCell onClick={(e) => e.stopPropagation()}>
+        <Select
+          value={driver.staff_member_id ?? 'unassigned'}
+          onValueChange={handleAssignStaff}
+          disabled={updateDriver.isPending}
+        >
+          <SelectTrigger className="h-8 w-[140px] text-xs">
+            <SelectValue placeholder="Unassigned" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="unassigned">Unassigned</SelectItem>
+            {staffMembers?.filter(s => s.is_active).map((staff) => (
+              <SelectItem key={staff.id} value={staff.id}>
+                {staff.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </TableCell>
       <TableCell>
         <DocumentProgress documentsUploaded={driver.documents_uploaded} />

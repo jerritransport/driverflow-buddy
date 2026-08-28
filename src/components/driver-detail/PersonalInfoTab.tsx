@@ -384,28 +384,28 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
         </div>
       </section>
 
-      {/* Staff Assignment */}
+      {/* Sales Agent */}
       <section>
         <div className="mb-3 flex items-center gap-2">
           <h4 className="flex items-center gap-2 text-sm font-semibold text-foreground">
             <Building2 className="h-4 w-4" />
-            Staff Assignment
+            Sales Agent
           </h4>
         </div>
         <div className="grid gap-3 rounded-lg border bg-muted/30 p-4">
           <div className="flex items-center justify-between gap-4">
-            <span className="text-xs text-muted-foreground">Assigned Staff</span>
+            <span className="text-xs text-muted-foreground">Assigned Sales Agent</span>
             <Select
-              value={(driver as any).staff_member_id || ''}
+              value={(driver as any).staff_member_id || 'unassigned'}
               onValueChange={async (value) => {
                 try {
                   await updateDriver.mutateAsync({
                     driverId: driver.id,
-                    updates: { staff_member_id: value || null } as any,
+                    updates: { staff_member_id: value === 'unassigned' ? null : value } as any,
                   });
-                  toast.success('Staff updated');
+                  toast.success('Sales agent updated');
                 } catch (err: any) {
-                  toast.error(`Failed to update staff: ${err.message}`);
+                  toast.error(`Failed to update sales agent: ${err.message}`);
                 }
               }}
             >
@@ -413,6 +413,7 @@ export function PersonalInfoTab({ driver }: PersonalInfoTabProps) {
                 <SelectValue placeholder="Unassigned" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="unassigned">Unassigned</SelectItem>
                 {activeStaff.map((s) => (
                   <SelectItem key={s.id} value={s.id}>
                     {s.name}
