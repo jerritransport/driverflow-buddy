@@ -16,6 +16,7 @@ import FollowUps from "./pages/FollowUps";
 import IntakeForms from "./pages/IntakeForms";
 import TestResults from "./pages/TestResults";
 import PendingDonorPass from "./pages/PendingDonorPass";
+import UnpaidIntake from "./pages/UnpaidIntake";
 import Reports from "./pages/Reports";
 import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
@@ -95,6 +96,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <PendingDonorPass />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/unpaid-intake"
+              element={
+                <ProtectedRoute>
+                  <UnpaidIntake />
                 </ProtectedRoute>
               }
             />

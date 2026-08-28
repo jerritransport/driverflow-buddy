@@ -27,6 +27,7 @@ import {
   FlaskConical,
   CreditCard,
   UserCog,
+  DollarSign,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import goopLogo from '@/assets/goop-logo.png';
@@ -37,6 +38,7 @@ const allNavItems = [
   { title: 'Follow-Ups', icon: Calendar, path: '/follow-ups', adminOnly: false },
   { title: 'Intake Forms', icon: FileText, path: '/intake-forms', adminOnly: true },
   { title: 'SAPs', icon: Stethoscope, path: '/saps', adminOnly: true },
+  { title: 'Unpaid Intake', icon: DollarSign, path: '/unpaid-intake', adminOnly: true },
   { title: 'Pending Donor Pass', icon: FileText, path: '/pending-donor-pass', adminOnly: true },
   { title: 'Pending Test Results', icon: FlaskConical, path: '/test-results', adminOnly: true },
   { title: 'Unmatched Payments', icon: CreditCard, path: '/unmatched-payments', adminOnly: true },
