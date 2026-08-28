@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Driver } from '@/hooks/useDrivers';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -19,7 +20,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Send, PartyPopper, Clock, FileText, ChevronDown, Loader2 } from 'lucide-react';
+import { Mail, Send, PartyPopper, Clock, FileText, Loader2, Paperclip, X, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface CommunicationActionsProps {
@@ -100,12 +101,67 @@ const EMAIL_TEMPLATES: EmailTemplate[] = [
   },
 ];
 
+const MAX_ATTACHMENTS = 5;
+const MAX_ATTACHMENT_SIZE = 10 * 1024 * 1024; // 10MB
+
+interface PendingAttachment {
+  id: string;
+  file: File;
+  previewUrl: string | null;
+}
+
+// Escapes HTML special characters, then converts blank-line breaks to
+// paragraphs and single newlines to <br> — turns the plain-text body the
+// person edited into safe, readable HTML.
+function textToHtmlParagraphs(text: string): string {
+  const escaped = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  return escaped
+    .split(/\n\s*\n/)
+    .map((para) => `<p style="margin:0 0 16px;">${para.replace(/\n/g, '<br>')}</p>`)
+    .join('');
+}
+
+// Wraps the email body in a simple branded theme (header bar + footer).
+function wrapEmailHtml(bodyText: string): string {
+  const bodyHtml = textToHtmlParagraphs(bodyText);
+  return `
+<div style="font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; max-width: 560px; margin: 0 auto;">
+  <div style="background: linear-gradient(90deg, #7cc142, #d81f4b); padding: 20px 24px; border-radius: 8px 8px 0 0;">
+    <span style="color: #ffffff; font-size: 18px; font-weight: 700;">GOOP RTD Dashboard</span>
+  </div>
+  <div style="border: 1px solid #e5e7eb; border-top: none; padding: 24px; border-radius: 0 0 8px 8px; color: #1f2937; font-size: 14px; line-height: 1.6;">
+    ${bodyHtml}
+  </div>
+  <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 16px;">
+    Sent via GOOP RTD Dashboard
+  </p>
+</div>`.trim();
+}
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      // Strip the "data:<mime>;base64," prefix — Gmail API wants raw base64.
+      resolve(result.split(',')[1] ?? '');
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export function CommunicationActions({ driver }: CommunicationActionsProps) {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editedSubject, setEditedSubject] = useState('');
   const [editedBody, setEditedBody] = useState('');
   const [sending, setSending] = useState(false);
+  const [attachments, setAttachments] = useState<PendingAttachment[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleSelectTemplate = (templateId: string) => {
     const template = EMAIL_TEMPLATES.find(t => t.id === templateId);
@@ -114,28 +170,94 @@ export function CommunicationActions({ driver }: CommunicationActionsProps) {
     setSelectedTemplateId(templateId);
     setEditedSubject(template.getSubject(driver));
     setEditedBody(template.getBody(driver));
+    setAttachments([]);
     setDialogOpen(true);
+  };
+
+  const addAttachments = (files: FileList | File[]) => {
+    const incoming = Array.from(files);
+    setAttachments((prev) => {
+      const room = MAX_ATTACHMENTS - prev.length;
+      if (room <= 0) {
+        toast.error(`You can attach up to ${MAX_ATTACHMENTS} files.`);
+        return prev;
+      }
+      const accepted: PendingAttachment[] = [];
+      for (const file of incoming.slice(0, room)) {
+        if (file.size > MAX_ATTACHMENT_SIZE) {
+          toast.error(`${file.name} is over the 10MB limit.`);
+          continue;
+        }
+        accepted.push({
+          id: `${file.name}-${file.size}-${Date.now()}-${Math.random()}`,
+          file,
+          previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : null,
+        });
+      }
+      return [...prev, ...accepted];
+    });
+  };
+
+  const removeAttachment = (id: string) => {
+    setAttachments((prev) => {
+      const target = prev.find((a) => a.id === id);
+      if (target?.previewUrl) URL.revokeObjectURL(target.previewUrl);
+      return prev.filter((a) => a.id !== id);
+    });
+  };
+
+  // Lets the person paste a screenshot straight from the clipboard into the
+  // email body, the same way Gmail lets you paste an image into a compose window.
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    const imageFiles: File[] = [];
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file) imageFiles.push(file);
+      }
+    }
+    if (imageFiles.length > 0) {
+      e.preventDefault();
+      addAttachments(imageFiles);
+      toast.success(`${imageFiles.length > 1 ? 'Screenshots' : 'Screenshot'} attached.`);
+    }
   };
 
   const handleSend = async () => {
     setSending(true);
     try {
-      // Placeholder: will connect to email automation
-      console.log('Sending email:', {
-        to: driver.email,
-        subject: editedSubject,
-        body: editedBody,
-        templateId: selectedTemplateId,
+      const attachmentPayload = await Promise.all(
+        attachments.map(async (a) => ({
+          filename: a.file.name || 'attachment',
+          mime_type: a.file.type || 'application/octet-stream',
+          content_base64: await fileToBase64(a.file),
+        }))
+      );
+
+      const { data, error } = await supabase.functions.invoke('send-driver-email', {
+        body: {
+          to: driver.email,
+          subject: editedSubject,
+          body_html: wrapEmailHtml(editedBody),
+          attachments: attachmentPayload,
+          tenant_id: driver.tenant_id ?? null,
+        },
       });
 
-      await new Promise(resolve => setTimeout(resolve, 800));
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
 
       toast.success(`Email sent to ${driver.email}`, {
         description: `Template: ${EMAIL_TEMPLATES.find(t => t.id === selectedTemplateId)?.label}`,
       });
+      attachments.forEach((a) => { if (a.previewUrl) URL.revokeObjectURL(a.previewUrl); });
+      setAttachments([]);
       setDialogOpen(false);
-    } catch {
-      toast.error('Failed to send email');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to send email';
+      toast.error('Failed to send email', { description: message });
     } finally {
       setSending(false);
     }
@@ -205,8 +327,18 @@ export function CommunicationActions({ driver }: CommunicationActionsProps) {
       </div>
 
       {/* Email Edit Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={(next) => {
+          if (sending) return;
+          if (!next) {
+            attachments.forEach((a) => { if (a.previewUrl) URL.revokeObjectURL(a.previewUrl); });
+            setAttachments([]);
+          }
+          setDialogOpen(next);
+        }}
+      >
+        <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {selectedTemplate?.icon}
@@ -238,9 +370,68 @@ export function CommunicationActions({ driver }: CommunicationActionsProps) {
                 id="email-body"
                 value={editedBody}
                 onChange={(e) => setEditedBody(e.target.value)}
+                onPaste={handlePaste}
                 rows={10}
                 className="font-mono text-sm"
+                placeholder="Tip: paste a screenshot directly here to attach it"
               />
+            </div>
+
+            {/* Attachments */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label>Attachments</Label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept="image/*,.pdf,.doc,.docx"
+                  className="hidden"
+                  onChange={(e) => {
+                    if (e.target.files) addAttachments(e.target.files);
+                    e.target.value = '';
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={attachments.length >= MAX_ATTACHMENTS}
+                >
+                  <Paperclip className="h-3.5 w-3.5" />
+                  Attach file
+                </Button>
+              </div>
+
+              {attachments.length > 0 && (
+                <div className="grid grid-cols-3 gap-2">
+                  {attachments.map((a) => (
+                    <div key={a.id} className="relative rounded-md border p-2">
+                      <button
+                        type="button"
+                        onClick={() => removeAttachment(a.id)}
+                        className="absolute -right-1.5 -top-1.5 rounded-full bg-destructive p-0.5 text-destructive-foreground"
+                        aria-label="Remove attachment"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                      {a.previewUrl ? (
+                        <img src={a.previewUrl} alt={a.file.name} className="h-16 w-full rounded object-cover" />
+                      ) : (
+                        <div className="flex h-16 w-full items-center justify-center rounded bg-muted">
+                          <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                        </div>
+                      )}
+                      <p className="mt-1 truncate text-xs text-muted-foreground">{a.file.name}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Paste a screenshot directly into the body field, or attach files — up to {MAX_ATTACHMENTS}.
+              </p>
             </div>
           </div>
 
